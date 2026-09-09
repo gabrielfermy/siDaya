@@ -60,14 +60,23 @@ export function formatThermalReceipt(
   // Footer & PayLink QR prompt if applicable
   p.align('center');
   if (order.paylinkUrl) {
-    p.textLine('Bayar Online / Verifikasi Nota:');
+    p.textLine('Scan QR Bayar / Verifikasi:');
+    p.qrCode(order.paylinkUrl, paperWidth === 58 ? 5 : 6);
     p.textLine(order.paylinkUrl);
+    p.feed(1);
   }
   p.textLine(tenant.footerNote ?? 'Terima Kasih Atas Kunjungan Anda');
   p.textLine('Powered by SiDaya (Ashvin Labs)');
 
   p.cut();
   return p.toBytes();
+}
+
+/**
+ * Returns raw ESC/POS byte sequence to kick open cash drawer via RJ-11 port
+ */
+export function formatCashDrawerKick(pin: 2 | 5 = 2): Uint8Array {
+  return new EscPosBuilder().cashDrawerKick(pin).toBytes();
 }
 
 /**

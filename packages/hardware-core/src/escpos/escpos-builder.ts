@@ -85,6 +85,77 @@ export class EscPosBuilder {
   }
 
   /**
+   * Opens standard cash drawer connected via RJ11 (ESC p m t1 t2)
+   * Pin 2 (m=0) or Pin 5 (m=1)
+   */
+  cashDrawerKick(pin: 2 | 5 = 2): this {
+    const m = pin === 2 ? 0x00 : 0x01;
+    this.buffer.push(0x1b, 0x70, m, 0x19, 0xfa);
+    return this;
+  }
+
+  /**
+   * Prints a 2D QR Code using standard ESC/POS GS ( k commands
+   */
+  qrCode(data: string, size: number = 6): this {
+    const encoder = new TextEncoder();
+    const dataBytes = encoder.encode(data);
+    const len = dataBytes.length + 3;
+    const pL = len % 256;
+    const pH = Math.floor(len / 256);
+
+    // 1. Set model (Model 2)
+    this.buffer.push(0x1d, 0x28, 0x6b, 0x04, 0x00, 0x31, 0x41, 0x32, 0x00);
+    // 2. Set module size (1-16 dots)
+    this.buffer.push(0x1d, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x43, Math.min(Math.max(size, 1), 16));
+    // 3. Set error correction (Level M = 49)
+    this.buffer.push(0x1d, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x45, 0x31);
+    // 4. Store data in symbol storage area
+    this.buffer.push(0x1d, 0x28, 0x6b, pL, pH, 0x31, 0x50, 0x30);
+    for (let i = 0; i < dataBytes.length; i++) {
+      this.buffer.push(dataBytes[i]!);
+    }
+    // 5. Print symbol
+    this.buffer.push(0x1d, 0x28, 0x6b, 0x03, 0x00, 0x31, 0x51, 0x30);
+    return this;
+  }
+
+  /**
+   * Prints 1D Barcode (GS k)
+   */
+  barcode(code: string, type: 'EAN13' | 'CODE128' = 'CODE128'): this {
+    const encoder = new TextEncoder();
+    const codeBytes = encoder.encode(code);
+
+    // Set barcode height = 64 dots
+    this.buffer.push(0x1d, 0x68, 64);
+    // Set HRI characters below barcode
+    this.buffer.push(0x1d, 0x48, 2);
+
+    if (type === 'EAN13') {
+      this.buffer.push(0x1d, 0x6b, 67, codeBytes.length);
+    } else {
+      // CODE128
+      this.buffer.push(0x1d, 0x6b, 73, codeBytes.length);
+    }
+
+    for (let i = 0; i < codeBytes.length; i++) {
+      this.buffer.push(codeBytes[i]!);
+    }
+    return this;
+  }
+
+  /**
+   * Appends raw bytes into buffer
+   */
+  raw(bytes: number[] | Uint8Array): this {
+    for (let i = 0; i < bytes.length; i++) {
+      this.buffer.push(bytes[i]!);
+    }
+    return this;
+  }
+
+  /**
    * Cuts paper with full or partial feed
    */
   cut(partial: boolean = false): this {
