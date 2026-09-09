@@ -2,8 +2,9 @@
 
 When starting, initializing, or preparing new projects, modules, or services in this repository, always adhere to these rules:
 
-1. **Architecture Before Code**:
+1. **Architecture & Documentation-First Sync**:
    - Never write code without first reviewing or updating the relevant specifications in `docs/technical/` or `docs/business/`.
+   - **Implementation Deviation Protocol**: Every time the implementation must change or deviate from the originally planned system (e.g., changes to state management packages, schema alterations, subdomain routing, or lifecycle flows), you MUST update and sync the corresponding documentation in `docs/` to reflect the latest design BEFORE writing or modifying the code.
 
 2. **Strict TypeScript & Type-First Development**:
    - All models, DTOs, and domain enums must originate in `@sidaya/shared-types`.

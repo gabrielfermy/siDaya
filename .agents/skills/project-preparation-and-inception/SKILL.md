@@ -62,6 +62,9 @@ Never begin scaffolding code without foundational documentation in place. In the
 4. **Dynamic Entitlements Matrix**:
    - Dynamic feature keys (`FeatureKey`) mapping modules to subscription tiers (`FREE_STARTER`, `RETAIL_STARTER`, `GROSIR_PRO`, `ENTERPRISE`).
 
+5. **Implementation Deviation & Documentation-First Sync Invariant**:
+   - Every time an implementation must change or deviate from the planned system (e.g. changing state management libraries, schema modifications, subdomain additions), update the documentation in `docs/` FIRST before writing or modifying code.
+
 ---
 
 ## Stage 3: Monorepo & Type-First Scaffolding (Phase 0)
