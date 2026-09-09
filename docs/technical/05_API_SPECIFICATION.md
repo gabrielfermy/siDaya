@@ -8,17 +8,29 @@
 * **Base URL**: `https://api.sidaya.id/api/v1`
 * **Protocol**: HTTPS / TLS 1.3
 * **Content Negotiation**: `Content-Type: application/json; charset=utf-8`
-* **Standard Error Representation**:
+* **Standard Error Representation Envelope**:
   ```json
   {
     "success": false,
     "error": {
       "code": "INSUFFICIENT_STOCK",
       "message": "Product 'Beras Rojolele' has only 2 units available.",
+      "status": 400,
+      "trace_id": "req_88f91a2bc0d",
+      "timestamp": "2026-09-09T13:30:00Z",
       "details": { "product_id": "prod_01JA98Z", "requested": 5, "available": 2 }
     }
   }
   ```
+* **Global HTTP Status Code & Error Code Taxonomy**:
+  * `400 Bad Request` (`BAD_REQUEST`, `VALIDATION_FAILED`, `MALFORMED_JSON`)
+  * `401 Unauthorized` (`UNAUTHORIZED`, `SESSION_EXPIRED`, `INVALID_TOKEN`)
+  * `403 Forbidden` (`FORBIDDEN`, `INSUFFICIENT_PERMISSIONS`, `TENANT_RESTRICTED`)
+  * `404 Not Found` (`RESOURCE_NOT_FOUND`, `TENANT_NOT_FOUND`, `ORDER_NOT_FOUND`)
+  * `429 Too Many Requests` (`RATE_LIMIT_EXCEEDED`, `BRUTE_FORCE_LOCKOUT`)
+  * `500 Internal Server Error` (`INTERNAL_SERVER_ERROR`, `DATABASE_UNREACHABLE`)
+  * `503 Service Unavailable` (`MAINTENANCE_MODE`, `SERVICE_DEGRADED`)
+
 
 ---
 
