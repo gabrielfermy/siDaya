@@ -78,7 +78,7 @@ VALUES
         'gabriel@ashvinlabs.com',
         'SUPER_ADMIN',
         'PLATFORM_INITIALIZATION',
-        'c4b8e219-9831-482a-bc91-23a9cf8e12d4',
+        NULL,
         'INIT-0001',
         '{"note": "Initial Control Plane deployment and tenant baseline provisioning"}'::jsonb,
         '127.0.0.1'
