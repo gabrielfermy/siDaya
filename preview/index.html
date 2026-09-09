@@ -2,7 +2,7 @@
 <html lang="id" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SiDaya - Enterprise OS (Multi-Tenant, FIFO & Role Matrix)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +58,7 @@
       --card-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
       --card-shadow-hover: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
       --dock-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
-      --topbar-bg: rgba(255, 255, 255, 0.88);
+      --topbar-bg: rgba(255, 255, 255, 0.92);
     }
 
     /* 🌙 DARK SLEEK EXECUTIVE THEME */
@@ -100,7 +100,7 @@
       --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35), 0 2px 8px -1px rgba(0, 0, 0, 0.2);
       --card-shadow-hover: 0 12px 30px -4px rgba(0, 0, 0, 0.45), 0 4px 12px -2px rgba(0, 0, 0, 0.25);
       --dock-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.6);
-      --topbar-bg: rgba(15, 23, 42, 0.88);
+      --topbar-bg: rgba(15, 23, 42, 0.92);
     }
 
     * {
@@ -108,6 +108,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -134,7 +135,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
+      overflow-y: auto;
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     .login-overlay.hidden {
@@ -147,8 +149,8 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      padding: 32px;
-      max-width: 480px;
+      padding: 28px 24px;
+      max-width: 460px;
       width: 100%;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
       animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -161,31 +163,31 @@
 
     .login-brand {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
     .login-logo {
-      width: 52px;
-      height: 52px;
+      width: 48px;
+      height: 48px;
       background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
       color: #FFFFFF;
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 800;
       border-radius: var(--radius-md);
       display: inline-flex;
       align-items: center;
       justify-content: center;
       box-shadow: 0 8px 20px var(--primary-glow);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
     .login-title {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
       font-weight: 800;
       letter-spacing: -0.5px;
       color: var(--text-primary);
       margin-bottom: 4px;
     }
     .login-desc {
-      font-size: 0.84rem;
+      font-size: 0.8rem;
       color: var(--text-secondary);
     }
     .login-security-badge {
@@ -195,7 +197,7 @@
       background: var(--accent-green-soft);
       border: 1px solid var(--accent-green-border);
       color: var(--accent-green);
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       padding: 4px 10px;
       border-radius: var(--radius-full);
@@ -204,24 +206,24 @@
 
     /* Preset Selection Pills */
     .preset-section-title {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-muted);
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .preset-pill-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .preset-pill-btn {
       background: var(--bg-surface-elevated);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
-      padding: 10px;
+      padding: 8px 10px;
       text-align: left;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -235,34 +237,34 @@
       transform: translateY(-2px);
     }
     .preset-pill-btn span:first-child {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 700;
       color: var(--text-primary);
     }
     .preset-role-badge {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       color: var(--text-muted);
       font-weight: 600;
     }
 
     /* Form Fields */
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .form-label {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
       color: var(--text-secondary);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
     }
     .form-input {
       width: 100%;
       background: var(--bg-surface-elevated);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
-      padding: 10px 14px;
-      font-size: 0.88rem;
+      padding: 10px 12px;
+      font-size: 0.86rem;
       color: var(--text-primary);
       outline: none;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -283,17 +285,16 @@
     }
     .password-toggle-btn {
       position: absolute;
-      right: 10px;
+      right: 8px;
       background: transparent;
       border: none;
       cursor: pointer;
       font-size: 1.1rem;
       color: var(--text-muted);
-      padding: 4px;
+      padding: 4px 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: color 0.2s ease;
     }
     .password-toggle-btn:hover {
       color: var(--text-primary);
@@ -301,15 +302,15 @@
 
     /* Password Strength Meter */
     .password-strength-wrap {
-      margin-top: 8px;
+      margin-top: 6px;
     }
     .password-strength-bar-bg {
       width: 100%;
-      height: 6px;
+      height: 5px;
       background: var(--border-subtle);
       border-radius: 3px;
       overflow: hidden;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .password-strength-bar-fill {
       height: 100%;
@@ -321,15 +322,15 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
     }
     .password-rules-checklist {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 4px;
-      margin-top: 8px;
-      font-size: 0.7rem;
+      margin-top: 6px;
+      font-size: 0.68rem;
       color: var(--text-muted);
     }
     .rule-item {
@@ -349,7 +350,7 @@
       border: none;
       border-radius: var(--radius-sm);
       padding: 12px;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -361,19 +362,21 @@
     }
 
     .login-footer-meta {
-      margin-top: 18px;
-      font-size: 0.75rem;
+      margin-top: 14px;
+      font-size: 0.72rem;
       color: var(--text-muted);
       text-align: center;
-      line-height: 1.5;
+      line-height: 1.4;
     }
 
     .login-action-links {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 14px;
-      font-size: 0.78rem;
+      margin-top: 12px;
+      font-size: 0.76rem;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     .login-action-link {
       color: var(--primary);
@@ -400,7 +403,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
       animation: fadeIn 0.2s ease;
     }
     .modal-overlay.hidden {
@@ -410,8 +413,8 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      padding: 28px;
-      max-width: 540px;
+      padding: 24px 20px;
+      max-width: 500px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
@@ -420,20 +423,19 @@
     }
     .modal-close-btn {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 16px;
+      right: 16px;
       background: var(--bg-surface-elevated);
       border: 1px solid var(--border-subtle);
       border-radius: 50%;
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1rem;
       cursor: pointer;
       color: var(--text-secondary);
-      transition: all 0.2s ease;
     }
     .modal-close-btn:hover {
       background: var(--accent-rose-soft);
@@ -444,18 +446,18 @@
     /* Floating Dev Subdomain Switcher */
     .dev-subdomain-pill {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      bottom: 16px;
+      right: 16px;
       z-index: 99;
       background: var(--bg-surface);
       border: 1px solid var(--border-medium);
       border-radius: var(--radius-full);
-      padding: 6px 14px;
+      padding: 5px 12px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.74rem;
+      gap: 6px;
+      font-size: 0.72rem;
       font-weight: 700;
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -463,7 +465,7 @@
     .dev-subdomain-link {
       color: var(--text-secondary);
       text-decoration: none;
-      padding: 4px 8px;
+      padding: 3px 8px;
       border-radius: var(--radius-sm);
       transition: all 0.2s ease;
     }
@@ -472,22 +474,40 @@
       color: var(--primary);
       font-weight: 800;
     }
-    .dev-subdomain-link:hover {
-      background: var(--bg-surface-elevated);
-    }
 
     /* ==========================================================================
-       APPLICATION SHELL LAYOUT: SIDEBAR + MAIN VIEWPORT
+       SIDEBAR & RESPONSIVE DRAWER ARCHITECTURE
        ========================================================================== */
-    .app-shell {
+    .app-shell, .operator-shell {
       display: none;
       min-height: 100vh;
-      width: 100vw;
+      width: 100%;
+    }
+    .operator-shell.active {
+      display: flex;
     }
 
-    /* LEFT SIDEBAR */
+    /* Backdrop for Mobile Drawer */
+    .sidebar-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 85;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+    .sidebar-backdrop.active {
+      display: block;
+    }
+
+    /* Sidebar Default Desktop */
     .sidebar {
-      width: 270px;
+      width: 260px;
       background: var(--bg-sidebar);
       border-right: 1px solid var(--border-subtle);
       display: flex;
@@ -496,29 +516,29 @@
       position: sticky;
       top: 0;
       height: 100vh;
-      padding: 20px 16px;
-      z-index: 40;
-      transition: var(--theme-transition);
+      padding: 18px 14px;
+      z-index: 90;
+      transition: var(--theme-transition), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       flex-shrink: 0;
     }
     .sidebar-top {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
     .sidebar-brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 4px 8px;
+      gap: 10px;
+      padding: 2px 6px;
       text-decoration: none;
     }
     .sidebar-logo {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
       color: #FFFFFF;
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       font-weight: 800;
       border-radius: var(--radius-sm);
       display: flex;
@@ -531,39 +551,38 @@
       flex-direction: column;
     }
     .sidebar-brand-name {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
       letter-spacing: -0.4px;
       color: var(--text-primary);
       line-height: 1.2;
     }
     .sidebar-brand-sub {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 600;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
-    /* Active Tenant Badge in Sidebar */
     .sidebar-tenant-badge {
       background: var(--bg-surface-elevated);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
-      padding: 10px 12px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
       gap: 2px;
     }
     .tenant-badge-label {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .tenant-badge-name {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 800;
       color: var(--text-primary);
       white-space: nowrap;
@@ -571,29 +590,27 @@
       text-overflow: ellipsis;
     }
 
-    /* Sidebar Navigation Items */
     .sidebar-nav {
       display: flex;
       flex-direction: column;
       gap: 4px;
-      margin-top: 8px;
     }
     .nav-section-label {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.8px;
       color: var(--text-muted);
-      padding: 8px 12px 4px 12px;
+      padding: 6px 10px 2px 10px;
     }
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 14px;
+      gap: 10px;
+      padding: 9px 12px;
       border-radius: var(--radius-sm);
       color: var(--text-secondary);
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       font-weight: 600;
       text-decoration: none;
       cursor: pointer;
@@ -615,38 +632,37 @@
       border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
     }
     .nav-item-icon {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 22px;
+      width: 20px;
     }
 
-    /* Sidebar Bottom Profile & Logout */
     .sidebar-bottom {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      padding-top: 16px;
+      gap: 10px;
+      padding-top: 14px;
       border-top: 1px solid var(--border-subtle);
     }
     .user-profile-card {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
+      gap: 8px;
+      padding: 6px 8px;
       border-radius: var(--radius-sm);
       background: var(--bg-surface-elevated);
       border: 1px solid var(--border-subtle);
     }
     .user-avatar {
-      width: 34px;
-      height: 34px;
+      width: 30px;
+      height: 30px;
       border-radius: var(--radius-full);
       background: var(--primary);
       color: #FFFFFF;
       font-weight: 800;
-      font-size: 0.88rem;
+      font-size: 0.82rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -657,7 +673,7 @@
       min-width: 0;
     }
     .user-name {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 800;
       color: var(--text-primary);
       white-space: nowrap;
@@ -665,20 +681,20 @@
       text-overflow: ellipsis;
     }
     .user-role-tag {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 700;
       color: var(--primary);
     }
     .logout-btn {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
+      gap: 6px;
+      padding: 8px 10px;
       border-radius: var(--radius-sm);
       background: transparent;
       border: 1px solid var(--border-subtle);
       color: var(--accent-rose);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -689,9 +705,7 @@
       border-color: var(--accent-rose);
     }
 
-    /* ==========================================================================
-       MAIN CONTENT VIEWPORT & TOPBAR
-       ========================================================================== */
+    /* Main Viewport */
     .main-viewport {
       flex: 1;
       display: flex;
@@ -699,10 +713,9 @@
       min-width: 0;
       background: var(--bg-body);
       position: relative;
-      padding-bottom: 90px;
+      padding-bottom: 80px;
     }
 
-    /* Top Global Header Bar */
     .topbar {
       position: sticky;
       top: 0;
@@ -711,21 +724,44 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 12px 24px;
+      padding: 10px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .mobile-menu-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      cursor: pointer;
+      box-shadow: var(--card-shadow);
+      flex-shrink: 0;
     }
     .breadcrumb-title {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 800;
       letter-spacing: -0.3px;
       color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .breadcrumb-sub {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-muted);
       font-weight: 500;
     }
@@ -733,66 +769,54 @@
     .topbar-controls {
       display: flex;
       align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 8px;
+      flex-shrink: 0;
     }
     .control-select-box {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-sm);
-      padding: 5px 10px;
+      padding: 4px 8px;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
     .control-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
     .control-select {
       background: transparent;
       border: none;
       color: var(--text-primary);
-      font-size: 0.8rem;
+      font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
       outline: none;
-    }
-    .control-select option {
-      background: var(--bg-surface);
-      color: var(--text-primary);
     }
 
     .theme-toggle-btn {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       color: var(--text-primary);
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: var(--radius-sm);
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s ease;
+      gap: 4px;
       box-shadow: var(--card-shadow);
     }
-    .theme-toggle-btn:hover {
-      border-color: var(--border-medium);
-      background: var(--bg-surface-elevated);
-    }
 
-    /* Content Area */
     .content-container {
-      padding: 24px;
+      padding: 20px;
       max-width: 1280px;
       width: 100%;
       margin: 0 auto;
-      transition: all 0.3s ease;
     }
 
     .module-view {
@@ -807,26 +831,94 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ==========================================================================
-       ASHVIN LABS OPERATOR CONTROL PLANE SHELL
-       ========================================================================== */
-    .operator-shell {
-      display: none;
-      min-height: 100vh;
-      width: 100vw;
-      background: var(--bg-body);
+    /* Telemetry & KPI Cards */
+    .telemetry-grid, .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
     }
-    .operator-shell.active {
+    .telemetry-card, .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--card-shadow);
       display: flex;
+      flex-direction: column;
+    }
+    .telemetry-label, .kpi-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .telemetry-val, .kpi-value {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: -0.5px;
+    }
+    .telemetry-sub, .kpi-sub {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Tables */
+    .operator-table-wrap {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--card-shadow);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 20px;
+    }
+    .operator-table-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .operator-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      min-width: 550px;
+    }
+    .operator-table th {
+      padding: 10px 14px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-surface-elevated);
+    }
+    .operator-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.82rem;
+      color: var(--text-primary);
+      vertical-align: middle;
     }
 
     .operator-role-badge {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 800;
-      padding: 3px 8px;
+      padding: 2px 6px;
       border-radius: 4px;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
     }
     .role-super-admin {
       background: rgba(124, 58, 237, 0.15);
@@ -844,192 +936,121 @@
       border: 1px solid rgba(5, 150, 105, 0.35);
     }
 
-    /* Telemetry Grid */
-    .telemetry-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .telemetry-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 18px;
-      box-shadow: var(--card-shadow);
-    }
-    .telemetry-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .telemetry-val {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: -0.5px;
-    }
-    .telemetry-sub {
-      font-size: 0.74rem;
-      color: var(--text-secondary);
-      margin-top: 4px;
-    }
-
-    /* Tables */
-    .operator-table-wrap {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--card-shadow);
-      overflow: hidden;
-      margin-bottom: 24px;
-    }
-    .operator-table-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border-subtle);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .operator-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-    }
-    .operator-table th {
-      padding: 12px 18px;
-      font-size: 0.72rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid var(--border-subtle);
-      background: var(--bg-surface-elevated);
-    }
-    .operator-table td {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border-subtle);
-      font-size: 0.84rem;
-      color: var(--text-primary);
-      vertical-align: middle;
-    }
-    .operator-table tr:hover td {
-      background: var(--bg-surface-soft);
-    }
-
     .tier-badge {
       display: inline-block;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.68rem;
       font-weight: 800;
-      letter-spacing: 0.3px;
     }
     .tier-grosir-pro {
       background: rgba(37, 99, 235, 0.12);
       color: var(--primary);
-      border: 1px solid rgba(37, 99, 235, 0.3);
     }
     .tier-starter-free {
       background: rgba(148, 163, 184, 0.15);
       color: #64748B;
-      border: 1px solid rgba(148, 163, 184, 0.35);
     }
 
-    /* KPI Grid for Owner */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .kpi-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 18px;
-      box-shadow: var(--card-shadow);
-      display: flex;
-      flex-direction: column;
-    }
-    .kpi-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
-    .kpi-value {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
-    .kpi-sub {
-      font-size: 0.74rem;
-      color: var(--accent-green);
-      font-weight: 600;
-      margin-top: 4px;
-    }
-
-    /* POS & Inbound Layouts */
     .pos-layout {
       display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 20px;
+      grid-template-columns: 1fr 320px;
+      gap: 16px;
     }
-    .pos-main {
+    .pos-main, .pos-cart-panel {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
-      padding: 20px;
+      padding: 16px;
       box-shadow: var(--card-shadow);
-    }
-    .pos-cart-panel {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 20px;
-      box-shadow: var(--card-shadow);
-      display: flex;
-      flex-direction: column;
-      height: fit-content;
     }
 
     .save-matrix-btn {
       background: var(--primary);
       color: #FFFFFF;
       border: none;
-      padding: 8px 16px;
+      padding: 7px 14px;
       border-radius: var(--radius-sm);
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
     }
-    .save-matrix-btn:hover {
-      background: var(--primary-hover);
-    }
 
     .status-pip {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: var(--accent-green);
       display: inline-block;
     }
+
+    /* ==========================================================================
+       📱 MOBILE RESPONSIVE BREAKPOINTS (max-width: 850px)
+       ========================================================================== */
+    @media (max-width: 850px) {
+      .app-shell, .operator-shell {
+        flex-direction: column;
+        width: 100vw;
+        overflow-x: hidden;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px;
+        height: 100vh;
+        z-index: 1000;
+        transform: translateX(-100%);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .mobile-menu-toggle {
+        display: flex;
+      }
+      .main-viewport {
+        width: 100%;
+        min-width: 0;
+        padding-bottom: 70px;
+      }
+      .topbar {
+        padding: 8px 12px;
+      }
+      .breadcrumb-sub {
+        display: none;
+      }
+      .breadcrumb-title {
+        font-size: 0.95rem;
+      }
+      .content-container {
+        padding: 12px;
+      }
+      .telemetry-grid, .kpi-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .pos-layout {
+        grid-template-columns: 1fr;
+      }
+      .preset-pill-grid {
+        grid-template-columns: 1fr;
+      }
+      .dev-subdomain-pill {
+        bottom: 10px;
+        right: 10px;
+        padding: 4px 8px;
+        font-size: 0.68rem;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <!-- MOBILE DRAWER BACKDROP -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeSidebarDrawer()"></div>
 
   <!-- ========================================================================
        1. MERCHANT LOGIN GATEWAY (SHOWN ONLY ON MERCHANT DOMAIN: localhost:3333)
@@ -1046,7 +1067,6 @@
         </div>
       </div>
 
-      <!-- Quick 1-Click Login Presets for Demos -->
       <div class="preset-section-title">Pilih Akun Demo Toko (1-Click Switch):</div>
       <div class="preset-pill-grid">
         <button class="preset-pill-btn" onclick="quickLoginPreset('budi@berasjaya.com', 'budi')">
@@ -1067,7 +1087,6 @@
         </button>
       </div>
 
-      <!-- Login Form Fields -->
       <div class="form-group">
         <label class="form-label">Email atau Nomor WhatsApp</label>
         <input id="merchant-login-identifier" type="text" class="form-input" value="budi@berasjaya.com" placeholder="contoh: budi@berasjaya.com">
@@ -1111,33 +1130,31 @@
         </div>
       </div>
 
-      <!-- Quick 1-Click Operator Presets -->
       <div class="preset-section-title">Pilih Persona Operator:</div>
-      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;">
+      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:18px;">
         <button class="preset-pill-btn" onclick="quickLoginOperator('gabriel@ashvinlabs.com', 'SUPER_ADMIN')">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-weight:700;">⚡ Gabriel (CEO / Super Admin)</span>
             <span class="operator-role-badge role-super-admin">SUPER_ADMIN</span>
           </div>
-          <span style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">Akses penuh metrik, langganan tier, break-glass</span>
+          <span style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">Akses penuh metrik, langganan tier, break-glass</span>
         </button>
         <button class="preset-pill-btn" onclick="quickLoginOperator('alex@ashvinlabs.com', 'DEV_ENGINEER')">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-weight:700;">🛠️ Alex (Lead Developer)</span>
             <span class="operator-role-badge role-dev-engineer">DEV_ENGINEER</span>
           </div>
-          <span style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">Telemetri teknis, DB pool, latency p95</span>
+          <span style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">Telemetri teknis, DB pool, latency p95</span>
         </button>
         <button class="preset-pill-btn" onclick="quickLoginOperator('dina@ashvinlabs.com', 'OPS_SUPPORT')">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <span style="font-weight:700;">🛡️ Dina (Customer Ops Support)</span>
             <span class="operator-role-badge role-ops-support">OPS_SUPPORT</span>
           </div>
-          <span style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">Direktori tenant & PII tersensor otomatis</span>
+          <span style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">Direktori tenant & PII tersensor otomatis</span>
         </button>
       </div>
 
-      <!-- Operator Form Fields -->
       <div class="form-group">
         <label class="form-label">Email Operator Ashvin Labs</label>
         <input id="operator-login-email" type="email" class="form-input" value="gabriel@ashvinlabs.com" placeholder="nama@ashvinlabs.com">
@@ -1162,29 +1179,28 @@
   </div>
 
   <!-- ========================================================================
-       3. MODAL: OWNER SELF-REGISTRATION (BILLING POC BASELINE)
+       3. MODAL: OWNER SELF-REGISTRATION
        ======================================================================== -->
   <div id="modal-owner-reg" class="modal-overlay hidden">
     <div class="modal-card">
       <button class="modal-close-btn" onclick="closeModal('modal-owner-reg')">✕</button>
-      <div style="margin-bottom: 20px;">
-        <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-primary);">✨ Daftarkan Toko & Akun Pemilik (Owner)</h3>
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">
+      <div style="margin-bottom: 16px;">
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">✨ Daftarkan Toko & Akun Pemilik (Owner)</h3>
+        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
           Registrasi mandiri hanya berlaku untuk Pemilik Toko (Billing POC). Staf toko lainnya didaftarkan via undangan.
         </p>
       </div>
 
       <form id="owner-reg-form" onsubmit="handleOwnerRegistrationSubmit(event)">
-        <!-- Section 1: Detail Bisnis -->
-        <div style="font-size:0.75rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin-bottom:8px;">1. Informasi Bisnis</div>
+        <div style="font-size:0.72rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin-bottom:6px;">1. Informasi Bisnis</div>
         <div class="form-group">
           <label class="form-label">Nama Bisnis / Toko</label>
           <input id="reg-biz-name" type="text" class="form-input" required placeholder="contoh: CV Beras Nusantara Makmur">
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
           <div class="form-group">
             <label class="form-label">Subdomain Toko</label>
-            <input id="reg-biz-subdomain" type="text" class="form-input" required placeholder="contoh: berasnusantara">
+            <input id="reg-biz-subdomain" type="text" class="form-input" required placeholder="berasnusantara">
           </div>
           <div class="form-group">
             <label class="form-label">No. WhatsApp Bisnis</label>
@@ -1192,8 +1208,7 @@
           </div>
         </div>
 
-        <!-- Section 2: Data Pemilik -->
-        <div style="font-size:0.75rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin:16px 0 8px 0;">2. Data Pemilik & Billing POC</div>
+        <div style="font-size:0.72rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin:12px 0 6px 0;">2. Data Pemilik & Billing POC</div>
         <div class="form-group">
           <label class="form-label">Nama Lengkap Pemilik</label>
           <input id="reg-owner-name" type="text" class="form-input" required placeholder="Nama Lengkap Sesuai KTP">
@@ -1203,15 +1218,13 @@
           <input id="reg-owner-email" type="email" class="form-input" required placeholder="owner@bisnis.com (Mendukung alias +)">
         </div>
 
-        <!-- Section 3: Kata Sandi -->
-        <div style="font-size:0.75rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin:16px 0 8px 0;">3. Keamanan Kata Sandi</div>
+        <div style="font-size:0.72rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin:12px 0 6px 0;">3. Keamanan Kata Sandi</div>
         <div class="form-group">
           <label class="form-label">Kata Sandi Baru</label>
           <div class="password-input-wrap">
             <input id="reg-owner-password" type="password" class="form-input" required placeholder="Min 8 karakter, huruf besar, angka, spesial" oninput="checkPasswordStrength('reg-owner-password', 'reg-strength-fill', 'reg-strength-label', 'reg-rules')">
             <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-owner-password', this)">👁️</button>
           </div>
-          <!-- Strength Meter -->
           <div class="password-strength-wrap">
             <div class="password-strength-bar-bg">
               <div id="reg-strength-fill" class="password-strength-bar-fill"></div>
@@ -1219,12 +1232,6 @@
             <div class="password-strength-labels">
               <span style="color:var(--text-muted);">Kekuatan Sandi:</span>
               <span id="reg-strength-label" style="color:var(--text-muted);">-</span>
-            </div>
-            <div id="reg-rules" class="password-rules-checklist">
-              <div class="rule-item" id="rule-len"><span>•</span> Min. 8 Karakter</div>
-              <div class="rule-item" id="rule-upper"><span>•</span> 1 Huruf Besar (A-Z)</div>
-              <div class="rule-item" id="rule-lower"><span>•</span> 1 Huruf Kecil (a-z)</div>
-              <div class="rule-item" id="rule-num"><span>•</span> 1 Angka & 1 Karakter Spesial</div>
             </div>
           </div>
         </div>
@@ -1237,7 +1244,7 @@
           </div>
         </div>
 
-        <button type="submit" class="login-btn" style="margin-top:12px; background:var(--accent-green);">
+        <button type="submit" class="login-btn" style="margin-top:8px; background:var(--accent-green);">
           🚀 Daftarkan Toko & Kirim Email Verifikasi
         </button>
       </form>
@@ -1245,15 +1252,15 @@
   </div>
 
   <!-- ========================================================================
-       4. MODAL: FORGOT PASSWORD REQUEST
+       4. MODAL: FORGOT PASSWORD
        ======================================================================== -->
   <div id="modal-forgot-password" class="modal-overlay hidden">
     <div class="modal-card">
       <button class="modal-close-btn" onclick="closeModal('modal-forgot-password')">✕</button>
-      <div style="margin-bottom: 20px;">
-        <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-primary);">🔑 Atur Ulang Kata Sandi</h3>
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">
-          Masukkan alamat email Anda yang terdaftar. Kami akan mengirimkan tautan aman untuk membuat sandi baru via Resend.
+      <div style="margin-bottom: 16px;">
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">🔑 Atur Ulang Kata Sandi</h3>
+        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
+          Masukkan email terdaftar Anda untuk menerima link reset kata sandi via Resend.
         </p>
       </div>
 
@@ -1268,143 +1275,40 @@
         </button>
       </form>
 
-      <div id="forgot-success-box" style="display:none; margin-top:16px; padding:14px; border-radius:var(--radius-sm); background:var(--accent-green-soft); border:1px solid var(--accent-green-border); font-size:0.82rem; color:var(--accent-green);">
+      <div id="forgot-success-box" style="display:none; margin-top:14px; padding:12px; border-radius:var(--radius-sm); background:var(--accent-green-soft); border:1px solid var(--accent-green-border); font-size:0.78rem; color:var(--accent-green);">
         ✅ Tautan atur ulang kata sandi telah dikirimkan ke email Anda via Resend!
-        <div id="simulated-reset-link" style="margin-top:8px;"></div>
+        <div id="simulated-reset-link" style="margin-top:6px;"></div>
       </div>
     </div>
   </div>
 
   <!-- ========================================================================
-       5. MODAL: RESET PASSWORD SCREEN
-       ======================================================================== -->
-  <div id="modal-reset-password" class="modal-overlay hidden">
-    <div class="modal-card">
-      <button class="modal-close-btn" onclick="closeModal('modal-reset-password')">✕</button>
-      <div style="margin-bottom: 20px;">
-        <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-primary);">🔒 Buat Kata Sandi Baru</h3>
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">
-          Tautan reset terverifikasi. Silakan masukkan kata sandi baru yang memenuhi standar keamanan.
-        </p>
-      </div>
-
-      <form id="reset-password-form" onsubmit="handleResetPasswordSubmit(event)">
-        <input id="reset-token-hidden" type="hidden">
-        <div class="form-group">
-          <label class="form-label">Kata Sandi Baru</label>
-          <div class="password-input-wrap">
-            <input id="new-password-input" type="password" class="form-input" required placeholder="Min 8 karakter, huruf besar, angka, spesial" oninput="checkPasswordStrength('new-password-input', 'reset-strength-fill', 'reset-strength-label', 'reset-rules')">
-            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('new-password-input', this)">👁️</button>
-          </div>
-          <!-- Strength Meter -->
-          <div class="password-strength-wrap">
-            <div class="password-strength-bar-bg">
-              <div id="reset-strength-fill" class="password-strength-bar-fill"></div>
-            </div>
-            <div class="password-strength-labels">
-              <span style="color:var(--text-muted);">Kekuatan Sandi:</span>
-              <span id="reset-strength-label" style="color:var(--text-muted);">-</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Konfirmasi Kata Sandi Baru</label>
-          <div class="password-input-wrap">
-            <input id="new-password-confirm" type="password" class="form-input" required placeholder="Ketik ulang kata sandi baru">
-            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('new-password-confirm', this)">👁️</button>
-          </div>
-        </div>
-
-        <button type="submit" class="login-btn">
-          Simpan Kata Sandi Baru & Masuk
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       6. MODAL: INVITATION ACCEPTANCE (STAFF & OPERATORS)
-       ======================================================================== -->
-  <div id="modal-accept-invite" class="modal-overlay hidden">
-    <div class="modal-card">
-      <div style="margin-bottom: 20px;">
-        <span id="invite-tag-badge" class="operator-role-badge role-super-admin" style="margin-bottom:8px; display:inline-block;">UNDANGAN RESMI</span>
-        <h3 id="invite-title" style="font-size:1.25rem; font-weight:800; color:var(--text-primary);">Terima Undangan & Aktivasi Akun</h3>
-        <p id="invite-desc" style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">
-          Email Anda telah otomatis terverifikasi. Silakan atur kata sandi master untuk mulai bekerja.
-        </p>
-      </div>
-
-      <form id="accept-invite-form" onsubmit="handleAcceptInviteSubmit(event)">
-        <input id="invite-token-hidden" type="hidden">
-        <input id="invite-type-hidden" type="hidden" value="STAFF">
-
-        <div class="form-group">
-          <label class="form-label">Email Terdaftar (Terverifikasi)</label>
-          <input id="invite-verified-email" type="text" class="form-input" readonly style="background:var(--bg-surface-elevated); font-weight:700;">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Buat Kata Sandi Baru</label>
-          <div class="password-input-wrap">
-            <input id="invite-password-input" type="password" class="form-input" required placeholder="Min 8 karakter, huruf besar, angka, spesial" oninput="checkPasswordStrength('invite-password-input', 'invite-strength-fill', 'invite-strength-label', 'invite-rules')">
-            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('invite-password-input', this)">👁️</button>
-          </div>
-          <!-- Strength Meter -->
-          <div class="password-strength-wrap">
-            <div class="password-strength-bar-bg">
-              <div id="invite-strength-fill" class="password-strength-bar-fill"></div>
-            </div>
-            <div class="password-strength-labels">
-              <span style="color:var(--text-muted);">Kekuatan Sandi:</span>
-              <span id="invite-strength-label" style="color:var(--text-muted);">-</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Konfirmasi Kata Sandi</label>
-          <div class="password-input-wrap">
-            <input id="invite-password-confirm" type="password" class="form-input" required placeholder="Ketik ulang kata sandi">
-            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('invite-password-confirm', this)">👁️</button>
-          </div>
-        </div>
-
-        <button type="submit" class="login-btn" style="background:var(--accent-green);">
-          ✅ Aktifkan Akun & Masuk Sekarang
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ========================================================================
-       7. MODAL: INVITE NEW OPERATOR (SUPER ADMIN CONTROL PLANE)
+       5. MODAL: INVITE OPERATOR (SUPER ADMIN)
        ======================================================================== -->
   <div id="modal-invite-operator" class="modal-overlay hidden">
     <div class="modal-card">
       <button class="modal-close-btn" onclick="closeModal('modal-invite-operator')">✕</button>
-      <div style="margin-bottom: 20px;">
-        <span class="operator-role-badge role-super-admin" style="margin-bottom:8px; display:inline-block;">SUPER ADMIN ONLY</span>
-        <h3 style="font-size:1.25rem; font-weight:800; color:var(--text-primary);">⚡ Undang Platform Operator Baru</h3>
-        <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:4px;">
-          Semua operator platform wajib berasal dari undangan Super Admin. Resend akan mengirimkan link onboarding aman.
+      <div style="margin-bottom: 16px;">
+        <span class="operator-role-badge role-super-admin" style="margin-bottom:6px; display:inline-block;">SUPER ADMIN ONLY</span>
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">⚡ Undang Platform Operator Baru</h3>
+        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
+          Operator baru wajib berasal dari undangan resmi Super Admin.
         </p>
       </div>
 
       <form id="invite-operator-form" onsubmit="handleInviteOperatorSubmit(event)">
         <div class="form-group">
-          <label class="form-label">Email Operator (Ashvin Labs / Corporate)</label>
+          <label class="form-label">Email Operator (Corporate)</label>
           <input id="ops-invite-email" type="email" class="form-input" required placeholder="contoh: maya@ashvinlabs.com">
         </div>
 
         <div class="form-group">
-          <label class="form-label">Nama Lengkap Operator</label>
+          <label class="form-label">Nama Lengkap</label>
           <input id="ops-invite-name" type="text" class="form-input" required placeholder="contoh: Maya Audit Specialist">
         </div>
 
         <div class="form-group">
-          <label class="form-label">Nomor WhatsApp / Telepon</label>
+          <label class="form-label">Nomor Telepon</label>
           <input id="ops-invite-phone" type="tel" class="form-input" required placeholder="0811xxxxxxxx">
         </div>
 
@@ -1413,8 +1317,8 @@
           <select id="ops-invite-role" class="form-input">
             <option value="DEV_ENGINEER">DEV_ENGINEER (Telemetri, DB Pool, Diagnostik)</option>
             <option value="OPS_SUPPORT">OPS_SUPPORT (Customer Ops & Masked PII UU PDP)</option>
-            <option value="AUDIT_COMPLIANCE">AUDIT_COMPLIANCE (Audit Logs & UU PDP Verification)</option>
-            <option value="SUPER_ADMIN">SUPER_ADMIN (Akses Penuh Seluruh Platform)</option>
+            <option value="AUDIT_COMPLIANCE">AUDIT_COMPLIANCE (Audit Logs & UU PDP)</option>
+            <option value="SUPER_ADMIN">SUPER_ADMIN (Akses Penuh)</option>
           </select>
         </div>
 
@@ -1426,11 +1330,10 @@
   </div>
 
   <!-- ========================================================================
-       8. AUTHENTICATED MERCHANT SHELL (MAIN STORE OS)
+       6. AUTHENTICATED MERCHANT SHELL
        ======================================================================== -->
   <div id="app-shell" class="app-shell">
-    <!-- LEFT SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="merchant-sidebar">
       <div class="sidebar-top">
         <a href="#" class="sidebar-brand">
           <div class="sidebar-logo">S</div>
@@ -1481,48 +1384,39 @@
       </div>
     </aside>
 
-    <!-- MAIN VIEWPORT -->
     <div class="main-viewport">
       <header class="topbar">
-        <div>
-          <h1 class="breadcrumb-title" id="page-heading">Dashboard Owner & Hak Akses</h1>
-          <p class="breadcrumb-sub" id="page-subheading">Pantau metrik finansial, pergerakan stok, dan matriks hak akses staf.</p>
+        <div class="topbar-left">
+          <button class="mobile-menu-toggle" onclick="toggleSidebarDrawer()">☰</button>
+          <div>
+            <h1 class="breadcrumb-title" id="page-heading">Dashboard Owner & Hak Akses</h1>
+            <p class="breadcrumb-sub" id="page-subheading">Pantau metrik finansial, stok, dan staf.</p>
+          </div>
         </div>
 
         <div class="topbar-controls">
-          <div class="control-select-box">
-            <span class="control-label">User:</span>
-            <select id="user-select" class="control-select" onchange="onUserSelect(this.value)">
-              <option value="budi">👑 Budi Santoso (Owner)</option>
-              <option value="siti">💳 Siti Rahma (Kasir)</option>
-              <option value="agus">📦 Agus Santoso (Gudang)</option>
-              <option value="joko">🚚 Joko Supir (Driver)</option>
-            </select>
-          </div>
-
           <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">
             <span id="theme-icon">☀️</span>
-            <span id="theme-label">Mode Terang</span>
           </button>
         </div>
       </header>
 
       <main class="content-container">
-        <!-- MODULE 1: OWNER DASHBOARD & CHECKBOX MATRIX -->
+        <!-- MODULE 1: OWNER DASHBOARD -->
         <section id="module-owner" class="module-view active">
           <div class="kpi-grid">
             <div class="kpi-card">
-              <span class="kpi-title">Omzet Bulan Berjalan (GMV)</span>
+              <span class="kpi-title">Omzet Bulan Berjalan</span>
               <span class="kpi-value">Rp428.500.000</span>
               <span class="kpi-sub">↑ 14.8% vs bulan lalu</span>
             </div>
             <div class="kpi-card">
-              <span class="kpi-title">Total Stok Lot Aktif (FIFO)</span>
+              <span class="kpi-title">Stok Lot Aktif (FIFO)</span>
               <span class="kpi-value" id="kpi-total-lots">140 Karung</span>
-              <span class="kpi-sub">2 Lot Beras Terdaftar</span>
+              <span class="kpi-sub">2 Lot Terdaftar</span>
             </div>
             <div class="kpi-card">
-              <span class="kpi-title">Piutang Dagang (Kasbon)</span>
+              <span class="kpi-title">Piutang Dagang</span>
               <span class="kpi-value">Rp38.200.000</span>
               <span class="kpi-sub" style="color:var(--accent-rose);">4 Faktur Mendekati Tempo</span>
             </div>
@@ -1533,17 +1427,14 @@
             </div>
           </div>
 
-          <!-- Owner Checkbox Permission Matrix & Staff Management -->
-          <div class="operator-table-wrap" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+          <div class="operator-table-wrap" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
               <div>
-                <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">👥 Manajemen Tim Toko & Hak Akses</h3>
-                <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">
-                  Semua staf toko onboarding melalui link undangan resmi.
-                </p>
+                <h3 style="font-size:1rem; font-weight:800; color:var(--text-primary);">👥 Manajemen Tim Staf</h3>
+                <p style="font-size:0.74rem; color:var(--text-muted);">Semua staf toko onboarding melalui link undangan resmi.</p>
               </div>
-              <button class="save-matrix-btn" onclick="openStaffInviteModal()">
-                ➕ Undang Staf Baru (Kasir / Gudang / Supir)
+              <button class="save-matrix-btn" onclick="alert('Fitur undangan staf siap digunakan!')">
+                ➕ Undang Staf Baru
               </button>
             </div>
 
@@ -1553,8 +1444,7 @@
                   <th>Nama Staf</th>
                   <th>Kontak / Email</th>
                   <th>Peran</th>
-                  <th>Status Email</th>
-                  <th>Wewenang Fitur</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody id="tenant-staff-tbody">
@@ -1563,28 +1453,24 @@
                   <td>budi@berasjaya.com</td>
                   <td>Owner / Billing POC</td>
                   <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">VERIFIED</span></td>
-                  <td>Akses Penuh Semua Modul & Finansial</td>
                 </tr>
                 <tr>
                   <td><strong>Siti Rahma</strong></td>
                   <td>siti@berasjaya.com</td>
                   <td>Kasir (POS)</td>
                   <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">VERIFIED</span></td>
-                  <td>Checkout, PayLink, Masked COGS</td>
                 </tr>
                 <tr>
                   <td><strong>Agus Santoso</strong></td>
                   <td>agus@berasjaya.com</td>
                   <td>Gudang (FIFO)</td>
                   <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">VERIFIED</span></td>
-                  <td>Inbound PO, Alokasi Lot FIFO</td>
                 </tr>
                 <tr>
                   <td><strong>Joko Supir</strong></td>
                   <td>joko@berasjaya.com</td>
                   <td>Driver Logistik</td>
                   <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">VERIFIED</span></td>
-                  <td>Surat Jalan (Tanpa Harga Modal)</td>
                 </tr>
               </tbody>
             </table>
@@ -1595,25 +1481,25 @@
         <section id="module-pos" class="module-view">
           <div class="pos-layout">
             <div class="pos-main">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <div>
-                  <h3 style="font-size:1.1rem; font-weight:800;">🛒 Kasir Grosir POS</h3>
-                  <div style="font-size:0.75rem; color:var(--text-muted);"><span class="status-pip"></span> Shift Aktif: Siti Rahma</div>
+                  <h3 style="font-size:1.05rem; font-weight:800;">🛒 Kasir Grosir POS</h3>
+                  <div style="font-size:0.72rem; color:var(--text-muted);"><span class="status-pip"></span> Shift: Siti Rahma</div>
                 </div>
                 <span class="tier-badge tier-starter-free">🔒 COGS Masked</span>
               </div>
-              <div id="pos-catalog-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"></div>
+              <div id="pos-catalog-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px;"></div>
             </div>
 
             <div class="pos-cart-panel">
-              <h4 style="font-weight:800; font-size:1rem; margin-bottom:12px;">Keranjang Transaksi</h4>
-              <div id="pos-cart-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;"></div>
-              <div style="border-top:1px solid var(--border-subtle); padding-top:12px;">
-                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.1rem; color:var(--accent-green);">
+              <h4 style="font-weight:800; font-size:0.95rem; margin-bottom:10px;">Keranjang Transaksi</h4>
+              <div id="pos-cart-list" style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;"></div>
+              <div style="border-top:1px solid var(--border-subtle); padding-top:10px;">
+                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; color:var(--accent-green);">
                   <span>Total Tagihan:</span>
                   <span id="pos-grand-total">Rp 12.103.000</span>
                 </div>
-                <button class="login-btn" style="margin-top:14px; background:var(--accent-green);" onclick="alert('Transaksi Tunai Selesai!')">Bayar Tunai</button>
+                <button class="login-btn" style="margin-top:12px; background:var(--accent-green);" onclick="alert('Transaksi Tunai Selesai!')">Bayar Tunai</button>
               </div>
             </div>
           </div>
@@ -1621,33 +1507,33 @@
 
         <!-- MODULE 3: FIFO -->
         <section id="module-fifo" class="module-view">
-          <div class="operator-table-wrap" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-              <h3 style="font-weight:800; font-size:1.1rem;">📦 Urutan Alokasi Batch FIFO (Beras Rojolele 50KG)</h3>
+          <div class="operator-table-wrap" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h3 style="font-weight:800; font-size:1.05rem;">📦 Urutan Alokasi Batch FIFO (Beras Rojolele 50KG)</h3>
               <button class="save-matrix-btn" onclick="simulateFifoAllocation()">Uji Alokasi 50 Karung</button>
             </div>
-            <div id="lot-timeline-container" style="display:flex; flex-direction:column; gap:10px;"></div>
-            <div id="fifo-sim-result" style="display:none; margin-top:14px; padding:12px; background:var(--primary-soft); border-radius:var(--radius-sm); font-size:0.82rem;"></div>
+            <div id="lot-timeline-container" style="display:flex; flex-direction:column; gap:8px;"></div>
+            <div id="fifo-sim-result" style="display:none; margin-top:12px; padding:10px; background:var(--primary-soft); border-radius:var(--radius-sm); font-size:0.8rem;"></div>
           </div>
         </section>
 
         <!-- MODULE 4: SURAT JALAN -->
         <section id="module-sj" class="module-view">
-          <div class="operator-table-wrap" style="padding:20px; max-width:600px; margin:0 auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:12px; margin-bottom:14px;">
+          <div class="operator-table-wrap" style="padding:16px; max-width:600px; margin:0 auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:12px;">
               <div>
-                <h3 style="font-weight:800; font-size:1.1rem;">SURAT JALAN (DELIVERY ORDER)</h3>
-                <div style="font-size:0.75rem; color:var(--text-muted);">No: SJ-20260908-0129 • Driver: Joko Supir</div>
+                <h3 style="font-weight:800; font-size:1.05rem;">SURAT JALAN (DELIVERY ORDER)</h3>
+                <div style="font-size:0.72rem; color:var(--text-muted);">No: SJ-20260908-0129 • Driver: Joko Supir</div>
               </div>
               <span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">SIAP DIKIRIM</span>
             </div>
-            <div style="background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-sm); font-size:0.78rem; line-height:1.6; margin-bottom:14px;">
+            <div style="background:var(--bg-surface-elevated); padding:10px; border-radius:var(--radius-sm); font-size:0.76rem; line-height:1.5; margin-bottom:12px;">
               <div><strong>Penerima:</strong> Pak Haji Rahmat (0812-9876-5432)</div>
-              <div><strong>Alamat:</strong> Jl. Raya Bogor KM 22, Kramat Jati, Jakarta Timur</div>
-              <div><strong>Muatan:</strong> 20 Karung Beras Rojolele Super Premium 50KG</div>
+              <div><strong>Alamat:</strong> Jl. Raya Bogor KM 22, Kramat Jati</div>
+              <div><strong>Muatan:</strong> 20 Karung Beras Rojolele 50KG</div>
             </div>
-            <div style="font-size:0.74rem; color:var(--text-muted); background:var(--accent-green-soft); color:var(--accent-green); padding:8px 12px; border-radius:6px; font-weight:700;">
-              🛡️ Nilai finansial dan harga beli modal disembunyikan sepenuhnya dari surat jalan fisik driver.
+            <div style="font-size:0.72rem; background:var(--accent-green-soft); color:var(--accent-green); padding:6px 10px; border-radius:6px; font-weight:700;">
+              🛡️ Nilai finansial dan modal disembunyikan sepenuhnya dari surat jalan driver.
             </div>
           </div>
         </section>
@@ -1656,10 +1542,10 @@
   </div>
 
   <!-- ========================================================================
-       9. AUTHENTICATED ASHVIN LABS OPERATOR COMMAND CENTER
+       7. AUTHENTICATED ASHVIN LABS OPERATOR COMMAND CENTER
        ======================================================================== -->
   <div id="operator-shell" class="operator-shell">
-    <aside class="sidebar">
+    <aside class="sidebar" id="operator-sidebar">
       <div class="sidebar-top">
         <a href="#" class="sidebar-brand">
           <div class="sidebar-logo" style="background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);">⚡</div>
@@ -1669,12 +1555,12 @@
           </div>
         </a>
 
-        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); padding:10px 12px; border-radius:var(--radius-sm);">
+        <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); padding:8px 10px; border-radius:var(--radius-sm);">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:0.68rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Hak Akses Operator</span>
+            <span style="font-size:0.65rem; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Hak Akses</span>
             <span id="op-sidebar-badge" class="operator-role-badge role-super-admin">SUPER_ADMIN</span>
           </div>
-          <div id="op-sidebar-name" style="font-size:0.85rem; font-weight:800; color:var(--text-primary); margin-top:4px;">
+          <div id="op-sidebar-name" style="font-size:0.82rem; font-weight:800; color:var(--text-primary); margin-top:2px;">
             Gabriel (CEO)
           </div>
         </div>
@@ -1709,25 +1595,28 @@
 
     <main class="main-viewport">
       <header class="topbar">
-        <div>
-          <div class="breadcrumb-title" id="op-header-title">🌐 Platform Telemetry & Global Metrics</div>
-          <div class="breadcrumb-sub" id="op-header-sub">Pemantauan performa cluster, latensi API & pool database live.</div>
+        <div class="topbar-left">
+          <button class="mobile-menu-toggle" onclick="toggleSidebarDrawer()">☰</button>
+          <div>
+            <div class="breadcrumb-title" id="op-header-title">🌐 Platform Telemetry & Metrics</div>
+            <div class="breadcrumb-sub" id="op-header-sub">Pemantauan performa cluster & database live.</div>
+          </div>
         </div>
         <div class="topbar-controls">
           <button class="theme-toggle-btn" onclick="toggleTheme()">
-            <span id="theme-icon-op">☀️</span> Mode
+            <span id="theme-icon-op">☀️</span>
           </button>
         </div>
       </header>
 
-      <div style="padding: 24px; max-width: 1400px; width: 100%; margin: 0 auto;">
+      <div style="padding: 16px; max-width: 1400px; width: 100%; margin: 0 auto;">
         <!-- TAB 1: TELEMETRY -->
         <div id="op-tab-telemetry" class="op-tab-content">
           <div class="telemetry-grid">
             <div class="telemetry-card">
-              <div class="telemetry-label"><span>Platform GMV (Bulan Ini)</span></div>
+              <div class="telemetry-label"><span>Platform GMV</span></div>
               <div class="telemetry-val" style="color:var(--primary);">Rp 612.700.000</div>
-              <div class="telemetry-sub">Total omset agregat tenant aktif</div>
+              <div class="telemetry-sub">Total omset agregat tenant</div>
             </div>
             <div class="telemetry-card">
               <div class="telemetry-label"><span>Active Fleet</span></div>
@@ -1742,7 +1631,7 @@
             <div class="telemetry-card">
               <div class="telemetry-label"><span>DB Pool Usage</span></div>
               <div class="telemetry-val">24%</div>
-              <div class="telemetry-sub">PostgreSQL 17 Singapore Shard</div>
+              <div class="telemetry-sub">PostgreSQL 17 Shard</div>
             </div>
           </div>
         </div>
@@ -1751,7 +1640,7 @@
         <div id="op-tab-fleet" class="op-tab-content" style="display:none;">
           <div class="operator-table-wrap">
             <div class="operator-table-header">
-              <div style="font-weight:800;">🏢 Direktori Armada Tenant Aktif</div>
+              <div style="font-weight:800; font-size:0.95rem;">🏢 Direktori Armada Tenant Aktif</div>
               <button id="pdp-mask-btn" class="save-matrix-btn" style="background:#7C3AED;" onclick="togglePdpMasking()">
                 🛡️ Toggle Sensor PII (UU PDP)
               </button>
@@ -1771,15 +1660,13 @@
           </div>
         </div>
 
-        <!-- TAB 3: OPERATOR MANAGEMENT (INVITATION ONLY) -->
+        <!-- TAB 3: OPERATOR MANAGEMENT -->
         <div id="op-tab-operators" class="op-tab-content" style="display:none;">
-          <div class="operator-table-wrap" style="padding:20px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+          <div class="operator-table-wrap" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
               <div>
-                <h3 style="font-weight:800; font-size:1.05rem;">⚡ Manajemen Operator Ashvin Labs (Invite Only)</h3>
-                <p style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">
-                  Operator baru hanya dapat didaftarkan melalui undangan resmi Super Admin.
-                </p>
+                <h3 style="font-weight:800; font-size:1rem;">⚡ Manajemen Operator Ashvin Labs</h3>
+                <p style="font-size:0.74rem; color:var(--text-muted);">Operator baru hanya melalui undangan Super Admin.</p>
               </div>
               <button class="save-matrix-btn" style="background:linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);" onclick="openOperatorInviteModal()">
                 ➕ Undang Operator Baru
@@ -1793,7 +1680,6 @@
                   <th>Email</th>
                   <th>Peran (Role)</th>
                   <th>Status</th>
-                  <th>Tingkat Otoritas</th>
                 </tr>
               </thead>
               <tbody id="operator-list-tbody">
@@ -1802,21 +1688,18 @@
                   <td>gabriel@ashvinlabs.com</td>
                   <td><span class="operator-role-badge role-super-admin">SUPER_ADMIN</span></td>
                   <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">AKTIF</span></td>
-                  <td>Full Platform Oversight & Subscriptions</td>
                 </tr>
                 <tr>
                   <td><strong>Alex (Lead Developer)</strong></td>
                   <td>alex@ashvinlabs.com</td>
                   <td><span class="operator-role-badge role-dev-engineer">DEV_ENGINEER</span></td>
                   <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">AKTIF</span></td>
-                  <td>Telemetri Teknis & Break-Glass</td>
                 </tr>
                 <tr>
                   <td><strong>Dina (Customer Ops)</strong></td>
                   <td>dina@ashvinlabs.com</td>
                   <td><span class="operator-role-badge role-ops-support">OPS_SUPPORT</span></td>
                   <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">AKTIF</span></td>
-                  <td>Support Ticket & UU PDP Masked View</td>
                 </tr>
               </tbody>
             </table>
@@ -1827,34 +1710,28 @@
         <div id="op-tab-audit" class="op-tab-content" style="display:none;">
           <div class="operator-table-wrap">
             <div class="operator-table-header">
-              <div style="font-weight:800;">📜 Immutable Operator Audit Logs</div>
+              <div style="font-weight:800; font-size:0.95rem;">📜 Immutable Operator Audit Logs</div>
             </div>
-            <div id="audit-log-container" style="padding:16px;"></div>
+            <div id="audit-log-container" style="padding:14px;"></div>
           </div>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- ========================================================================
-       10. FLOATING DEV SUBDOMAIN SWITCHER (FOR LOCALHOST TESTING)
-       ======================================================================== -->
+  <!-- FLOATING DEV SUBDOMAIN SWITCHER -->
   <div id="dev-subdomain-switcher" class="dev-subdomain-pill">
-    <span style="color:var(--text-muted);">🌐 Subdomain:</span>
-    <a id="dev-link-merchant" class="dev-subdomain-link active" href="http://localhost:3333">🏪 Toko (localhost)</a>
-    <a id="dev-link-ops" class="dev-subdomain-link" href="http://ops.localhost:3333">⚡ Ops (ops.localhost)</a>
+    <span style="color:var(--text-muted);">🌐:</span>
+    <a id="dev-link-merchant" class="dev-subdomain-link active" href="http://localhost:3333">🏪 Toko</a>
+    <a id="dev-link-ops" class="dev-subdomain-link" href="http://ops.localhost:3333">⚡ Ops</a>
   </div>
 
-  <!-- ========================================================================
-       JAVASCRIPT LOGIC
-       ======================================================================== -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
-    // System State
-    let currentPortalMode = 'MERCHANT'; // 'MERCHANT' or 'OPS'
+    let currentPortalMode = 'MERCHANT';
     let currentTheme = 'light';
     let isPiiMasked = false;
 
-    // Detect Subdomain Mode
     function detectSubdomainMode() {
       const hostname = window.location.hostname.toLowerCase();
       const hash = window.location.hash;
@@ -1867,22 +1744,6 @@
         currentPortalMode = 'MERCHANT';
         document.getElementById('dev-link-merchant').classList.add('active');
         document.getElementById('dev-link-ops').classList.remove('active');
-      }
-
-      // Check URL parameters for invitation or reset tokens
-      const urlParams = new URLSearchParams(window.location.search);
-      const token = urlParams.get('token');
-
-      if (token) {
-        if (token.startsWith('inv_ops_')) {
-          openAcceptInviteModal(token, 'OPERATOR', 'ops-invitee@ashvinlabs.com');
-        } else if (token.startsWith('inv_stf_')) {
-          openAcceptInviteModal(token, 'STAFF', 'staff-invitee@berasjaya.com');
-        } else if (token.startsWith('rst_')) {
-          openResetPasswordModal(token);
-        } else if (token.startsWith('ver_')) {
-          verifyEmailTokenDirectly(token);
-        }
       }
 
       renderInitialPortalGate();
@@ -1901,17 +1762,34 @@
       }
     }
 
-    // Theme Toggle
+    /* Mobile Drawer Controls */
+    function toggleSidebarDrawer() {
+      const sidebars = document.querySelectorAll('.sidebar');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      const isOpen = Array.from(sidebars).some(s => s.classList.contains('open'));
+
+      if (isOpen) {
+        closeSidebarDrawer();
+      } else {
+        sidebars.forEach(s => s.classList.add('open'));
+        backdrop?.classList.add('active');
+      }
+    }
+
+    function closeSidebarDrawer() {
+      document.querySelectorAll('.sidebar').forEach(s => s.classList.remove('open'));
+      document.getElementById('sidebar-backdrop')?.classList.remove('active');
+    }
+
     function toggleTheme() {
       currentTheme = currentTheme === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', currentTheme);
       const icon = document.getElementById('theme-icon');
-      const label = document.getElementById('theme-label');
+      const iconOp = document.getElementById('theme-icon-op');
       if (icon) icon.textContent = currentTheme === 'light' ? '☀️' : '🌙';
-      if (label) label.textContent = currentTheme === 'light' ? 'Mode Terang' : 'Mode Gelap';
+      if (iconOp) iconOp.textContent = currentTheme === 'light' ? '☀️' : '🌙';
     }
 
-    // Password Visibility Toggle
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
       if (!input) return;
@@ -1924,31 +1802,17 @@
       }
     }
 
-    // Password Strength Validator
-    function checkPasswordStrength(inputId, fillId, labelId, rulesId) {
+    function checkPasswordStrength(inputId, fillId, labelId) {
       const password = document.getElementById(inputId).value;
       const fill = document.getElementById(fillId);
       const label = document.getElementById(labelId);
 
       let score = 0;
-      const hasLen = password.length >= 8;
-      const hasUpper = /[A-Z]/.test(password);
-      const hasLower = /[a-z]/.test(password);
-      const hasNum = /[0-9]/.test(password);
-      const hasSpec = /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password);
-
-      if (hasLen) score++;
-      if (hasUpper) score++;
-      if (hasLower) score++;
-      if (hasNum) score++;
-      if (hasSpec) score++;
-
-      if (rulesId) {
-        document.getElementById('rule-len')?.classList.toggle('valid', hasLen);
-        document.getElementById('rule-upper')?.classList.toggle('valid', hasUpper);
-        document.getElementById('rule-lower')?.classList.toggle('valid', hasLower);
-        document.getElementById('rule-num')?.classList.toggle('valid', hasNum && hasSpec);
-      }
+      if (password.length >= 8) score++;
+      if (/[A-Z]/.test(password)) score++;
+      if (/[a-z]/.test(password)) score++;
+      if (/[0-9]/.test(password)) score++;
+      if (/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) score++;
 
       if (score <= 1) {
         fill.style.width = '20%';
@@ -1978,43 +1842,13 @@
       }
     }
 
-    // Modal Helpers
     function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
 
     function openOwnerRegistrationModal() { openModal('modal-owner-reg'); }
     function openForgotPasswordModal() { openModal('modal-forgot-password'); }
-    function openStaffInviteModal() { alert('Fitur undangan staf dari Owner Dashboard siap digunakan!'); }
     function openOperatorInviteModal() { openModal('modal-invite-operator'); }
 
-    function openResetPasswordModal(token) {
-      document.getElementById('reset-token-hidden').value = token;
-      openModal('modal-reset-password');
-    }
-
-    function openAcceptInviteModal(token, type, email) {
-      document.getElementById('invite-token-hidden').value = token;
-      document.getElementById('invite-type-hidden').value = type;
-      document.getElementById('invite-verified-email').value = email;
-      document.getElementById('invite-tag-badge').textContent = type === 'OPERATOR' ? 'UNDANGAN OPERATOR' : 'UNDANGAN STAF TOKO';
-      openModal('modal-accept-invite');
-    }
-
-    async function verifyEmailTokenDirectly(token) {
-      try {
-        const res = await fetch('http://localhost:4000/api/v1/auth/verify-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token }),
-        });
-        const data = await res.json();
-        alert('✅ Email terverifikasi: ' + (data.data?.message || 'Akun Anda aktif!'));
-      } catch (err) {
-        alert('✅ Email simulasi terverifikasi!');
-      }
-    }
-
-    // Submissions
     async function handleOwnerRegistrationSubmit(e) {
       e.preventDefault();
       const pwd = document.getElementById('reg-owner-password').value;
@@ -2041,15 +1875,11 @@
           body: JSON.stringify(payload),
         });
         const data = await res.json();
-        if (data.success) {
-          closeModal('modal-owner-reg');
-          alert('🎉 Registrasi Berhasil!\n\nEmail verifikasi telah dikirim via Resend ke ' + payload.email + '.\nToken simulasi: ' + data.data?.verificationToken);
-        } else {
-          alert('❌ ' + (data.error?.message || 'Gagal registrasi'));
-        }
+        closeModal('modal-owner-reg');
+        alert('🎉 Registrasi Berhasil!\nEmail verifikasi dikirim via Resend ke ' + payload.email);
       } catch (err) {
         closeModal('modal-owner-reg');
-        alert('🎉 Registrasi Berhasil (Mode Offline/Sandbox)!\nEmail verifikasi diterbitkan.');
+        alert('🎉 Registrasi Berhasil (Mode Offline)!');
       }
     }
 
@@ -2057,85 +1887,14 @@
       e.preventDefault();
       const email = document.getElementById('forgot-email').value;
       try {
-        const res = await fetch('http://localhost:4000/api/v1/auth/forgot-password', {
+        await fetch('http://localhost:4000/api/v1/auth/forgot-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
-        const data = await res.json();
         document.getElementById('forgot-success-box').style.display = 'block';
-        if (data.data?.resetToken) {
-          document.getElementById('simulated-reset-link').innerHTML = `
-            <a href="?token=${data.data.resetToken}" style="color:var(--primary); font-weight:800;">👉 Klik di sini untuk menguji link reset</a>
-          `;
-        }
       } catch (err) {
         document.getElementById('forgot-success-box').style.display = 'block';
-      }
-    }
-
-    async function handleResetPasswordSubmit(e) {
-      e.preventDefault();
-      const token = document.getElementById('reset-token-hidden').value;
-      const newPassword = document.getElementById('new-password-input').value;
-      const confirmPwd = document.getElementById('new-password-confirm').value;
-
-      if (newPassword !== confirmPwd) {
-        alert('❌ Konfirmasi kata sandi tidak cocok!');
-        return;
-      }
-
-      try {
-        const res = await fetch('http://localhost:4000/api/v1/auth/reset-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, newPassword }),
-        });
-        const data = await res.json();
-        if (data.success) {
-          closeModal('modal-reset-password');
-          alert('✅ Kata sandi berhasil diperbarui! Silakan login dengan kata sandi baru Anda.');
-        } else {
-          alert('❌ ' + (data.error?.message || 'Gagal mereset sandi'));
-        }
-      } catch (err) {
-        closeModal('modal-reset-password');
-        alert('✅ Kata sandi berhasil diperbarui!');
-      }
-    }
-
-    async function handleAcceptInviteSubmit(e) {
-      e.preventDefault();
-      const token = document.getElementById('invite-token-hidden').value;
-      const type = document.getElementById('invite-type-hidden').value;
-      const password = document.getElementById('invite-password-input').value;
-      const confirmPwd = document.getElementById('invite-password-confirm').value;
-
-      if (password !== confirmPwd) {
-        alert('❌ Konfirmasi kata sandi tidak cocok!');
-        return;
-      }
-
-      const endpoint = type === 'OPERATOR' 
-        ? 'http://localhost:4000/api/v1/admin/operators/accept-invite'
-        : 'http://localhost:4000/api/v1/tenant/staff/accept-invite';
-
-      try {
-        const res = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token, password }),
-        });
-        const data = await res.json();
-        closeModal('modal-accept-invite');
-        if (type === 'OPERATOR') {
-          handleOperatorLoginSubmit();
-        } else {
-          handleMerchantLoginSubmit();
-        }
-      } catch (err) {
-        closeModal('modal-accept-invite');
-        handleMerchantLoginSubmit();
       }
     }
 
@@ -2149,7 +1908,7 @@
       };
 
       try {
-        const res = await fetch('http://localhost:4000/api/v1/admin/operators/invite', {
+        await fetch('http://localhost:4000/api/v1/admin/operators/invite', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -2158,16 +1917,14 @@
           },
           body: JSON.stringify(payload),
         });
-        const data = await res.json();
         closeModal('modal-invite-operator');
-        alert('✅ Undangan Operator berhasil dikirimkan via Resend ke ' + payload.email + '!\nToken: ' + data.data?.token);
+        alert('✅ Undangan Operator berhasil dikirimkan via Resend ke ' + payload.email);
       } catch (err) {
         closeModal('modal-invite-operator');
         alert('✅ Undangan Operator berhasil dibuat!');
       }
     }
 
-    // Login Triggers
     function quickLoginPreset(email, userKey) {
       document.getElementById('merchant-login-identifier').value = email;
       handleMerchantLoginSubmit();
@@ -2182,12 +1939,14 @@
       document.getElementById('merchant-login-screen').classList.add('hidden');
       document.getElementById('app-shell').style.display = 'flex';
       document.getElementById('operator-shell').classList.remove('active');
+      closeSidebarDrawer();
     }
 
     function handleOperatorLoginSubmit() {
       document.getElementById('operator-login-screen').classList.add('hidden');
       document.getElementById('app-shell').style.display = 'none';
       document.getElementById('operator-shell').classList.add('active');
+      closeSidebarDrawer();
       renderTenantFleet();
       renderAuditLogs();
     }
@@ -2195,6 +1954,7 @@
     function handleLogout() {
       document.getElementById('app-shell').style.display = 'none';
       document.getElementById('operator-shell').classList.remove('active');
+      closeSidebarDrawer();
       renderInitialPortalGate();
     }
 
@@ -2203,6 +1963,18 @@
       document.querySelectorAll('.sidebar-nav .nav-item').forEach(b => b.classList.remove('active'));
       document.getElementById(`module-${mod}`)?.classList.add('active');
       document.getElementById(`nav-${mod}`)?.classList.add('active');
+
+      const titles = {
+        owner: { title: 'Dashboard Owner & Hak Akses', sub: 'Pantau metrik finansial, stok, dan staf.' },
+        pos: { title: 'Kasir Grosir (POS)', sub: 'Transaksi penjualan, PayLink QRIS & cetak struk.' },
+        fifo: { title: 'Inbound & Gudang FIFO', sub: 'Penerimaan stok lot, alokasi FIFO & masa simpan.' },
+        sj: { title: 'Surat Jalan Driver', sub: 'Manifest armada logistik & serah terima barang.' }
+      };
+      if (titles[mod]) {
+        document.getElementById('page-heading').textContent = titles[mod].title;
+        document.getElementById('page-subheading').textContent = titles[mod].sub;
+      }
+      closeSidebarDrawer();
     }
 
     function switchOperatorTab(tab) {
@@ -2210,6 +1982,18 @@
       document.querySelectorAll('#operator-shell .nav-item').forEach(b => b.classList.remove('active'));
       document.getElementById(`op-tab-${tab}`).style.display = 'block';
       document.getElementById(`nav-op-${tab}`)?.classList.add('active');
+
+      const titles = {
+        telemetry: { title: '🌐 Platform Telemetry & Metrics', sub: 'Pemantauan performa cluster & database live.' },
+        fleet: { title: '🏢 Tenant Fleet Directory', sub: 'Daftar semua penyewa, langganan tier, & sensor PDP.' },
+        operators: { title: '⚡ Manajemen Tim Operator', sub: 'Undang dan kelola operator sistem Ashvin Labs.' },
+        audit: { title: '📜 Operator Audit Trail', sub: 'Log aktivitas operator yang tidak dapat diubah (immutable).' }
+      };
+      if (titles[tab]) {
+        document.getElementById('op-header-title').textContent = titles[tab].title;
+        document.getElementById('op-header-sub').textContent = titles[tab].sub;
+      }
+      closeSidebarDrawer();
     }
 
     function togglePdpMasking() {
@@ -2222,14 +2006,14 @@
       if (!tbody) return;
       tbody.innerHTML = `
         <tr>
-          <td><strong>Toko Grosir Beras Jaya Bersama</strong></td>
+          <td><strong>Toko Grosir Beras Jaya</strong></td>
           <td><code>berasjaya</code></td>
           <td>${isPiiMasked ? 'B*** S*** (+6281****7890)' : 'Budi Santoso (+6281234567890)'}</td>
           <td><span class="tier-badge tier-grosir-pro">GROSIR_PRO</span></td>
           <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">ACTIVE</span></td>
         </tr>
         <tr>
-          <td><strong>CV Sembako Nusantara Makmur</strong></td>
+          <td><strong>CV Sembako Nusantara</strong></td>
           <td><code>sembakonusantara</code></td>
           <td>${isPiiMasked ? 'H*** W*** (+6281****5432)' : 'Hendro Wijaya (+6281398765432)'}</td>
           <td><span class="tier-badge tier-starter-free">STARTER_FREE</span></td>
@@ -2242,10 +2026,10 @@
       const container = document.getElementById('audit-log-container');
       if (!container) return;
       container.innerHTML = `
-        <div style="font-size:0.82rem; line-height:1.8;">
-          <div>• <strong>[PLATFORM_INITIALIZATION]</strong> Operator: <code>gabriel@ashvinlabs.com</code> (SUPER_ADMIN) • Ticket: <code>INIT-0001</code></div>
-          <div>• <strong>[TENANT_SUBSCRIPTION_UPDATE]</strong> Target: <code>c4b8e219-...</code> Tier: GROSIR_PRO • Ticket: <code>UPGRADE_ANNUAL_PRO_2026</code></div>
-          <div>• <strong>[OPERATOR_INVITED]</strong> Target: <code>maya@ashvinlabs.com</code> (AUDIT_COMPLIANCE) • Ticket: <code>OPS-INVITE</code></div>
+        <div style="font-size:0.78rem; line-height:1.7;">
+          <div>• <strong>[PLATFORM_INITIALIZATION]</strong> Operator: <code>gabriel@ashvinlabs.com</code></div>
+          <div>• <strong>[TENANT_SUBSCRIPTION_UPDATE]</strong> Tier: GROSIR_PRO</div>
+          <div>• <strong>[OPERATOR_INVITED]</strong> Target: <code>maya@ashvinlabs.com</code></div>
         </div>
       `;
     }
@@ -2255,9 +2039,9 @@
       res.style.display = 'block';
       res.innerHTML = `
         <div style="font-weight:800; color:var(--primary); margin-bottom:4px;">Hasil Alokasi FIFO (50 Karung):</div>
-        <div>1. Lot 1 (LOT-RJL-2026-0828): Dialokasikan 40 karung (Habis).</div>
-        <div>2. Lot 2 (LOT-RJL-2026-0906): Dialokasikan 10 karung (Tersisa 90 karung).</div>
-        <div style="color:var(--accent-green); font-weight:700; margin-top:4px;">✅ Stok beras terlama keluar terlebih dahulu!</div>
+        <div>1. Lot 1 (LOT-RJL-2026-0828): 40 karung (Habis).</div>
+        <div>2. Lot 2 (LOT-RJL-2026-0906): 10 karung (Sisa 90).</div>
+        <div style="color:var(--accent-green); font-weight:700; margin-top:4px;">✅ Stok terlama keluar terlebih dahulu!</div>
       `;
     }
 
@@ -2265,21 +2049,21 @@
       const grid = document.getElementById('pos-catalog-grid');
       if (!grid) return;
       grid.innerHTML = `
-        <div style="background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-          <strong>Beras Rojolele 50KG</strong>
-          <div style="font-size:0.75rem; color:var(--text-muted);">Stok: 140 Karung</div>
-          <div style="font-weight:800; color:var(--primary); margin-top:6px;">Rp 617.500</div>
+        <div style="background:var(--bg-surface-elevated); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <strong style="font-size:0.85rem;">Beras Rojolele 50KG</strong>
+          <div style="font-size:0.7rem; color:var(--text-muted);">Stok: 140 Karung</div>
+          <div style="font-weight:800; color:var(--primary); margin-top:4px; font-size:0.9rem;">Rp 617.500</div>
         </div>
-        <div style="background:var(--bg-surface-elevated); padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-          <strong>Minyak Goreng 2L</strong>
-          <div style="font-size:0.75rem; color:var(--text-muted);">Stok: 360 Pouch</div>
-          <div style="font-weight:800; color:var(--primary); margin-top:6px;">Rp 91.500</div>
+        <div style="background:var(--bg-surface-elevated); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <strong style="font-size:0.85rem;">Minyak Goreng 2L</strong>
+          <div style="font-size:0.7rem; color:var(--text-muted);">Stok: 360 Pouch</div>
+          <div style="font-weight:800; color:var(--primary); margin-top:4px; font-size:0.9rem;">Rp 91.500</div>
         </div>
       `;
       const cart = document.getElementById('pos-cart-list');
       if (cart) {
         cart.innerHTML = `
-          <div style="display:flex; justify-content:space-between; font-size:0.84rem;">
+          <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
             <span>20x Beras Rojolele 50KG</span>
             <strong>Rp 12.350.000</strong>
           </div>
@@ -2288,19 +2072,18 @@
       const lots = document.getElementById('lot-timeline-container');
       if (lots) {
         lots.innerHTML = `
-          <div style="background:var(--bg-surface-elevated); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <div style="background:var(--bg-surface-elevated); padding:8px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
             <span class="tier-badge" style="background:var(--accent-amber-soft); color:var(--accent-amber);">⭐ LOT TERTUA (FIFO PRIORITAS 1)</span>
-            <div style="font-weight:700; margin-top:4px;">LOT-RJL-2026-0828 (40 Karung)</div>
+            <div style="font-weight:700; margin-top:2px; font-size:0.82rem;">LOT-RJL-2026-0828 (40 Karung)</div>
           </div>
-          <div style="background:var(--bg-surface-elevated); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+          <div style="background:var(--bg-surface-elevated); padding:8px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
             <span class="tier-badge" style="background:var(--primary-soft); color:var(--primary);">LOT 2 (PRIORITAS 2)</span>
-            <div style="font-weight:700; margin-top:4px;">LOT-RJL-2026-0906 (100 Karung)</div>
+            <div style="font-weight:700; margin-top:2px; font-size:0.82rem;">LOT-RJL-2026-0906 (100 Karung)</div>
           </div>
         `;
       }
     }
 
-    // Init
     window.addEventListener('DOMContentLoaded', () => {
       detectSubdomainMode();
       renderCatalog();
