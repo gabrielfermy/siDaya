@@ -1931,6 +1931,57 @@
     </div>
   </div>
 
+  <!-- MODAL: ADD CUSTOMER -->
+  <div id="modal-add-customer" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      <div style="margin-bottom: 16px;">
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">👥 Tambah Pelanggan Grosir Baru</h3>
+        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
+          Daftarkan pelanggan toko, nomor WhatsApp untuk penagihan PayLink, dan plafon kredit/kasbon.
+        </p>
+      </div>
+
+      <form onsubmit="handleAddCustomerSubmit(event)">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div class="form-group">
+            <label class="form-label">Nama Pemilik / PIC</label>
+            <input id="cust-name" type="text" class="form-input" required placeholder="contoh: Pak Haji Rahmat">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nama Toko / Usaha</label>
+            <input id="cust-store" type="text" class="form-input" required placeholder="contoh: Toko Barokah Jaya">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div class="form-group">
+            <label class="form-label">No. WhatsApp</label>
+            <input id="cust-phone" type="tel" class="form-input" required placeholder="081298765432">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tier Pelanggan</label>
+            <select id="cust-tier" class="form-input">
+              <option value="PRIME_WHOLESALE">⭐ Prime Wholesale (Prioritas)</option>
+              <option value="GROSIR_REGULER">📦 Grosir Reguler</option>
+              <option value="WARUNG_CASH">🏪 Warung Kelontong (Cash)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Alamat Lengkap / Titik Bongkar</label>
+          <input id="cust-address" type="text" class="form-input" required placeholder="Pasar Kramat Jati Blok C-12, Jakarta Timur">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Plafon Kredit / Batas Kasbon (Rp)</label>
+          <input id="cust-credit-limit" type="number" min="0" step="500000" class="form-input" required placeholder="15000000">
+        </div>
+        <button type="submit" class="login-btn" style="background:var(--primary);">
+          💾 Simpan Pelanggan Baru
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- ========================================================================
        4. AUTHENTICATED MERCHANT SHELL (7 COMPLETE ENTERPRISE MODULES)
        ======================================================================== -->
@@ -2253,27 +2304,68 @@
             </div>
           </div>
 
-          <div class="operator-table-wrap" style="padding:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
-              <div>
-                <h3 style="font-size:1rem; font-weight:800; color:var(--text-primary);">👥 Manajemen Tim & Staf Toko</h3>
-                <p style="font-size:0.74rem; color:var(--text-muted);">Semua staf onboarding melalui link undangan resmi pemilik toko.</p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom:16px;">
+            <!-- Arus Kas & Komposisi Penjualan -->
+            <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; box-shadow:var(--card-shadow);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h4 style="font-weight:800; font-size:0.92rem; color:var(--text-primary);">💰 Komposisi Kas & Pembayaran</h4>
+                <span class="tier-badge tier-grosir-pro">REALTIME</span>
               </div>
-              <button class="save-matrix-btn" onclick="openModal('invite-staff')">
-                ➕ Undang Staf Baru
-              </button>
+              <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem;">
+                <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm);">
+                  <span>💵 Tunai Kasir POS:</span>
+                  <strong style="color:var(--accent-green);" id="dash-cash-total">Rp 416.575.000</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm);">
+                  <span>📱 PayLink QRIS (BCA/Midtrans):</span>
+                  <strong style="color:var(--primary);" id="dash-qris-total">Rp 12.350.000</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm);">
+                  <span>📒 Kasbon Belum Lunas:</span>
+                  <strong style="color:var(--accent-rose);" id="dash-debt-total">Rp 11.925.000</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- FIFO Stock Health -->
+            <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; box-shadow:var(--card-shadow);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <h4 style="font-weight:800; font-size:0.92rem; color:var(--text-primary);">📦 Status Gudang & Batch FIFO</h4>
+                <button class="save-matrix-btn" style="padding:3px 8px; font-size:0.7rem;" onclick="switchModule('fifo')">Lihat Semua Lot →</button>
+              </div>
+              <div id="dash-fifo-preview" style="display:flex; flex-direction:column; gap:6px; font-size:0.76rem;">
+                <!-- Filled by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Pintasan Operasional & Live Feeds -->
+          <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; box-shadow:var(--card-shadow);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+              <div>
+                <h4 style="font-weight:800; font-size:0.95rem; color:var(--text-primary);">⚡ Pintasan Cepat & Transaksi Terkini</h4>
+                <p style="font-size:0.72rem; color:var(--text-muted);">Akses modul operasional langsung dengan satu klik.</p>
+              </div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="save-matrix-btn" style="background:var(--primary);" onclick="switchModule('pos')">🛒 Kasir POS</button>
+                <button class="save-matrix-btn" style="background:var(--accent-green);" onclick="openModal('inbound-lot')">📥 Inbound Lot</button>
+                <button class="save-matrix-btn" style="background:#7C3AED;" onclick="switchModule('customers')">👥 Pelanggan</button>
+                <button class="save-matrix-btn" style="background:var(--accent-amber);" onclick="switchModule('piutang')">📒 Buku Piutang</button>
+              </div>
             </div>
 
             <table class="operator-table">
               <thead>
                 <tr>
-                  <th>Nama Staf</th>
-                  <th>Kontak / Email</th>
-                  <th>Peran (Role)</th>
+                  <th>No. Faktur</th>
+                  <th>Waktu</th>
+                  <th>Pelanggan</th>
+                  <th>Total Transaksi</th>
+                  <th>Metode</th>
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody id="tenant-staff-tbody"></tbody>
+              <tbody id="dash-recent-sales-tbody"></tbody>
             </table>
           </div>
         </section>
@@ -2465,6 +2557,139 @@
               </div>
             </div>
           </div>
+        </section>
+
+        <!-- MODULE: DIREKTORI PELANGGAN & CRM -->
+        <section id="module-customers" class="module-view">
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <span class="kpi-title">Total Pelanggan Terdaftar</span>
+              <span class="kpi-value" id="cust-kpi-total">4 Toko</span>
+              <span class="kpi-sub">Pelanggan Grosir & Warung</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-title">Total Plafon Kasbon</span>
+              <span class="kpi-value" id="cust-kpi-plafon">Rp 55.000.000</span>
+              <span class="kpi-sub">Batas Kredit Disetujui</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-title">Kasbon Berjalan (Piutang)</span>
+              <span class="kpi-value" id="cust-kpi-debt" style="color:var(--accent-rose);">Rp 11.925.000</span>
+              <span class="kpi-sub">2 Pelanggan Ada Tagihan</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-title">Pelanggan Prime</span>
+              <span class="kpi-value" id="cust-kpi-prime" style="color:var(--primary);">1 Toko</span>
+              <span class="kpi-sub">Omzet > Rp 100 Jt</span>
+            </div>
+          </div>
+
+          <div class="operator-table-wrap" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+              <div>
+                <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">👥 Direktori Pelanggan Grosir & Rekap Kasbon</h3>
+                <p style="font-size:0.74rem; color:var(--text-muted);">Database pelanggan langganan, nomor WhatsApp untuk penagihan PayLink, dan plafon kredit.</p>
+              </div>
+              <button class="save-matrix-btn" onclick="openModal('add-customer')">
+                ➕ Tambah Pelanggan Baru
+              </button>
+            </div>
+
+            <table class="operator-table">
+              <thead>
+                <tr>
+                  <th>ID & Pelanggan</th>
+                  <th>Kontak WA & Alamat</th>
+                  <th>Plafon Kasbon</th>
+                  <th>Saldo Kasbon</th>
+                  <th>Total Belanja</th>
+                  <th>Tier Pelanggan</th>
+                  <th>Aksi Cepat</th>
+                </tr>
+              </thead>
+              <tbody id="customers-master-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- MODULE: DAFTAR STAF & HAK AKSES PIN -->
+        <section id="module-users" class="module-view">
+          <div class="operator-table-wrap" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+              <div>
+                <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">👤 Manajemen Tim & Staf Toko</h3>
+                <p style="font-size:0.74rem; color:var(--text-muted);">Semua staf onboarding melalui link undangan resmi, dilengkapi PIN cepat kasir (timing-safe HMAC).</p>
+              </div>
+              <button class="save-matrix-btn" onclick="openModal('invite-staff')">
+                ➕ Undang Staf Baru
+              </button>
+            </div>
+
+            <table class="operator-table">
+              <thead>
+                <tr>
+                  <th>Nama Staf</th>
+                  <th>Kontak / Email</th>
+                  <th>Peran (Role)</th>
+                  <th>Status Akun</th>
+                  <th>Keamanan PIN</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tenant-staff-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- MODULE: MATRIKS IZIN CHECKBOX (RBAC) -->
+        <section id="module-roles" class="module-view">
+          <div class="operator-table-wrap" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+              <div>
+                <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">🛡️ Matriks Izin Granular & Otoritas Checkbox (RBAC)</h3>
+                <p style="font-size:0.74rem; color:var(--text-muted);">Konfigurasi hak akses 18 capability keys. Owner memiliki hak akses penuh otomatis (*Bypass Rule*).</p>
+              </div>
+              <button class="save-matrix-btn" style="background:var(--primary);" onclick="handleSaveRoleMatrix()">
+                💾 Simpan Perubahan Matriks
+              </button>
+            </div>
+
+            <div id="role-matrix-container" style="overflow-x:auto;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- MODULE: FAKTUR PENJUALAN (NOTA DAGANG) -->
+        <section id="module-invoices" class="module-view">
+          <div class="operator-table-wrap" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+              <div>
+                <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-primary);">🧾 Rekap Faktur Penjualan (Nota Dagang)</h3>
+                <p style="font-size:0.74rem; color:var(--text-muted);">Semua riwayat transaksi penjualan POS, status pelunasan, dan alokasi batch FIFO.</p>
+              </div>
+              <button class="save-matrix-btn" style="background:var(--accent-green);" onclick="switchModule('pos')">
+                🛒 Buka Kasir POS
+              </button>
+            </div>
+
+            <table class="operator-table">
+              <thead>
+                <tr>
+                  <th>No. Faktur</th>
+                  <th>Tanggal & Waktu</th>
+                  <th>Pelanggan</th>
+                  <th>Nilai Transaksi</th>
+                  <th>Metode Bayar</th>
+                  <th>Status Nota</th>
+                  <th>Aksi Dokumen</th>
+                </tr>
+              </thead>
+              <tbody id="invoices-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
         <!-- MODULE 8: DYNAMIC COMING SOON / ROADMAP SHOWCASE -->
         <section id="module-coming-soon" class="module-view">
           <div class="coming-soon-wrapper">
@@ -3263,12 +3488,24 @@
         { id: 'PIU-01', invoiceId: 'INV-20260908-001', customer: 'Toko Berkah Abadi', phone: '081298765432', totalAmount: 12350000, remainingAmount: 7350000, dueDate: '15 Sep 2026', status: 'BELUM_LUNAS' },
         { id: 'PIU-02', invoiceId: 'INV-20260906-089', customer: 'Warung Bu Siti', phone: '081388776655', totalAmount: 4575000, remainingAmount: 4575000, dueDate: '10 Sep 2026', status: 'JATUH_TEMPO' }
       ],
-      staff: [
-        { name: 'Budi Santoso', email: 'budi@berasjaya.com', phone: '081234567890', role: '👑 Owner / Billing POC', status: 'VERIFIED' },
-        { name: 'Siti Rahma', email: 'siti@berasjaya.com', phone: '081288881111', role: '💳 Kasir Grosir (POS)', status: 'VERIFIED' },
-        { name: 'Agus Santoso', email: 'agus@berasjaya.com', phone: '081288882222', role: '📦 Gudang & FIFO', status: 'VERIFIED' },
-        { name: 'Joko Supir', email: 'joko@berasjaya.com', phone: '081288883333', role: '🚚 Driver Logistik', status: 'VERIFIED' }
+      customers: [
+        { id: 'CUST-001', name: 'Pak Haji Rahmat', storeName: 'Toko Barokah Jaya', phone: '081298765432', address: 'Pasar Kramat Jati Blok C-12, Jakarta Timur', creditLimit: 25000000, currentDebt: 0, totalOrders: 14, totalSpend: 142500000, tier: 'PRIME_WHOLESALE', status: 'ACTIVE' },
+        { id: 'CUST-002', name: 'Ibu Hj. Siti Aminah', storeName: 'Warung Berkah Sembako', phone: '081388776655', address: 'Jl. Raya Pasar Minggu No. 45, Jakarta Selatan', creditLimit: 10000000, currentDebt: 4575000, totalOrders: 8, totalSpend: 68200000, tier: 'GROSIR_REGULER', status: 'ACTIVE' },
+        { id: 'CUST-003', name: 'Pak Joni Pranata', storeName: 'Toko Sinar Terang', phone: '081288990011', address: 'Pasar Jatinegara Lantai Dasar No. 18, Jakarta Timur', creditLimit: 15000000, currentDebt: 7350000, totalOrders: 11, totalSpend: 95800000, tier: 'GROSIR_REGULER', status: 'ACTIVE' },
+        { id: 'CUST-004', name: 'Pak Dedi Mulyadi', storeName: 'Warung Kelontong Rejeki', phone: '081122334455', address: 'Jl. Lapangan Tembak No. 9, Cibubur', creditLimit: 5000000, currentDebt: 0, totalOrders: 5, totalSpend: 31400000, tier: 'WARUNG_CASH', status: 'ACTIVE' }
       ],
+      staff: [
+        { name: 'Budi Santoso', email: 'budi@berasjaya.com', phone: '081234567890', role: '👑 Owner / Billing POC', status: 'VERIFIED', pinConfigured: true },
+        { name: 'Siti Rahma', email: 'siti@berasjaya.com', phone: '081288881111', role: '💳 Kasir Grosir (POS)', status: 'VERIFIED', pinConfigured: true },
+        { name: 'Agus Santoso', email: 'agus@berasjaya.com', phone: '081288882222', role: '📦 Gudang & FIFO', status: 'VERIFIED', pinConfigured: true },
+        { name: 'Joko Supir', email: 'joko@berasjaya.com', phone: '081288883333', role: '🚚 Driver Logistik', status: 'VERIFIED', pinConfigured: false }
+      ],
+      rolePermissions: {
+        OWNER: ['all'],
+        KASIR: ['pos:checkout', 'pos:apply_discount', 'shifts:operate', 'shifts:close_z'],
+        GUDANG: ['inventory:inbound_receive', 'inventory:adjust', 'inventory:opname', 'logistics:dispatch'],
+        DRIVER: ['logistics:dispatch', 'logistics:sign_pod']
+      },
       operator: {
         isPiiMasked: true,
         tenants: [
@@ -3574,6 +3811,51 @@
             showToast(`Operator ${payload.fullName} berhasil diundang!`, 'success');
             break;
           }
+
+          /* CRM & Staff Actions */
+          case 'CUSTOMER_ADD': {
+            const custId = 'CUST-' + String(this.state.customers.length + 1).padStart(3, '0');
+            this.state.customers.unshift({
+              id: custId,
+              name: payload.name,
+              storeName: payload.storeName,
+              phone: payload.phone,
+              address: payload.address,
+              creditLimit: payload.creditLimit,
+              currentDebt: 0,
+              totalOrders: 0,
+              totalSpend: 0,
+              tier: payload.tier || 'GROSIR_REGULER',
+              status: 'ACTIVE'
+            });
+            showToast(`👥 Pelanggan ${payload.storeName} (${payload.name}) berhasil didaftarkan!`, 'success');
+            break;
+          }
+          case 'STAFF_INVITE': {
+            this.state.staff.push({
+              name: payload.name,
+              email: payload.email,
+              phone: payload.phone,
+              role: payload.role,
+              status: 'VERIFIED',
+              pinConfigured: false
+            });
+            showToast(`✉️ Undangan staf dikirim ke ${payload.email}`, 'success');
+            break;
+          }
+          case 'STAFF_RESET_PIN': {
+            const st = this.state.staff.find(s => s.email === payload.email);
+            if (st) {
+              st.pinConfigured = true;
+              showToast(`🔑 PIN cepat staf ${st.name} berhasil diatur ulang (HMAC timing-safe).`, 'success');
+            }
+            break;
+          }
+          case 'ROLE_MATRIX_SAVE': {
+            this.state.rolePermissions = payload;
+            showToast('🛡️ Matriks otoritas RBAC berhasil disimpan ke workspace!', 'success');
+            break;
+          }
         }
 
         this.notify();
@@ -3616,6 +3898,7 @@
         'invite-staff': 'modal-invite-staff',
         'inbound-lot': 'modal-inbound-lot',
         'add-product': 'modal-add-product',
+        'add-customer': 'modal-add-customer',
         'receipt': 'modal-receipt'
       };
       Object.entries(modalMap).forEach(([key, elementId]) => {
@@ -3758,11 +4041,11 @@
             'catalog': 'katalog',
             'pengaturan': 'pengaturan',
             'settings': 'pengaturan',
-            'customers': 'owner',
+            'customers': 'customers',
             'receiving': 'fifo',
-            'invoices': 'owner',
-            'users': 'owner',
-            'roles': 'owner',
+            'invoices': 'invoices',
+            'users': 'users',
+            'roles': 'roles',
             'audit-logs': 'pengaturan',
             'backup': 'pengaturan'
           };
@@ -3804,8 +4087,11 @@
             }
 
             // Render Active Merchant Components
-            renderOwnerDashboardMetrics(state);
-            renderStaffTable(state.staff);
+            renderOwnerDashboardOverview(state);
+            renderCustomerTable(state.customers || []);
+            renderStaffTable(state.staff || []);
+            renderRoleMatrixTable(state.rolePermissions || {});
+            renderInvoicesTable(state.sales || []);
             renderPosCatalog(state.catalog, state.inventoryLots);
             renderPosCart(state.cart);
             renderFifoTimeline(state.catalog, state.inventoryLots);
@@ -3819,9 +4105,6 @@
         if (window.location.pathname !== '/' + urlSlug) {
           history.replaceState(null, '', '/' + urlSlug);
         }
-        renderSuratJalanList(state.suratJalan);
-        renderPiutangTable(state.piutang);
-        renderKatalogMasterTable(state.catalog, state.inventoryLots, mUser.role.includes('OWNER'));
       }
     }
 
@@ -3834,7 +4117,7 @@
       return 'Rp ' + Number(amount || 0).toLocaleString('id-ID');
     }
 
-    function renderOwnerDashboardMetrics(state) {
+    function renderOwnerDashboardOverview(state) {
       const totalSales = state.sales.reduce((sum, s) => sum + s.totalAmount, 0) + 428500000;
       const totalLotsRemaining = state.inventoryLots.reduce((sum, l) => sum + l.qtyRemaining, 0);
       const totalPiutang = state.piutang.reduce((sum, p) => sum + p.remainingAmount, 0);
@@ -3848,6 +4131,98 @@
       if (lotsEl) lotsEl.textContent = `${totalLotsRemaining} Unit`;
       if (sjEl) sjEl.textContent = `${state.suratJalan.length} Pengiriman`;
       if (piuEl) piuEl.textContent = formatRupiah(totalPiutang);
+
+      const cashEl = document.getElementById('dash-cash-total');
+      const qrisEl = document.getElementById('dash-qris-total');
+      const debtEl = document.getElementById('dash-debt-total');
+      if (cashEl) cashEl.textContent = formatRupiah(totalSales - 12350000);
+      if (qrisEl) qrisEl.textContent = formatRupiah(12350000);
+      if (debtEl) debtEl.textContent = formatRupiah(totalPiutang);
+
+      const fifoPreviewEl = document.getElementById('dash-fifo-preview');
+      if (fifoPreviewEl) {
+        fifoPreviewEl.innerHTML = state.inventoryLots.slice(0, 3).map(l => {
+          const p = state.catalog.find(c => c.sku === l.sku) || { name: l.sku, unit: 'Unit' };
+          return `
+            <div style="display:flex; justify-content:space-between; padding:6px 8px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); border:1px solid ${l.isOldest ? 'var(--accent-amber)' : 'var(--border-subtle)'};">
+              <span>${l.isOldest ? '⭐ ' : ''}<strong>${l.id}</strong> (${p.name})</span>
+              <strong style="color:var(--primary);">${l.qtyRemaining} ${p.unit}</strong>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const recentTbody = document.getElementById('dash-recent-sales-tbody');
+      if (recentTbody) {
+        recentTbody.innerHTML = state.sales.slice(0, 5).map(s => `
+          <tr>
+            <td><strong>${s.id}</strong></td>
+            <td>${s.createdAt}</td>
+            <td>${s.customer}</td>
+            <td style="font-weight:800; color:var(--primary);">${formatRupiah(s.totalAmount)}</td>
+            <td><span class="tier-badge ${s.paymentMethod === 'TUNAI' ? 'tier-grosir-pro' : 'tier-starter-free'}">${s.paymentMethod}</span></td>
+            <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${s.status}</span></td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function renderCustomerTable(customers) {
+      const tbody = document.getElementById('customers-master-tbody');
+      const totalEl = document.getElementById('cust-kpi-total');
+      const plafonEl = document.getElementById('cust-kpi-plafon');
+      const debtEl = document.getElementById('cust-kpi-debt');
+      const primeEl = document.getElementById('cust-kpi-prime');
+
+      const totalPlafon = customers.reduce((sum, c) => sum + (c.creditLimit || 0), 0);
+      const totalDebt = customers.reduce((sum, c) => sum + (c.currentDebt || 0), 0);
+      const primeCount = customers.filter(c => c.tier === 'PRIME_WHOLESALE').length;
+      const debtCount = customers.filter(c => (c.currentDebt || 0) > 0).length;
+
+      if (totalEl) totalEl.textContent = `${customers.length} Toko`;
+      if (plafonEl) plafonEl.textContent = formatRupiah(totalPlafon);
+      if (debtEl) debtEl.textContent = formatRupiah(totalDebt);
+      if (primeEl) primeEl.textContent = `${primeCount} Toko`;
+
+      const debtSubEl = document.querySelector('#cust-kpi-debt + .kpi-sub');
+      if (debtSubEl) debtSubEl.textContent = `${debtCount} Pelanggan Ada Tagihan`;
+
+      if (!tbody) return;
+
+      tbody.innerHTML = customers.map(c => `
+        <tr>
+          <td>
+            <strong>${c.storeName}</strong>
+            <div style="font-size:0.72rem; color:var(--text-muted);">PIC: ${c.name} • <code>${c.id}</code></div>
+          </td>
+          <td>
+            <div>📱 <strong>${c.phone}</strong></div>
+            <div style="font-size:0.72rem; color:var(--text-secondary); max-width:240px; white-space:normal;">${c.address}</div>
+          </td>
+          <td><strong>${formatRupiah(c.creditLimit)}</strong></td>
+          <td style="font-weight:800; color:${c.currentDebt > 0 ? 'var(--accent-rose)' : 'var(--accent-green)'};">
+            ${formatRupiah(c.currentDebt)}
+            ${c.currentDebt > 0 ? `<div style="font-size:0.68rem; color:var(--accent-rose);">⚠️ Kasbon Aktif</div>` : `<div style="font-size:0.68rem; color:var(--accent-green);">Lunas</div>`}
+          </td>
+          <td>
+            <div style="font-weight:700;">${formatRupiah(c.totalSpend)}</div>
+            <div style="font-size:0.7rem; color:var(--text-muted);">${c.totalOrders} Transaksi</div>
+          </td>
+          <td>
+            <span class="tier-badge ${c.tier === 'PRIME_WHOLESALE' ? 'tier-grosir-pro' : (c.tier === 'GROSIR_REGULER' ? 'tier-starter-free' : '')}" style="${c.tier === 'WARUNG_CASH' ? 'background:var(--bg-surface-elevated); color:var(--text-secondary); border:1px solid var(--border-medium);' : ''}">
+              ${c.tier === 'PRIME_WHOLESALE' ? '⭐ PRIME' : (c.tier === 'GROSIR_REGULER' ? 'GROSIR' : 'WARUNG')}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              ${c.currentDebt > 0 ? `
+                <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:#059669;" onclick="store.dispatch('PIUTANG_SEND_REMINDER', { id: '${c.id}', customer: '${c.storeName}', phone: '${c.phone}', remainingAmount: ${c.currentDebt} })">📱 WA PayLink</button>
+              ` : ''}
+              <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:var(--bg-surface-elevated); color:var(--text-primary); border:1px solid var(--border-medium);" onclick="showToast('Riwayat transaksi ${c.storeName} dimuat', 'info')">📜 Riwayat</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
     }
 
     function renderStaffTable(staffList) {
@@ -3859,6 +4234,152 @@
           <td>${s.email} (${s.phone})</td>
           <td><span class="tier-badge ${s.role.includes('Owner') ? 'tier-grosir-pro' : 'tier-starter-free'}">${s.role}</span></td>
           <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${s.status}</span></td>
+          <td>
+            <span class="tier-badge" style="background:${s.pinConfigured ? 'var(--accent-green-soft)' : 'var(--accent-amber-soft)'}; color:${s.pinConfigured ? 'var(--accent-green)' : 'var(--accent-amber)'};">
+              ${s.pinConfigured ? '🔒 PIN AKTIF (HMAC)' : '⚠️ BELUM ADA PIN'}
+            </span>
+          </td>
+          <td>
+            <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:var(--primary);" onclick="handleResetStaffPin('${s.email}')">
+              🔑 Reset PIN
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderRoleMatrixTable(perms) {
+      const container = document.getElementById('role-matrix-container');
+      if (!container) return;
+
+      const modules = [
+        {
+          name: '🛒 Kasir POS & Transaksi',
+          caps: [
+            { key: 'pos:view_catalog', label: 'Buka Katalog & Scan Barcode' },
+            { key: 'pos:checkout', label: 'Proses Pembayaran POS (Tunai/QRIS)' },
+            { key: 'pos:apply_discount', label: 'Berikan Diskon Khusus Grosir' },
+            { key: 'pos:void_item', label: 'Void / Hapus Item dari Transaksi' }
+          ]
+        },
+        {
+          name: '💳 Shift Kasir & Tutup Buku (Z)',
+          caps: [
+            { key: 'shifts:operate', label: 'Buka Shift Kasir & Terima Modal Kas' },
+            { key: 'shifts:close_z', label: 'Cetak Laporan Tutup Shift (Z-Report)' }
+          ]
+        },
+        {
+          name: '📦 Inventori Gudang & FIFO',
+          caps: [
+            { key: 'inventory:view_stock', label: 'Lihat Stok Live & Nomor Lot' },
+            { key: 'inventory:inbound_receive', label: 'Catat Inbound Lot Baru' },
+            { key: 'inventory:adjust', label: 'Penyesuaian Stok / Rusak (Adjustment)' },
+            { key: 'inventory:opname', label: 'Eksekusi Stock Opname Fisik' }
+          ]
+        },
+        {
+          name: '🚚 Logistik & Surat Jalan',
+          caps: [
+            { key: 'logistics:view_sj', label: 'Akses Dokumen Surat Jalan' },
+            { key: 'logistics:dispatch', label: 'Update Status Pengiriman Armada' },
+            { key: 'logistics:sign_pod', label: 'Konfirmasi Serah Terima Barang (POD)' }
+          ]
+        },
+        {
+          name: '💰 Keuangan, COGS & Laba Rugi',
+          caps: [
+            { key: 'finance:view_cogs', label: 'Lihat Harga Modal (COGS Privacy)' },
+            { key: 'finance:view_profit', label: 'Akses Laporan Laba Rugi Realtime' },
+            { key: 'finance:manage_piutang', label: 'Kelola Buku Kasbon & Penagihan WA' },
+            { key: 'finance:export_data', label: 'Ekspor Data Finansial Excel/CSV' }
+          ]
+        },
+        {
+          name: '⚙️ Tata Kelola Staf & Pengaturan',
+          caps: [
+            { key: 'system:manage_users', label: 'Undang Staf & Kelola Peran' },
+            { key: 'system:manage_settings', label: 'Ubah Subdomain & Akun Bank Settlement' }
+          ]
+        }
+      ];
+
+      const roles = [
+        { id: 'KASIR', label: '💳 Kasir Grosir' },
+        { id: 'GUDANG', label: '📦 Staf Gudang' },
+        { id: 'DRIVER', label: '🚚 Driver Logistik' }
+      ];
+
+      let html = `
+        <table class="operator-table" style="min-width:700px;">
+          <thead>
+            <tr>
+              <th style="width:40%;">Modul & Kunci Otoritas (Capability Key)</th>
+              <th style="text-align:center; width:15%;">👑 OWNER</th>
+              ${roles.map(r => `<th style="text-align:center; width:15%;">${r.label}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      modules.forEach(mod => {
+        html += `
+          <tr style="background:var(--bg-surface-elevated);">
+            <td colspan="${roles.length + 2}" style="font-weight:800; color:var(--primary); font-size:0.84rem; padding:8px 12px;">
+               ${mod.name}
+            </td>
+          </tr>
+        `;
+        mod.caps.forEach(cap => {
+          html += `
+            <tr>
+              <td>
+                <div style="font-weight:700; font-size:0.8rem;">${cap.label}</div>
+                <code style="font-size:0.68rem; color:var(--text-muted);">${cap.key}</code>
+              </td>
+              <td style="text-align:center;">
+                <span class="tier-badge tier-grosir-pro" title="Owner memiliki akses tak terbatas otomatis">✓ FULL</span>
+              </td>
+              ${roles.map(r => {
+                const rolePerms = perms[r.id] || [];
+                const isChecked = rolePerms.includes(cap.key) || rolePerms.includes('all');
+                return `
+                  <td style="text-align:center;">
+                    <input type="checkbox" class="role-perm-check" data-role="${r.id}" data-key="${cap.key}" ${isChecked ? 'checked' : ''} style="width:16px; height:16px; accent-color:var(--primary); cursor:pointer;">
+                  </td>
+                `;
+              }).join('')}
+            </tr>
+          `;
+        });
+      });
+
+      html += `
+          </tbody>
+        </table>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function renderInvoicesTable(sales) {
+      const tbody = document.getElementById('invoices-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = sales.map(s => `
+        <tr>
+          <td><strong>${s.id}</strong></td>
+          <td>${s.createdAt}</td>
+          <td><strong>${s.customer}</strong></td>
+          <td style="font-weight:800; color:var(--primary);">${formatRupiah(s.totalAmount)}</td>
+          <td><span class="tier-badge ${s.paymentMethod === 'TUNAI' ? 'tier-grosir-pro' : 'tier-starter-free'}">${s.paymentMethod}</span></td>
+          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${s.status}</span></td>
+          <td>
+            <div style="display:flex; gap:6px;">
+              <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem;" onclick="store.dispatch('OPEN_MODAL', 'receipt'); renderReceiptModal('${s.id}', ${s.totalAmount}, '${s.paymentMethod}', ${JSON.stringify(s.allocations || []).replace(/"/g, '&quot;')})">🖨️ Cetak Nota</button>
+              <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:var(--bg-surface-elevated); color:var(--text-primary); border:1px solid var(--border-medium);" onclick="switchModule('sj')">🚚 Surat Jalan</button>
+            </div>
+          </td>
         </tr>
       `).join('');
     }
@@ -4362,6 +4883,45 @@
 
       store.dispatch('STAFF_INVITE', { name, email, phone, role });
       store.dispatch('CLOSE_MODAL');
+    }
+
+    function handleAddCustomerSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('cust-name').value;
+      const storeName = document.getElementById('cust-store').value;
+      const phone = document.getElementById('cust-phone').value;
+      const tier = document.getElementById('cust-tier').value;
+      const address = document.getElementById('cust-address').value;
+      const creditLimit = parseInt(document.getElementById('cust-credit-limit').value, 10) || 0;
+
+      store.dispatch('CUSTOMER_ADD', { name, storeName, phone, tier, address, creditLimit });
+      store.dispatch('CLOSE_MODAL');
+    }
+
+    function handleSaveRoleMatrix() {
+      const checks = document.querySelectorAll('.role-perm-check');
+      const newPerms = {
+        OWNER: ['all'],
+        KASIR: [],
+        GUDANG: [],
+        DRIVER: []
+      };
+
+      checks.forEach(c => {
+        if (c.checked) {
+          const role = c.getAttribute('data-role');
+          const key = c.getAttribute('data-key');
+          if (newPerms[role]) {
+            newPerms[role].push(key);
+          }
+        }
+      });
+
+      store.dispatch('ROLE_MATRIX_SAVE', newPerms);
+    }
+
+    function handleResetStaffPin(email) {
+      store.dispatch('STAFF_RESET_PIN', { email });
     }
 
     function handleInviteOperatorSubmit(e) {
