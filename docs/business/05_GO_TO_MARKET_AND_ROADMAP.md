@@ -84,6 +84,7 @@ gantt
   * Compound trade discount calculator (`5% + 2% + Rp 1,000`).
   * Unit conversions (*PCS $\rightarrow$ Lusin $\rightarrow$ Karton*).
   * Multi-hardware printing: Bluetooth ESC/POS (58mm/80mm) and Dot Matrix Continuous Form (Epson ESC/P2).
+  * **High-Speed Barcode & SKU Scanner (Phase 1 MVP)**: Instant O(1) barcode lookup (EAN-13, UPC, Code 128) via smartphone camera and wireless Bluetooth laser scanners for frictionless management of thousands of SKUs.
   * Dynamic Client PayLink web checkout portal (QRIS & Virtual Accounts via platform payment gateway).
   * Real-time payment webhook callback that marks orders as "PAID" and alerts the merchant.
 
@@ -93,6 +94,7 @@ gantt
 * **Key Deliverables**:
   * **Multi-Tenant & Multi-User Authentication Engine**: Universal login for mobile and web backoffice (`sidaya.id/login` / `app.sidaya.id`). Automatic single-tenant workspace routing, multi-store switcher for business owners, and session token enrichment.
   * **Merchant Backoffice Dashboard Shell (Responsive Web & Mobile)**: Dual-surface dashboard interface with branch selector, company branding, and core operational KPI widgets (daily turnover, cash drawer float, piutang aging, low-stock alerts).
+  * **High-Volume Catalog & Barcode Engine**: Massive catalog support (scaling to 50,000+ items) with sub-5ms search, barcode batch assignment during Inbound Receiving, and handheld Stock Opname discrepancy scanning.
   * **Granular Checkbox Permission Matrix & Role-Adaptive UI**: Decouples rigid hardcoded roles into modular capability checkboxes (`pos:checkout`, `warehouse:inbound`, `logistics:dispatch`, `catalog:view_cogs`, `finance:reports`). Screens dynamically adapt on smartphones and desktops to only show tabs and actions the employee is authorized to use.
   * **Supabase Realtime CDC WebSocket Engine**: Sub-second synchronization between cashier registers, warehouse scanners, field drivers, and owner monitoring screens.
   * **Inbound Supply & Receiving Dock**: Track supplier POs, arrival dates, physical count checks, and multi-bin storage assignment (Warehouse $\rightarrow$ Zone $\rightarrow$ Rack $\rightarrow$ Bin).
