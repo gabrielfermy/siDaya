@@ -20,8 +20,8 @@ graph TD
         SyncQueue[Outbox Mutation Queue]
         NetWatcher[Network Status Monitor]
         
-        UI -->|1. Instant Read/Write (<10ms)| MemDB
-        UI -->|2. Enqueues Mutation| SyncQueue
+        UI -->|"1. Instant Read/Write (<10ms)"| MemDB
+        UI -->|"2. Enqueues Mutation"| SyncQueue
     end
     
     subgraph "Supabase Cloud Backend"
