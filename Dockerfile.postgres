@@ -1,0 +1,5 @@
+FROM postgres:16-alpine
+
+# Copy schema and seed scripts into initialization directory
+COPY packages/database/migrations/00001_initial_schema.sql /docker-entrypoint-initdb.d/01_schema.sql
+COPY supabase/seed.sql /docker-entrypoint-initdb.d/02_seed.sql

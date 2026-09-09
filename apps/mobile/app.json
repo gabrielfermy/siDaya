@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "SiDaya POS & Wholesale",
+    "slug": "sidaya",
+    "version": "0.1.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F172A"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "id.sidaya.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F172A"
+      },
+      "package": "id.sidaya.app"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-updates",
+        {
+          "username": "ashvinlabs"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "sidaya-pos"
+      }
+    }
+  }
+}

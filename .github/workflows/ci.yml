@@ -1,0 +1,39 @@
+name: Continuous Integration (CI)
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    name: Build, Strict Typecheck & Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.4.0
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build All Monorepo Projects
+        run: pnpm run build
+
+      - name: Strict Typecheck
+        run: pnpm run typecheck
+
+      - name: Run Phase 1 Verification Tests
+        run: npx tsx packages/hardware-core/test/verify-phase1.ts

@@ -1,0 +1,49 @@
+name: Deploy to Vercel
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'apps/paylink-web/**'
+      - 'packages/**'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'apps/paylink-web/**'
+      - 'packages/**'
+  workflow_dispatch:
+
+jobs:
+  deploy-vercel:
+    name: Build & Deploy PayLink to Vercel
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.4.0
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Monorepo Dependencies
+        run: pnpm --filter @sidaya/shared-types --filter @sidaya/paylink-web run build
+
+      - name: Deploy to Vercel (Preview / Production)
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: ./apps/paylink-web
+          vercel-args: ${{ github.ref == 'refs/heads/main' && '--prod' || '' }}

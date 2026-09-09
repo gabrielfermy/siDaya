@@ -1,0 +1,26 @@
+{
+  "name": "sidaya-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SiDaya by Ashvin Labs - Next-Gen Mobile SaaS for Wholesale Trade, Inbound Inventory, Surat Jalan & Instant Payments",
+  "author": "Ashvin Labs",
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "pnpm -r run lint",
+    "test": "pnpm -r run test",
+    "clean": "pnpm -r run clean",
+    "dev:db": "docker compose up -d",
+    "dev:api": "pnpm --filter @sidaya/api-core run dev",
+    "dev:web": "pnpm --filter @sidaya/paylink-web run dev",
+    "dev:preview": "node preview/serve.js",
+    "dev:mobile": "pnpm --filter @sidaya/mobile start",
+    "dev": "docker compose up -d && pnpm --filter @sidaya/api-core --filter @sidaya/paylink-web --parallel run dev",
+    "test:phase2": "npx tsx packages/api-core/test/verify-phase2.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  },
+  "packageManager": "pnpm@11.4.0"
+}

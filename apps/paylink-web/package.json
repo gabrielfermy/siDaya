@@ -1,0 +1,24 @@
+{
+  "name": "@sidaya/paylink-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Frictionless Client Payment Web Portal for WhatsApp Orders (Dynamic QRIS, VA, Realtime Settlement)",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist",
+    "dev": "tsx watch src/dev-server.ts",
+    "start": "node dist/dev-server.js"
+  },
+  "dependencies": {
+    "@sidaya/shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.5"
+  }
+}

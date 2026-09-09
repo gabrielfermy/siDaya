@@ -1,0 +1,24 @@
+{
+  "name": "@sidaya/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SiDaya Offline-First Mobile Point of Sale & Wholesale Operations App (React Native / Expo)",
+  "main": "src/app/index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@sidaya/hardware-core": "workspace:*",
+    "@sidaya/shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "typescript": "^5.4.5"
+  }
+}
