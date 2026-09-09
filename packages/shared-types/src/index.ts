@@ -14,6 +14,7 @@ export * from './models/order.model.js';
 export * from './models/shift.model.js';
 export * from './models/piutang.model.js';
 export * from './models/platform-admin.model.js';
+export * from './models/auth.model.js';
 
 // Utilities
 export * from './utils/whatsapp-formatter.js';

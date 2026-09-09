@@ -145,10 +145,10 @@ graph TB
         ObjectStorage[(S3 / MinIO\nInvoices, Logos & PDFs)]
     end
 
-    App -->|REST / RPC APIs| Gateway
-    App <-->|WebSockets (Sub-second CDC)| RealtimeServer
-    KDS <-->|WebSockets (Live Order Stream)| RealtimeServer
-    WebPortal -->|Public Checkout API| Gateway
+    App -->|"REST / RPC APIs"| Gateway
+    App <-->|"WebSockets (Sub-second CDC)"| RealtimeServer
+    KDS <-->|"WebSockets (Live Order Stream)"| RealtimeServer
+    WebPortal -->|"Public Checkout API"| Gateway
     Gateway --> AppServer
     RealtimeServer <-->|Logical Replication pgoutput| DB
     AppServer --> DB
@@ -375,3 +375,92 @@ CREATE POLICY cashier_hide_cogs ON products
     )
   );
 ```
+
+---
+
+## 7. Multi-Domain & Subdomain Isolation Topology
+
+To provide strict boundaries between customer operations, platform telemetry, and customer payment rails, SiDaya splits traffic across distinct subdomains:
+
+| Subdomain | Environment / Local | Audience & Scope | Responsibilities |
+| :--- | :--- | :--- | :--- |
+| **Merchant App** | `sidaya.biz.id`<br>`localhost:3333` | Store Owners, Cashiers, Warehouse, Drivers | POS Terminal, FIFO Inventory, Surat Jalan Manifests, Owner Backoffice |
+| **Control Plane** | `ops.sidaya.biz.id`<br>`ops.localhost:3333` | Ashvin Labs Officers (Super Admin, Dev, Support) | Tenant Fleet Directory, Subscriptions, Platform Telemetry, Immutable Audit Trail |
+| **PayLink Portal** | `pay.sidaya.biz.id`<br>`pay.localhost:3333` | End-Buyers & Wholesale Clients | Zero-install QRIS & Virtual Account Checkout, Invoice Status, Payment Receipts |
+
+---
+
+## 8. Authentication & Onboarding Lifecycle (Owner Self-Reg vs. Invitation-Only)
+
+```mermaid
+flowchart TD
+    subgraph SelfReg ["🏢 1. Merchant Owner Self-Registration"]
+        A[New Store Owner] -->|Enters Business Info, Email, Password| B[POST /api/v1/auth/register-owner]
+        B --> C[Create Tenant Group & Workspace]
+        C --> D[Generate Verification Token]
+        D -->|Resend Email Service| E[Send Email Verification]
+        E --> F[Owner Verifies -> Full Access]
+    end
+
+    subgraph StaffInv ["👥 2. Tenant Staff Onboarding (Invitation Only)"]
+        F --> G[Owner Invites Cashier / Warehouse / Driver]
+        G -->|POST /api/v1/tenants/:id/invitations| H[Send Invitation Token via Resend / WA]
+        H --> I[Staff Accepts -> Fast PIN & Role Assigned]
+    end
+
+    subgraph OpsInv ["⚡ 3. Platform Operator Onboarding (Super Admin Only)"]
+        J[Ashvin Labs Super Admin] -->|POST /api/v1/admin/operators/invite| K[Create Operator Invitation]
+        K -->|Resend Corporate Email| L[Send Operator Activation Token]
+        L --> M[Operator Activated with RBAC: SUPER_ADMIN / DEV / OPS / AUDIT]
+    end
+```
+
+### Invariants:
+1. **Global Email Uniqueness**: An email address can only exist once across all tables (`platform_operators`, `tenant_users`, and `auth.users`). Alias `+` addressing is supported (e.g. `owner+test@domain.com`).
+2. **Owner Exclusivity**: Self-registration is restricted exclusively to Store Owners (Billing POC). All subordinate tenant staff (Cashiers, Warehouse, Drivers) and platform operators must enter through formal invitation tokens.
+3. **Password Security**: Enforces industry-standard strength (minimum 8 characters, uppercase, lowercase, numbers, and special characters).
+
+---
+
+## 9. Client State Management Architecture (Zustand & Pre-Paint Zero-FOUC)
+
+To prevent stateless rendering issues, multi-tab desynchronization, and visual flash-of-unauthenticated-content (FOUC), SiDaya implements a centralized **Zustand State Store Engine**:
+
+```mermaid
+flowchart TD
+    subgraph Viewport ["🖥️ UI Viewport & Dispatchers"]
+        A[POS Terminal / FIFO / Surat Jalan / Control Plane] -->|Action Dispatch| B[Zustand Action Methods]
+    end
+
+    subgraph StateStore ["⚡ Zustand Reactive Store (Single Source of Truth)"]
+        B --> C[State Slices:\nauth, ui, catalog, inventoryLots, cart, sales, suratJalan, staff, operator]
+        C --> D[FIFO Batch Depletion Algorithm]
+        C --> E[Immutable State Transitions]
+    end
+
+    subgraph StorageSync ["🔄 Persistence & Multi-Tab Synchronizer"]
+        C --> F[Zustand Persist Middleware]
+        F --> G[Local / Session Storage]
+        G -->|window StorageEvent| H[Cross-Tab Realtime Synchronizer]
+    end
+
+    subgraph Renderer ["🎨 Pure Reactive Subscriber"]
+        C -->|store.subscribe| I[renderUI Deterministik]
+        I --> J[Pre-Paint Zero-FOUC CSS Selectors]
+    end
+```
+
+### Core Architecture Components:
+1. **Zustand Single Source of Truth (`useSiDayaStore`)**:
+   - Manages all live client domain models in an immutable state tree.
+   - Automatically handles FIFO batch calculations, deducting quantities from the oldest received lots first during POS checkouts.
+2. **Automated State Persistence & Hydration**:
+   - Integrated with Zustand `persist` middleware, ensuring shopping carts, active inventory lots, delivery manifests, and operator PII masking settings persist seamlessly across browser refreshes.
+3. **Cross-Tab Real-Time Synchronization**:
+   - Listens to `window.addEventListener('storage', ...)` to propagate state mutations (e.g. inventory decrements or staff invitations) across multiple open browser tabs in real-time.
+4. **Pre-Paint Zero-FOUC (Flash of Unauthenticated Content) Architecture**:
+   - Synchronous inline script in `<head>` resolves theme and authentication state before first paint.
+   - Declarative CSS classes (`html.state-auth-*` vs `html.state-unauth-*`) ensure authenticated routes (`/dashboard`, `/pos`, `/fleet`) render without flickering the login screen on reload.
+5. **Clean HTML5 Path-Based Routing**:
+   - Full RESTful URL paths (`/dashboard`, `/pos`, `/fifo`, `/surat-jalan`, `/telemetry`, `/fleet`, `/operators`, `/audit`, `/login`) synchronized via HTML5 `history.pushState` and `popstate` listeners.
+

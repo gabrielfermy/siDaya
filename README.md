@@ -61,9 +61,9 @@ graph TD
     end
 
     subgraph Platform Control Plane RBAC
-        CP -->|SUPER_ADMIN (Gabriel - CEO)| SA["Global Metrics, Tier Overrides, Break-Glass"]
-        CP -->|DEV_ENGINEER (Alex - Lead Dev)| DE["Telemetry, Latency p95, Error Logs, DB Pool"]
-        CP -->|OPS_SUPPORT (Dina - Ops)| OS["Tenant Directory (PII Masked: +6281****7890)"]
+        CP -->|"SUPER_ADMIN (Gabriel - CEO)"| SA["Global Metrics, Tier Overrides, Break-Glass"]
+        CP -->|"DEV_ENGINEER (Alex - Lead Dev)"| DE["Telemetry, Latency p95, Error Logs, DB Pool"]
+        CP -->|"OPS_SUPPORT (Dina - Ops)"| OS["Tenant Directory (PII Masked: +6281****7890)"]
     end
 
     subgraph Data & Storage Engine

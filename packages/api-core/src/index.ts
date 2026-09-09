@@ -6,4 +6,5 @@ export * from './services/delivery-order.service';
 export * from './services/auth-tenant.service';
 export * from './services/inbound-fifo.service';
 export * from './services/platform-admin.service';
+export * from './services/email-dispatch.service';
 export * from './controllers/payment-webhook.controller';

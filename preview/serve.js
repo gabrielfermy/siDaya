@@ -17,6 +17,9 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`SiDaya Prototype Server running at http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`SiDaya Multi-Domain Prototype Server running at http://localhost:${PORT}`);
+  console.log(` - Merchant Plane: http://localhost:${PORT}`);
+  console.log(` - Operator Control Plane: http://ops.localhost:${PORT}`);
+  console.log(` - PayLink Portal: http://pay.localhost:${PORT}`);
 });
