@@ -571,7 +571,179 @@ Generates an official Driver Working Permit (*Surat Jalan* / Delivery Order) lin
 
 ---
 
-### K. Control Plane Endpoints: Ashvin Labs Platform Operator & Fleet Telemetry
+### I. Sales Returns & Invoicing Lifecycle (Pilar 5)
+
+#### `POST /sales/returns`
+Processes a customer sales return, restores stock to corresponding FIFO batches, and issues a credit note or cash refund.
+
+```http
+POST /api/v1/sales/returns HTTP/1.1
+Authorization: Bearer <JWT_ACCESS_TOKEN>
+X-Tenant-ID: a0000001-0000-0000-0000-000000000001
+Content-Type: application/json
+
+{
+  "order_id": "ord_991823ab",
+  "customer_id": "cust_001",
+  "settlement_type": "CREDIT_NOTE",
+  "notes": "2 karung beras sobek saat pengiriman",
+  "items": [
+    {
+      "order_item_id": "item_001",
+      "product_id": "prod_01JA98Z",
+      "batch_id": "lot_20260901_01",
+      "quantity_returned": 2,
+      "unit_price": 625000,
+      "restock_condition": "RESTOCK_GOOD"
+    }
+  ]
+}
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "return_id": "ret_77182a",
+    "return_number": "RET-20260909-001",
+    "total_refund_amount": 1250000,
+    "settlement_type": "CREDIT_NOTE",
+    "customer_piutang_deducted": 1250000,
+    "status": "COMPLETED",
+    "created_at": "2026-09-09T14:00:00Z"
+  }
+}
+```
+
+---
+
+### J. Procurement, Multi-Warehouse Transfers & Stock Opname (Pilar 2 & 4)
+
+#### `POST /procurement/orders`
+Creates a Purchase Order (PO) to a supplier with optional automatic approval evaluation.
+
+```json
+{
+  "supplier_id": "sup_001",
+  "expected_delivery_date": "2026-09-15",
+  "payment_terms": "TOP_30_DAYS",
+  "items": [
+    {
+      "product_id": "prod_01JA98Z",
+      "quantity": 100,
+      "unit_cost": 590000
+    }
+  ],
+  "notes": "Pesanan beras musim panen September"
+}
+```
+
+#### `POST /inventory/transfers`
+Dispatches an inter-warehouse stock transfer between branches.
+
+```json
+{
+  "source_branch_id": "br_pusat",
+  "destination_branch_id": "br_mangga_dua",
+  "driver_name": "Sopir Hendra",
+  "vehicle_plate": "B 9912 CD",
+  "items": [
+    {
+      "product_id": "prod_01JA98Z",
+      "batch_id": "lot_20260901_01",
+      "quantity_sent": 50
+    }
+  ]
+}
+```
+
+#### `POST /inventory/stock-opname`
+Submits a physical stock opname audit with scanned quantities vs system balance.
+
+```json
+{
+  "branch_id": "br_pusat",
+  "items": [
+    {
+      "product_id": "prod_01JA98Z",
+      "batch_id": "lot_20260901_01",
+      "system_qty": 50,
+      "physical_qty": 48,
+      "reason": "DAMAGED"
+    }
+  ]
+}
+```
+
+---
+
+### K. Integrated Finance, Multi-Account Cash & Bank (Pilar 7)
+
+#### `GET /finance/cash-bank`
+Retrieves all cash drawer, petty cash, and bank accounts with live balances.
+
+```json
+{
+  "success": true,
+  "data": [
+    { "id": "acc_01", "account_name": "Kasir Utama (Cash Drawer)", "account_type": "CASH", "current_balance": 1850000 },
+    { "id": "acc_02", "account_name": "BCA Operasional", "account_type": "BANK", "bank_name": "BCA", "account_number": "8891234567", "current_balance": 142500000 },
+    { "id": "acc_03", "account_name": "Mandiri Grosir", "account_type": "BANK", "bank_name": "Mandiri", "account_number": "12300998877", "current_balance": 87300000 }
+  ]
+}
+```
+
+#### `GET /finance/reports/profit-loss`
+Generates a real-time Profit & Loss statement based on actual FIFO cost of goods sold.
+
+```json
+{
+  "success": true,
+  "data": {
+    "period": { "from": "2026-09-01", "to": "2026-09-09" },
+    "gross_revenue": 185000000,
+    "sales_discounts": 3500000,
+    "net_revenue": 181500000,
+    "cogs_fifo": 152000000,
+    "gross_profit": 29500000,
+    "gross_profit_margin_pct": 16.25,
+    "operating_expenses": 6500000,
+    "net_profit": 23000000
+  }
+}
+```
+
+---
+
+### L. Approval Workflows & Immutable Activity Audit Logs (Pilar 8 & 9)
+
+#### `GET /governance/audit-logs`
+Retrieves cryptographically logged immutable audit events.
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "log_001",
+      "actor_name": "Budi Santoso",
+      "actor_role": "OWNER",
+      "action_type": "PRICE_OVERRIDE",
+      "entity_name": "products",
+      "entity_id": "prod_01JA98Z",
+      "old_state": { "price": 640000 },
+      "new_state": { "price": 625000 },
+      "ip_address": "180.252.11.45",
+      "ray_id": "ray_991823ab",
+      "created_at": "2026-09-09T14:15:00Z"
+    }
+  ]
+}
+```
+
+---
+
+### M. Control Plane Endpoints: Ashvin Labs Platform Operator & Fleet Telemetry
 
 #### `POST /api/v1/admin/auth/login`
 Authenticates an Ashvin Labs staff member (`@ashvinlabs.com`) and returns an operator session with granted administrative capabilities.

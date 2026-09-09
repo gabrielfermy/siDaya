@@ -161,131 +161,188 @@ graph TB
 
 ---
 
-## 3. The Modular Monolith & Domain Boundaries
+## 3. The 9 Pillars of Enterprise ERP Architecture & Domain Boundaries
 
-To guarantee that any domain module can be added, updated, or removed independently without regressions, all modules adhere to strict **Hexagonal / Clean Architecture boundaries**. Direct cross-module database querying is prohibited; all cross-domain operations must pass through explicit **Domain Interfaces** or the **Asynchronous Domain Event Bus**.
-
-### Core Bounded Contexts
+To guarantee that any enterprise domain module can be added, updated, or toggled independently without regressions, all modules adhere to strict **Hexagonal / Clean Architecture boundaries**. Direct cross-module database querying is prohibited; all cross-domain operations must pass through explicit **Domain Interfaces** or the **Asynchronous Domain Event Bus**.
 
 ```mermaid
 classDiagram
-    class IdentityModule {
-        +TenantService
-        +AuthService
-        +StaffRoleService
-        +QuickPinAuthService
+    class Pilar1_Dashboard {
+        +ExecutiveMetricsService
+        +GrossProfitFifoCalculator
+        +CashBankSummaryService
+        +SmartAlertEngine
     }
-    class EntitlementModule {
-        +TenantEntitlementService
-        +FeatureRegistry
-        +PlanLimitGuard
-    }
-    class ShiftModule {
-        +ShiftLifecycleService
-        +CashDrawerTracker
-        +ReconciliationReportService
-    }
-    class CatalogModule {
-        +ProductService
-        +WholesalePriceTierService
+    class Pilar2_Inventory {
+        +MasterSkuService
+        +MultiWarehouseService
+        +BatchAllocationEngine (FIFO/FEFO)
+        +StockOpnameAdjustmentService
         +UnitConversionService
     }
-    class OrderModule {
-        +OrderCreationService
-        +CompoundDiscountEngine
-        +POSTransactionService
+    class Pilar3_ContactsCRM {
+        +SupplierDirectoryService
+        +CustomerDirectoryService
+        +WholesaleTierResolver
+        +DynamicCreditScoringService
     }
-    class InventoryModule {
-        +StockLedgerService
-        +StorageBinService
-        +BatchAllocationEngine (FIFO/FEFO)
-        +MultiWarehouseService
-        +AtomicDecrementService
-    }
-    class InboundProcurementModule {
-        +SupplierService
-        +SupplierPOService
+    class Pilar4_Procurement {
+        +StockPlanningReorderEngine
+        +PurchaseOrderService
         +GoodsReceivingService
         +SupplierReturnService (RTV)
     }
-    class LogisticsModule {
-        +SuratJalanService
-        +DriverManifestGenerator
-        +ProofOfDeliveryService
+    class Pilar5_SalesInvoicingPOS {
+        +OfflinePOSCheckoutService
+        +InvoiceMultiStatusEngine
+        +SalesReturnSettlementService
+        +CashierShiftX_Z_ReportService
+        +BarcodeScanningService
     }
-    class PayLinkModule {
-        +PayLinkGenerator
-        +WebhookHandler
-        +GatewayAdapterRegistry
+    class Pilar6_Logistics {
+        +SuratJalanService (Price-Masked)
+        +FleetDriverAssignmentService
+        +DigitalProofOfDeliveryService
     }
-    class PiutangModule {
-        +PiutangLedgerService
-        +DebtAgingService
-        +PartialSettlementEngine
+    class Pilar7_FinanceAccounting {
+        +AccountsReceivableLedger (Piutang)
+        +AccountsPayableLedger (Hutang)
+        +MultiAccountCashBankLedger
+        +RealtimeProfitLossService (FIFO HPP)
+        +CashFlowForecastService
+        +FixedAssetDepreciationService
     }
-    class HardwareModule {
-        +EscPosThermalDriver
-        +DotMatrixEscP2Driver
-        +PrinterProfileRegistry
+    class Pilar8_UserRBAC {
+        +TenantAuthService
+        +StaffRoleMatrixService
+        +QuickPinSwitchService
+    }
+    class Pilar9_GovernanceAudit {
+        +ImmutableAuditLogService
+        +DatabaseBackupSnapshotService
+        +DataExportService (Excel/PDF)
+        +PdpComplianceMaskingEngine
     }
 
-    OrderModule ..> EntitlementModule : Verifies Active Tiers
-    OrderModule ..> IdentityModule : Authenticates Staff PIN
-    OrderModule ..> CatalogModule : Resolves Wholesale & Units
-    OrderModule ..> InventoryModule : Requests FIFO Batch Reservation
-    OrderModule ..> LogisticsModule : Dispatches Driver Surat Jalan (Price-Stripped)
-    OrderModule ..> HardwareModule : Dispatches Print Jobs
-    OrderModule ..> PayLinkModule : Requests Payment Link
-    InboundProcurementModule ..> InventoryModule : Ingests Inbound Batches & Bins
-    PayLinkModule --> EventBus : Publishes 'OrderPaidEvent'
-    EventBus --> InventoryModule : Confirms Batch Decrement
-    EventBus --> PiutangModule : Clears Customer Kasbon
+    Pilar5_SalesInvoicingPOS ..> Pilar2_Inventory : Requests FIFO Batch Reservation
+    Pilar5_SalesInvoicingPOS ..> Pilar3_ContactsCRM : Resolves Customer Credit & Tiers
+    Pilar5_SalesInvoicingPOS ..> Pilar6_Logistics : Triggers Surat Jalan Generation
+    Pilar5_SalesInvoicingPOS ..> Pilar7_FinanceAccounting : Posts AR / Cash Ledger Entries
+    Pilar4_Procurement ..> Pilar2_Inventory : Ingests Goods Receiving Batches
+    Pilar4_Procurement ..> Pilar7_FinanceAccounting : Posts AP / Vendor Invoices
+    Pilar7_FinanceAccounting ..> Pilar2_Inventory : Reads FIFO COGS (HPP)
+    Pilar8_UserRBAC ..> Pilar9_GovernanceAudit : Logs Role Changes & Breakglass Access
 ```
 
-### Domain Module Responsibilities
+---
 
-| Module | Core Responsibility | Public API / Interfaces |
-| :--- | :--- | :--- |
-| **`IdentityModule`** | Tenant accounts, multi-staff credentials, JWT claims, fast 4–6 digit cashier PIN switching, outlet assignment. | `verifyStaffPin()`, `switchStationCashier()`, `getTenantStaff()` |
-| **`EntitlementModule`** | Plan definitions (Free, Retail, Grosir Pro, Enterprise), dynamic feature toggling, entitlement checks. | `isFeatureEnabled(tenantId, featureKey)`, `assertLimit()` |
-| **`ShiftModule`** | Register shift lifecycle (`shifts`), opening cash float, cash in/out drops, X-Report & Z-Report reconciliation. | `openShift()`, `recordCashDrop()`, `closeShift()` |
-| **`CatalogModule`** | Products, variants, barcodes, wholesale price tiers (*Eceran/Grosir*), unit conversions (*PCS/Lusin/Dus*). | `getProduct()`, `resolveTierPrice()`, `convertStockUnits()` |
-| **`InboundProcurementModule`** | Suppliers, inbound POs, goods receiving, carrier logs, and supplier return policies (RTV terms). | `createSupplierPO()`, `receiveInboundShipment()`, `recordSupplierReturn()` |
-| **`InventoryModule`** | Multi-bin storage locations (Warehouse $\rightarrow$ Zone $\rightarrow$ Rack $\rightarrow$ Bin), FIFO/FEFO batch allocation, atomic decrements. | `allocateBatchesFIFO()`, `recordStockMovement()`, `assignStorageBin()` |
-| **`LogisticsModule`** | Driver Working Permits (*Surat Jalan* / Delivery Orders) with price-stripped manifests linked to invoices, proof of delivery. | `generateSuratJalan()`, `recordProofOfDelivery()`, `getDriverManifest()` |
-| **`OrderModule`** | Order orchestration, shopping cart calculations, compound discounts (`5%+2%+Rp`), invoice numbering. | `createOrder()`, `calculateCompoundDiscount()`, `voidOrder()` |
-| **`PayLinkModule`** | Hosted checkout tokens, QRIS/VA gateway adapters, idempotent webhook processing and auto-reconciliation. | `generatePayLink()`, `handleGatewayWebhook()` |
-| **`PiutangModule`** | Accounts receivable ledger (`piutang_records`), customer debt aging, partial installment settlements via PayLink. | `recordPiutang()`, `settleInstallment()`, `getDebtSummary()` |
-| **`HardwareModule`** | ESC/POS thermal printer byte formatting (58/80mm), Dot Matrix Continuous Form (ESC/P2) layout renderer. | `formatThermalReceipt()`, `formatDotMatrixInvoice()`, `formatSuratJalan()` |
-| **`MarketplaceModule`**| Synchronizes orders, inventory, and settlement status with Tokopedia, Shopee, and TikTok Shop APIs. | `ingestMarketplaceOrder()`, `syncCatalogStock()` |
-| **`NotificationModule`**| WhatsApp Cloud API messages, mobile push alerts (FCM/APNS), customer receipt delivery. | `sendWhatsAppPayLink()`, `sendPushNotification()` |
+## 3.1. Canonical Tenant Dashboard Menu & Sub-Menu Navigation Map
+
+The Tenant Dashboard provides a structured, role-adaptive navigation hierarchy categorized cleanly across the **9 Strategic Pillars**:
+
+| Pilar | Menu Utama | Sub-Menu | Route Path | Deskripsi & Fungsi Bisnis | Role & Permission RBAC | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Pilar 1: Dashboard** | **📊 Dashboard** | Overview Eksekutif | `/dashboard` | Ringkasan omset realtime, laba kotor FIFO, nilai total inventory, posisi piutang & hutang jatuh tempo, saldo kas & bank, serta quick launchpad. | `OWNER`, `MANAGER`, `FINANCE_ADMIN` | **Live (MVP)** |
+| **Pilar 2: Inventori & Multi-Gudang** | **📦 Inventori** | Katalog & Master SKU | `/inventory/catalog` | Manajemen data master barang, barcode EAN-13/UPC, kategori, varian, dan multi-satuan (*Pcs/Lusin/Karton*). | `OWNER`, `MANAGER`, `WAREHOUSE` | **Live (MVP)** |
+| | | Batch & Lot FIFO | `/inventory/fifo-batches` | Pelacakan lot masuk, tanggal expired, lokasi rak/bin, dan simulasi antrean pengeluaran FIFO/FEFO otomatis. | `OWNER`, `WAREHOUSE` | **Live (MVP)** |
+| | | Multi-Gudang & Cabang | `/inventory/warehouses` | Daftar gudang (Pusat, Toko, Transit), alokasi stok per lokasi, dan transfer barang antar cabang (*Inter-Warehouse Transfer*). | `OWNER`, `MANAGER`, `WAREHOUSE` | **Roadmap (Phase 2)** |
+| | | Stock Opname | `/inventory/stock-opname` | Audit fisik berkala menggunakan barcode scanner genggam, perbandingan sistem vs fisik, dan approval penyesuaian (*Adjustment*). | `OWNER`, `MANAGER`, `WAREHOUSE` | **Roadmap (Phase 2)** |
+| | | Cetak Label Barcode | `/inventory/barcode-print` | Generator cetak batch stiker barcode/QR thermal (ukuran 33x15mm, 40x30mm) untuk ribuan SKU. | `OWNER`, `WAREHOUSE`, `CASHIER` | **Roadmap (Phase 2)** |
+| **Pilar 3: Kontak CRM & SRM** | **👥 Kontak** | Direktori Pemasok (*Supplier*) | `/contacts/suppliers` | Database vendor, syarat pembayaran (*Term of Payment / TOP*), rekening bank, dan buku pembantu hutang. | `OWNER`, `PURCHASING`, `FINANCE_ADMIN` | **Roadmap (Phase 2)** |
+| | | Direktori Pelanggan (*Customer*) | `/contacts/customers` | Database pembeli, tier harga grosir, batas plafon kredit (*Credit Limit*), riwayat transaksi, dan dynamic credit score. | `OWNER`, `MANAGER`, `SALESMAN`, `CASHIER` | **Live (MVP)** |
+| **Pilar 4: Pengadaan (Procurement)** | **🛍️ Pengadaan** | Perencanaan Stok & Min/Max | `/procurement/planning` | Kalkulasi reorder point otomatis berdasarkan velocity penjualan dan estimasi lead-time supplier. | `OWNER`, `PURCHASING` | **Roadmap (Phase 3)** |
+| | | Surat Pesanan (*Purchase Order / PO*) | `/procurement/po` | Pembuatan PO supplier, approval berjenjang, tracking status (Draft, Sent, Partial, Received, Canceled). | `OWNER`, `PURCHASING` | **Roadmap (Phase 2)** |
+| | | Penerimaan Barang (*Goods Receipt*) | `/procurement/receiving` | Pencatatan barang tiba di dermaga gudang, inspeksi kuantitas/kondisi, dan pembuatan lot batch FIFO otomatis. | `OWNER`, `WAREHOUSE`, `PURCHASING` | **Live (MVP)** |
+| | | Retur Pembelian (*RTV / Return to Vendor*) | `/procurement/returns` | Pengembalian barang rusak/kadaluarsa ke supplier, klaim garansi, dan pembuatan Nota Debet pengurang hutang. | `OWNER`, `PURCHASING`, `WAREHOUSE` | **Roadmap (Phase 2)** |
+| **Pilar 5: Penjualan & POS** | **🛒 Kasir & Penjualan** | Kasir POS (Fast Scan) | `/pos` | Terminal kasir offline-first, scan barcode cepat, diskon bertingkat (*5%+2%*), multi-satuan, cetak struk thermal & PayLink QRIS. | `OWNER`, `CASHIER`, `SALESMAN` | **Live (MVP)** |
+| | | Faktur Penjualan (*Sales Invoices*) | `/sales/invoices` | Manajemen nota dan faktur: Multi-status (Draft, Belum Lunas / Piutang, Jatuh Tempo, Lunas), filter tanggal, cetak Dot Matrix. | `OWNER`, `FINANCE_ADMIN`, `CASHIER` | **Live (MVP)** |
+| | | Retur Penjualan (*Sales Returns*) | `/sales/returns` | Alur pengembalian nota penjualan: kembalikan barang ke batch FIFO, pengembalian dana tunai, atau potong saldo piutang. | `OWNER`, `MANAGER`, `CASHIER` | **Roadmap (Phase 2)** |
+| | | Shift & Kas Kasir (*X/Z Reports*) | `/sales/shifts` | Modal kas awal (*Opening Float*), cash drops, penutupan kasir, selisih fisik vs sistem, dan cetak Laporan Z. | `OWNER`, `MANAGER`, `CASHIER` | **Roadmap (Phase 2)** |
+| | | Skema Harga & Promo (*Dynamic Pricing*) | `/sales/pricing` | Konfigurasi tier grosir, diskon kuantitas minimum, aturan promo waktu terbatas, dan komisi salesman. | `OWNER`, `MANAGER` | **Roadmap (Phase 3)** |
+| **Pilar 6: Logistik & Operasional** | **🚚 Logistik** | Surat Jalan (*Delivery Order*) | `/surat-jalan` | Penerbitan dokumen pengiriman bertanda-tangan digital, *Price-Masked* (tanpa harga/HPP untuk privasi sopir & pihak ketiga). | `OWNER`, `WAREHOUSE`, `DRIVER` | **Live (MVP)** |
+| | | Pelacakan Pengiriman (*Tracking & POD*) | `/logistics/tracking` | Status armada driver (*In Transit, Delivered, Failed*), upload foto serah terima barang (*Proof of Delivery*) & tanda tangan digital penerima. | `OWNER`, `WAREHOUSE`, `DRIVER` | **Roadmap (Phase 2)** |
+| **Pilar 7: Keuangan & Akuntansi** | **💰 Keuangan** | Buku Piutang (*Accounts Receivable*) | `/finance/piutang` | Ledger piutang pelanggan, debt aging (0-30, 31-60, 60+ hari), notifikasi tagihan WhatsApp PayLink, dan riwayat cicilan. | `OWNER`, `FINANCE_ADMIN` | **Live (MVP)** |
+| | | Buku Hutang (*Accounts Payable*) | `/finance/hutang` | Jadwal jatuh tempo hutang supplier, rencana pelunasan kas, dan rekonsiliasi faktur pembelian. | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 2)** |
+| | | Kas & Rekening Bank | `/finance/cash-bank` | Rekening multi-akun (Kas Kasir, Kas Kecil, BCA, Mandiri), mutasi transfer antar rekening, dan pencatatan biaya operasional. | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 2)** |
+| | | Laporan Laba Rugi & Neraca | `/finance/reports` | Laporan P&L otomatis berbasis HPP FIFO, laporan arus kas, neraca keuangan, dan export format akuntan (Excel/PDF). | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 2)** |
+| | | Peramalan Arus Kas (*Cash Forecast*) | `/finance/forecast` | Proyeksi likuiditas 30–90 hari ke depan berdasarkan jadwal jatuh tempo piutang vs hutang dagang. | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 3)** |
+| | | Aset Tetap & Depresiasi | `/finance/assets` | Pencatatan aset toko/gudang (kendaraan, komputer, rak) dan perhitungan penyusutan otomatis garis lurus bulanan. | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 3)** |
+| **Pilar 8: Pengguna & RBAC** | **👥 Manajemen Tim** | Daftar Pengguna & Karyawan | `/settings/users` | Undangan staf baru (Kasir, Gudang, Sopir, Purchasing), reset PIN cepat 4-6 digit, dan assignment outlet/gudang. | `OWNER`, `MANAGER` | **Live (MVP)** |
+| | | Matriks Hak Akses (*Role Matrix*) | `/settings/roles` | Matriks checkbox izin detail (*Owner Checkbox Matrix*) untuk mengontrol akses modul, privasi HPP, hak void nota, dan diskon manual. | `OWNER` | **Live (MVP)** |
+| **Pilar 9: Tata Kelola & Audit** | **🔒 Tata Kelola** | Audit Trail Aktivitas (*Audit Logs*) | `/settings/audit-logs` | Rekam jejak aktivitas tidak dapat diubah (*immutable*): siapa mengubah apa, kapan, alamat IP, dan Ray ID transaksi. | `OWNER` | **Live (MVP)** |
+| | | Backup & Export Data | `/settings/backup` | Snapshot backup database harian, download arsip master data (CSV/Excel/JSON), dan kepatuhan UU PDP No. 27/2022. | `OWNER` | **Live (MVP)** |
+| | | Pengaturan Profil & Hardware | `/pengaturan` | Konfigurasi identitas toko, logo struk, pairing printer thermal Bluetooth & Dot Matrix, dan pengaturan pajak PPN. | `OWNER`, `MANAGER` | **Live (MVP)** |
 
 ---
 
 ## 4. Pluggable Feature Registry & Dynamic Tenant Entitlements
 
-To satisfy the user requirement of **extreme modularity**—where features can be enabled, disabled, or removed at runtime when a tenant changes their subscription plan:
+To satisfy the core requirement of **extreme modularity**—where features can be enabled, disabled, or gated at runtime according to tenant subscription plans:
 
-### 1. Feature Registry & Keys
-Every feature is governed by a canonical `FeatureKey` enum:
+### 1. Unified Feature Registry & Keys
+Every capability across the 9 Pillars is governed by a canonical `FeatureKey` enum:
+
 ```typescript
 export enum FeatureKey {
-  CORE_POS = 'core:pos',
-  CLIENT_PAYLINK = 'fintech:paylink',
-  GROSIR_MULTI_TIER = 'wholesale:multi_tier',
-  COMPOUND_DISCOUNTS = 'wholesale:compound_discounts',
-  UNIT_CONVERSIONS = 'wholesale:unit_conversions',
-  INBOUND_PROCUREMENT = 'inventory:inbound_procurement',
+  // Pilar 1: Dashboard & Analytics
+  EXECUTIVE_DASHBOARD = 'dashboard:executive_kpis',
+  LIVE_PROFIT_FIFO = 'dashboard:live_profit_fifo',
+
+  // Pilar 2: Inventori & Multi-Gudang
+  CORE_CATALOG = 'inventory:core_catalog',
   STORAGE_BINS = 'inventory:storage_bins',
   FIFO_BATCH_ALLOCATION = 'inventory:fifo_batch_allocation',
+  MULTI_WAREHOUSE = 'inventory:multi_warehouse',
+  STOCK_OPNAME_AUDIT = 'inventory:stock_opname_audit',
+  BARCODE_BATCH_PRINTING = 'inventory:barcode_batch_printing',
+
+  // Pilar 3: Kontak CRM & SRM
+  SUPPLIER_DIRECTORY = 'contacts:suppliers',
+  CUSTOMER_CREDIT_SCORING = 'contacts:customer_credit_scoring',
+
+  // Pilar 4: Pengadaan (Procurement)
+  INBOUND_PROCUREMENT = 'procurement:inbound_po',
+  SUPPLIER_RETURNS_RTV = 'procurement:supplier_returns_rtv',
+  SMART_REORDER_PLANNING = 'procurement:smart_reorder_planning',
+
+  // Pilar 5: Penjualan & POS
+  CORE_POS = 'pos:core_checkout',
+  BARCODE_SCANNER_FAST_SCAN = 'pos:barcode_fast_scan',
+  GROSIR_MULTI_TIER = 'sales:wholesale_multi_tier',
+  COMPOUND_DISCOUNTS = 'sales:compound_discounts',
+  UNIT_CONVERSIONS = 'sales:unit_conversions',
+  INVOICE_MULTI_STATUS = 'sales:invoice_multi_status',
+  SALES_RETURNS_MANAGEMENT = 'sales:returns_management',
+  CASHIER_SHIFT_RECONCILIATION = 'sales:shift_reconciliation',
+
+  // Pilar 6: Logistik & Operasional
   DRIVER_SURAT_JALAN = 'logistics:driver_surat_jalan',
-  SUPPLIER_RETURNS = 'inventory:supplier_returns',
-  DOT_MATRIX_PRINTING = 'hardware:dot_matrix',
-  PIUTANG_LEDGER = 'finance:piutang',
-  STAFF_RBAC_SHIFTS = 'staff:rbac_shifts',
-  REALTIME_MULTI_DEVICE = 'sync:supabase_realtime',
+  DIGITAL_PROOF_OF_DELIVERY = 'logistics:digital_pod',
+
+  // Pilar 7: Keuangan & Akuntansi
+  PIUTANG_LEDGER = 'finance:piutang_ledger',
+  HUTANG_LEDGER = 'finance:hutang_ledger',
+  CASH_BANK_MULTI_ACCOUNT = 'finance:cash_bank_accounts',
+  PROFIT_LOSS_REPORTING = 'finance:profit_loss_reporting',
+  CASH_FLOW_FORECASTING = 'finance:cash_flow_forecasting',
+  FIXED_ASSETS_DEPRECIATION = 'finance:fixed_assets_depreciation',
+  CLIENT_PAYLINK = 'fintech:paylink_qris_va',
+
+  // Pilar 8: Pengguna & RBAC
+  STAFF_RBAC_MATRIX = 'staff:rbac_matrix',
+  FAST_PIN_SWITCHING = 'staff:fast_pin_switch',
+
+  // Pilar 9: Tata Kelola & Keamanan
+  IMMUTABLE_AUDIT_TRAIL = 'governance:immutable_audit_trail',
+  AUTO_BACKUP_DATA_EXPORT = 'governance:auto_backup_export',
+  APPROVAL_WORKFLOW_ENGINE = 'governance:approval_workflows',
+
+  // Hardware & Omnichannel
+  THERMAL_PRINTING = 'hardware:thermal_escpos',
+  DOT_MATRIX_PRINTING = 'hardware:dot_matrix_escp2',
   MARKETPLACE_SYNC = 'omnichannel:marketplace_sync',
-  RESTAURANT_MODE = 'hospitality:restaurant_mode', // Deferred backlog
+  SALESMAN_CANVASSING_SFA = 'sales:salesman_canvassing_sfa',
+  CONSIGNMENT_MANAGEMENT = 'inventory:consignment_management',
 }
 ```
 
@@ -567,11 +624,42 @@ flowchart LR
    - ⚙️ **Pengaturan & Hardware** (`/pengaturan`): Business profile, custom subdomain, ESC/POS printer pairing.
 
 2. **Roadmap Coming Soon Modules (Phased Delivery)**:
-   - 📊 **Laporan Laba Rugi & Finansial** (`/laporan` - **Phase 2 / Q4 2026**): Comprehensive P&L calculation, daily gross margins, COGS analysis, and tax export.
-   - 🏬 **Multi-Gudang & Transfer Cabang** (`/multi-gudang` - **Phase 2 / Q4 2026**): Inter-branch stock transfers, multi-bin distribution, and in-transit tracking.
+   - 📊 **Laporan Laba Rugi & Finansial** (`/finance/reports` - **Phase 2 / Q4 2026**): Comprehensive P&L calculation, daily gross margins, FIFO COGS analysis, and accountant export.
+   - 🏬 **Multi-Gudang & Transfer Cabang** (`/inventory/warehouses` - **Phase 2 / Q4 2026**): Inter-branch stock transfers, multi-bin distribution, and in-transit tracking.
    - 🔌 **Integrasi Marketplace & Omnichannel** (`/integrasi` - **Phase 3 / Q1 2027**): Realtime stock sync across Shopee, Tokopedia, and TikTok Shop.
-   - 🤖 **AI Demand Forecasting & Smart Reorder** (`/ai-forecasting` - **Phase 3 / Q1 2027**): Predictive commodity purchasing algorithms based on historical sales velocity.
+   - 🤖 **AI Demand Forecasting & Smart Reorder** (`/procurement/planning` - **Phase 3 / Q1 2027**): Predictive commodity purchasing algorithms based on historical sales velocity.
    - 🧾 **Pajak & e-Faktur Otomatis** (`/pajak` - **Phase 4 / Q2 2027**): Automated Indonesian tax compliance, PPN calculation, and DJP e-Faktur integration.
+
+---
+
+## 13. High-Value Extended Modules & Specialized Capabilities
+
+To cater to mid-sized wholesalers, FMCG distributors, and multi-outlet trade networks, SiDaya specifies 5 specialized enterprise capabilities:
+
+### 1. Approval Workflow Engine
+* **Configurable Financial Thresholds**: Store Owners can configure automatic approval rules for sensitive operations:
+  - *Purchase Order (PO)* exceeding a threshold (e.g. `> Rp 50.000.000` requires Owner/Director PIN).
+  - *Discretionary Cashier Discount* exceeding maximum allowance (e.g. `> 10%` or `> Rp 250.000`).
+  - *Transaction Void or Credit Limit Override*.
+* **Real-time Mobile Push Approvals**: Push notifications with 1-tap Approve/Reject delivered to the Owner's smartphone.
+
+### 2. Salesman Force Automation (SFA) & Field Canvassing
+* **Mobile Canvasser Order Taking**: Field salesmen can record customer orders, take payments, or register new toko outlets directly on Android smartphones.
+* **Geolocation & Route Optimization**: GPS-stamped check-in at customer shops (*Toko Retail*) to verify physical sales visits.
+* **Commission Tracking**: Automated calculation of sales commissions per salesman based on target achievement and cash collections.
+
+### 3. Consignment Management (Konsinyasi Masuk & Keluar)
+* **Konsinyasi Masuk (Supplier Titip Jual)**: Goods received from vendor without upfront payment; stock is tracked in a dedicated consignment ledger and vendor billing is triggered only when goods are sold.
+* **Konsinyasi Keluar (Titip Jual ke Toko Mitra)**: Stock dispatched to partner outlets; automated periodic stock settlement and margin calculation.
+
+### 4. Barcode Batch Label Generator & Thermal Printing
+* **Batch Print Engine**: Generate and print formatted barcode labels (EAN-13, Code 128, QR) on standard thermal label rolls (33x15mm, 40x30mm, 50x20mm).
+* **Mass SKU Printing**: 1-click printing for newly received PO lots or re-tagging physical shelves.
+
+### 5. Dynamic Credit Scoring & Automated Credit Limits
+* **Customer Payment Behavior Index**: Tracks historical Days Beyond Terms (DBT) and on-time payment percentages.
+* **Automated Credit Limit Scaling**: Automatically recommends or increases credit limits (e.g. from Rp 10M to Rp 25M) for verified reliable wholesale customers.
+
 
 
 

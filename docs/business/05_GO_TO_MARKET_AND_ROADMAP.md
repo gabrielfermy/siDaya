@@ -46,81 +46,81 @@ graph TD
 
 ```mermaid
 gantt
-    title SiDaya Product Delivery Roadmap
+    title SiDaya 9-Pilar Product Delivery Roadmap
     dateFormat  YYYY-MM
-    section Phase 1: Core & Grosir Parity
-    Core 3-Tap Checkout & Offline Storage    :2026-09, 2M
-    Wholesale Tiers, Unit Conversions & 5%+2% :2026-09, 2M
-    Dynamic Client PayLink Engine (QRIS/VA) :2026-10, 2M
-    Bluetooth Thermal & Dot Matrix Drivers   :2026-10, 2M
-    section Phase 2: Multi-Tenant Dashboard, Inventory & Logistics
-    Multi-Tenant & Multi-User Auth Engine    :2026-11, 1M
-    Merchant Web & Mobile Dashboard Shell    :2026-11, 1M
-    Owner Checkbox Permission Matrix         :2026-11, 1M
-    Ashvin Labs Operator Control Plane       :2026-11, 2M
-    Inbound POs, Receiving & Storage Bins    :2026-11, 2M
-    FIFO / FEFO Batch Allocation Engine      :2026-12, 2M
-    Driver Working Permit (Surat Jalan)      :2026-12, 2M
-    Piutang Ledger & Realtime Device Sync    :2026-12, 2M
-    section Phase 3: Shift Governance & Modularity
-    Station Fast Cashier PIN Switch (4-6 Digits):2027-01, 2M
-    Shift Management & Cash Drawer Balancing :2027-01, 2M
-    Dynamic Tenant Feature Registry Engine   :2027-02, 2M
-    section Phase 4: Omnichannel & Enterprise Logistics
+    section Phase 1: Core MVP & Wholesale Parity
+    Core POS Checkout, Multi-Tier & 5%+2%   :2026-09, 2M
+    Barcode Fast-Scan Engine (Camera & Laser):2026-09, 2M
+    Inbound FIFO Lots & Price-Masked Surat Jalan :2026-10, 2M
+    Buku Piutang & Dynamic PayLink (QRIS/VA):2026-10, 2M
+    Multi-Tenant Login & Owner Checkbox RBAC :2026-10, 2M
+    Ashvin Labs Super Admin Control Plane    :2026-10, 2M
+    section Phase 2: Multi-Warehouse & Core Finance
+    Multi-Status Invoices & Retur Penjualan  :2026-11, 2M
+    Multi-Gudang & Inter-Branch Stock Transfer :2026-11, 2M
+    Stock Opname & Thermal Barcode Label Print :2026-11, 2M
+    Supplier Directory, PO & Retur Beli RTV :2026-12, 2M
+    Kas & Rekening Bank (Multi-Akun)         :2026-12, 2M
+    Laporan Laba Rugi P&L (FIFO HPP Costing) :2026-12, 2M
+    Cashier Shift Governance & X/Z Reports   :2027-01, 1M
+    section Phase 3: SFA, Workflows & Advanced Assets
+    Salesman Force Automation SFA / Canvassing:2027-01, 2M
+    Approval Workflow Engine (PO, Void, Disc):2027-02, 2M
+    Konsinyasi Masuk & Keluar                :2027-02, 2M
+    Peramalan Arus Kas & Dynamic Credit Score:2027-02, 2M
+    Manajemen Aset Tetap & Depresiasi        :2027-03, 1M
+    section Phase 4: Omnichannel & AI Automation
     Marketplace Sync: Shopee / Tokopedia/ TikTok :2027-03, 3M
-    Supplier Return (RTV) & Multi-Warehouse Hubs:2027-04, 2M
-    Official WhatsApp Cloud API Dispatch    :2027-05, 3M
+    AI Demand Forecasting & Smart Reorder    :2027-04, 2M
+    Pajak PPN & DJP e-Faktur Otomatis        :2027-04, 2M
+    Official WhatsApp Cloud API Green Tick   :2027-05, 2M
 ```
 
 ---
 
-### Phase 1: The Core MVP & Wholesale Parity (Fast Checkout, Hardware & PayLink)
-* **Target Horizon**: Months 1–3
-* **Primary Objective**: Deliver the fastest mobile receipt generator on the market with wholesale trade logic, multi-hardware printer drivers, and an automated payment collection loop.
+### Phase 1: The Core MVP & Wholesale Parity (Fast Checkout, Barcode, FIFO & PayLink)
+* **Target Horizon**: Q3 2026 (Live & Active)
+* **Primary Objective**: Deliver the fastest mobile receipt generator and wholesale trading terminal with offline-first storage, hardware printing, FIFO inventory, driver permits, and automated digital payments.
 * **Key Deliverables**:
-  * Native Mobile App (iOS & Android via React Native Expo).
-  * 3-Tap instant order creation with offline-first local database (SQLite/WatermelonDB).
-  * Wholesale Multi-Tier Pricing (*Eceran*, *Grosir*, *Tipe Pelanggan*, *Salesman*).
-  * Compound trade discount calculator (`5% + 2% + Rp 1,000`).
-  * Unit conversions (*PCS $\rightarrow$ Lusin $\rightarrow$ Karton*).
-  * Multi-hardware printing: Bluetooth ESC/POS (58mm/80mm) and Dot Matrix Continuous Form (Epson ESC/P2).
-  * **High-Speed Barcode & SKU Scanner (Phase 1 MVP)**: Instant O(1) barcode lookup (EAN-13, UPC, Code 128) via smartphone camera and wireless Bluetooth laser scanners for frictionless management of thousands of SKUs.
-  * Dynamic Client PayLink web checkout portal (QRIS & Virtual Accounts via platform payment gateway).
-  * Real-time payment webhook callback that marks orders as "PAID" and alerts the merchant.
+  * **Offline-First POS & 3-Tap Checkout**: React Native Expo mobile app and web backoffice with local SQLite/WatermelonDB caching.
+  * **High-Speed Barcode Engine**: Instant sub-5ms scan-to-cart using smartphone cameras and wireless Bluetooth/USB laser scanners.
+  * **Wholesale Trade Engine**: Multi-tier pricing (*Eceran*, *Grosir 1*, *Grosir 2*, *Distributor*), compound discounts (`5% + 2% + Rp`), and multi-unit conversions (*Pcs $\rightarrow$ Lusin $\rightarrow$ Karton*).
+  * **Inbound Receiving & FIFO Batch Rotation**: Goods receiving dock with automated FIFO/FEFO batch depletion.
+  * **Price-Masked Surat Jalan**: Delivery manifest with encrypted invoice QR codes and redacted cost/selling prices.
+  * **Buku Piutang & Dynamic PayLink**: Debt aging tracking and instant WhatsApp PayLink (QRIS & Virtual Accounts).
+  * **Universal Multi-Tenant Auth & Checkbox RBAC Matrix**: Owner self-registration, invitation-only staff onboarding, and fast 4–6 digit PIN switching.
+  * **Ashvin Labs Operator Control Plane (`ops.sidaya.biz.id`)**: Fleet overview, subscription management, telemetry, and privacy break-glass audit log.
 
-### Phase 2: Multi-Tenant Web & Mobile Dashboard, Inbound Supply, FIFO Batch Logistics & Driver Working Permits (Surat Jalan)
-* **Target Horizon**: Months 4–6
-* **Primary Objective**: Empower multi-staff business operations with a universal mobile-first and desktop web backoffice, granular role customization via an Owner Checkbox Matrix, inbound supply tracking, automated FIFO stock rotation, and price-stripped delivery permits.
+### Phase 2: Multi-Warehouse, Sales/Purchase Returns & Integrated Core Finance
+* **Target Horizon**: Q4 2026
+* **Primary Objective**: Scale operations to multi-warehouse distributors with complete sales/purchase return lifecycles, stock opname audits, multi-account cash/bank management, and automated FIFO P&L reports.
 * **Key Deliverables**:
-  * **Multi-Tenant & Multi-User Authentication Engine**: Universal login for mobile and web backoffice (`sidaya.id/login` / `app.sidaya.id`). Automatic single-tenant workspace routing, multi-store switcher for business owners, and session token enrichment.
-  * **Merchant Backoffice Dashboard Shell (Responsive Web & Mobile)**: Dual-surface dashboard interface with branch selector, company branding, and core operational KPI widgets (daily turnover, cash drawer float, piutang aging, low-stock alerts).
-  * **High-Volume Catalog & Barcode Engine**: Massive catalog support (scaling to 50,000+ items) with sub-5ms search, barcode batch assignment during Inbound Receiving, and handheld Stock Opname discrepancy scanning.
-  * **Granular Checkbox Permission Matrix & Role-Adaptive UI**: Decouples rigid hardcoded roles into modular capability checkboxes (`pos:checkout`, `warehouse:inbound`, `logistics:dispatch`, `catalog:view_cogs`, `finance:reports`). Screens dynamically adapt on smartphones and desktops to only show tabs and actions the employee is authorized to use.
-  * **Supabase Realtime CDC WebSocket Engine**: Sub-second synchronization between cashier registers, warehouse scanners, field drivers, and owner monitoring screens.
-  * **Inbound Supply & Receiving Dock**: Track supplier POs, arrival dates, physical count checks, and multi-bin storage assignment (Warehouse $\rightarrow$ Zone $\rightarrow$ Rack $\rightarrow$ Bin).
-  * **Automated Batch Allocation (FIFO / FEFO)**: Algorithmically assigns the oldest batch to outgoing sales orders to eliminate commodity aging and spoilage.
-  * **Driver Working Permit (*Surat Jalan* / Delivery Order)**: Instantly generates a price-masked pick & delivery manifest linked to the sales invoice, with physical/digital proof of delivery signatures.
-  * **Ashvin Labs Platform Operator & Super Admin Control Plane (`admin.sidaya.id`)**: Dedicated control plane portal for Ashvin Labs management (CEO, Devs, Support) featuring multi-tenant telemetry (global GMV, active stores, health score), subscription overrides, operator RBAC, and privacy-preserving PII redaction with break-glass audit logs.
-  * **Piutang & Kasbon Ledger**: Track unpaid invoices with debt aging and PayLink partial settlements.
+  * **Advanced Invoicing & Retur Penjualan**: Multi-status invoices (*Draft, Belum Lunas, Jatuh Tempo, Lunas*) and sales returns with automated FIFO lot restock and credit note generation.
+  * **Multi-Warehouse & Inter-Branch Transfers**: Stock movements across central warehouses, retail outlets, and transit buffers.
+  * **Stock Opname & Batch Barcode Printing**: Handheld shelf barcode audits with discrepancy adjustments and thermal barcode label printing (33x15mm, 40x30mm).
+  * **Supplier Directory, PO & Retur Pembelian (RTV)**: Supplier SRM, digital Purchase Orders, and vendor returns with AP debit notes.
+  * **Multi-Account Kas & Bank**: Ledgers for Cash Drawer, Petty Cash, BCA, Mandiri, and payment gateway escrow accounts.
+  * **Realtime P&L (Laba Rugi FIFO)**: Automated gross margin and net profit reports calculated from exact FIFO inventory costs.
+  * **Cashier Shift Governance**: Opening cash float, cash drops, and automated X-Report / Z-Report end-of-day balancing.
 
-### Phase 3: Counter Shift Governance & Dynamic Feature Modularity
-* **Target Horizon**: Months 7–9
-* **Primary Objective**: Deepen point-of-sale operational control with high-speed counter station cashier switches and dynamic subscription plan toggling.
+### Phase 3: Salesman Automation (SFA), Approval Workflows & Advanced Assets
+* **Target Horizon**: Q1 2027
+* **Primary Objective**: Empower field sales teams, multi-tier organizational governance, and enterprise asset management.
 * **Key Deliverables**:
-  * **Station Fast PIN Switch (4–6 Digits)**: High-speed cashier transitions on shared counter tablets/phones without logging out of the underlying station device session.
-  * **Shift Cash Float Balancing**: Opening float, cash drops, and automated X-Report / Z-Report end-of-day reconciliation.
-  * **PostgreSQL RLS Security Guard**: Strictly enforces COGS masking based on the active session's `catalog:view_cogs` permission.
-  * **Pluggable Feature Registry Engine**: Runtime activation/deactivation of modules per tenant subscription tier without app rebuilds.
+  * **Salesman Force Automation (SFA) & Canvassing**: Mobile canvasser order taking, GPS-verified customer visits, and automated commission calculations.
+  * **Approval Workflow Engine**: Configurable authorization thresholds for high-value POs (> Rp 50M), discretionary discounts (> 10%), and voided invoices.
+  * **Konsinyasi Masuk & Keluar**: Dedicated ledgers for supplier consignment stock and partner outlet distribution.
+  * **Peramalan Arus Kas & Dynamic Credit Scoring**: 30–90 day cash forecast and automated customer credit limit scaling based on historical payment behavior.
+  * **Aset Tetap & Depresiasi**: Fixed asset registry with automated monthly straight-line depreciation.
 
-### Phase 4: Omnichannel & Enterprise Logistics
-* **Target Horizon**: Months 10–12+
-* **Primary Objective**: Expand to regional distributors and multi-warehouse hubs.
+### Phase 4: Omnichannel Sync, AI Predictive Operations & Tax Compliance
+* **Target Horizon**: Q2 2027
+* **Primary Objective**: Enterprise scale, multi-channel marketplace integration, and predictive AI automation.
 * **Key Deliverables**:
-  * **Marketplace Connectors**: Synchronizes order queues and revenue from Tokopedia, Shopee, and TikTok Shop.
-  * **Supplier Return (RTV) & Multi-Warehouse Routing**: Advanced supplier dispute workflows and inter-warehouse stock transfers.
-  * **Deferred Backlog**: *Cafe & Resto Table Layouts* and *Minimarket Fast-Scan* remain in low-priority backlog.
-  * **Official WhatsApp Cloud API**: Automated green-tick transactional messaging with interactive payment buttons.
-  * **Embedded Working Capital Referral**: Data-driven working capital loans with licensed fintech lending partners.
+  * **Marketplace Connectors**: Realtime catalog and order synchronization across Tokopedia, Shopee, and TikTok Shop.
+  * **AI Demand Forecasting & Smart Reorder**: Predictive purchasing algorithms optimizing stock levels and preventing stockouts.
+  * **Pajak & DJP e-Faktur**: Automated PPN calculation, tax withholding, and direct e-Faktur integration.
+  * **Official WhatsApp Cloud API**: Green-tick verified automated WhatsApp transactional messaging with interactive action buttons.
 
 ---
 
