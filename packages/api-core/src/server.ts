@@ -6,6 +6,7 @@ import {
   AuthTenantDomainService,
   InboundFifoDomainService,
   PlatformAdminDomainService,
+  EmailDispatchService,
   PaymentWebhookController,
 } from './index';
 import {
@@ -22,6 +23,12 @@ import {
   OrderFulfillmentStatus,
   PlatformOperatorRole,
   SubscriptionTier,
+  RegisterOwnerPayload,
+  InviteStaffPayload,
+  AcceptStaffInvitePayload,
+  InviteOperatorPayload,
+  AcceptOperatorInvitePayload,
+  ResetPasswordPayload,
 } from '@sidaya/shared-types';
 
 const PORT = parseInt(process.env['API_PORT'] || '4000', 10);
@@ -55,6 +62,7 @@ const deliveryOrderDomainService = new DeliveryOrderDomainService();
 const authTenantDomainService = new AuthTenantDomainService();
 const inboundFifoDomainService = new InboundFifoDomainService();
 const platformAdminDomainService = new PlatformAdminDomainService();
+const emailDispatchService = new EmailDispatchService();
 const webhookController = new PaymentWebhookController(gatewayRegistry);
 
 const CORS_HEADERS = {
@@ -114,6 +122,12 @@ function getOperatorContext(req: http.IncomingMessage): { id: string; email: str
   return { id, email, role };
 }
 
+function getBaseUrl(req: http.IncomingMessage, defaultPort = 3333): string {
+  const host = req.headers['host'] || `localhost:${defaultPort}`;
+  const proto = req.headers['x-forwarded-proto'] || 'http';
+  return `${proto}://${host}`;
+}
+
 const server = http.createServer(async (req: http.IncomingMessage, res: http.ServerResponse) => {
   const url = req.url || '';
   const pathname: string = url.split('?')[0] || '';
@@ -131,7 +145,7 @@ const server = http.createServer(async (req: http.IncomingMessage, res: http.Ser
     if (url === '/health' && method === 'GET') {
       sendJson(res, 200, {
         status: 'UP',
-        service: 'SiDaya Core API (Phase 2)',
+        service: 'SiDaya Core API (Phase 2 & Subdomain Auth)',
         timestamp: new Date().toISOString(),
         database: process.env['DATABASE_URL'] || 'postgresql://postgres:postgrespassword@localhost:54350/sidaya_dev',
         registeredPaymentGateways: gatewayRegistry.listRegistered(),
@@ -154,8 +168,96 @@ const server = http.createServer(async (req: http.IncomingMessage, res: http.Ser
         return;
       }
 
-      const session = await authTenantDomainService.login(identifier, credential);
-      sendJson(res, 200, { success: true, data: session });
+      try {
+        const session = await authTenantDomainService.login(identifier, credential);
+        sendJson(res, 200, { success: true, data: session });
+      } catch (err: any) {
+        sendJson(res, 401, { success: false, error: { message: err.message || 'Login gagal.' } });
+      }
+      return;
+    }
+
+    // POST /api/v1/auth/register-owner
+    if (pathname === '/api/v1/auth/register-owner' && method === 'POST') {
+      const body = (await parseBody(req)) as unknown as RegisterOwnerPayload;
+      if (!body.email || !body.businessName || !body.ownerName || !body.password) {
+        sendJson(res, 400, {
+          success: false,
+          error: { message: 'Nama Bisnis, Nama Pemilik, Email, dan Kata Sandi wajib diisi.' },
+        });
+        return;
+      }
+
+      // Check global email invariant across operators too
+      if (platformAdminDomainService.isOperatorEmailRegistered(body.email)) {
+        sendJson(res, 409, {
+          success: false,
+          error: { message: `Email '${body.email}' sudah terdaftar sebagai Ashvin Labs Platform Operator.` },
+        });
+        return;
+      }
+
+      try {
+        const baseUrl = getBaseUrl(req);
+        const result = await authTenantDomainService.registerOwner(body, emailDispatchService, baseUrl);
+        sendJson(res, 201, { success: true, data: result });
+      } catch (err: any) {
+        sendJson(res, 400, { success: false, error: { message: err.message } });
+      }
+      return;
+    }
+
+    // POST /api/v1/auth/verify-email
+    if (pathname === '/api/v1/auth/verify-email' && method === 'POST') {
+      const body = await parseBody(req);
+      const token = body['token'] as string;
+      if (!token) {
+        sendJson(res, 400, { success: false, error: { message: 'Token verifikasi wajib disertakan.' } });
+        return;
+      }
+
+      try {
+        const result = await authTenantDomainService.verifyEmail(token);
+        sendJson(res, 200, { success: true, data: result });
+      } catch (err: any) {
+        sendJson(res, 400, { success: false, error: { message: err.message } });
+      }
+      return;
+    }
+
+    // POST /api/v1/auth/forgot-password
+    if (pathname === '/api/v1/auth/forgot-password' && method === 'POST') {
+      const body = await parseBody(req);
+      const email = body['email'] as string;
+      if (!email) {
+        sendJson(res, 400, { success: false, error: { message: 'Email wajib diisi.' } });
+        return;
+      }
+
+      try {
+        const baseUrl = getBaseUrl(req);
+        const result = await authTenantDomainService.requestPasswordReset(email, emailDispatchService, baseUrl);
+        sendJson(res, 200, { success: true, data: result });
+      } catch (err: any) {
+        sendJson(res, 400, { success: false, error: { message: err.message } });
+      }
+      return;
+    }
+
+    // POST /api/v1/auth/reset-password
+    if (pathname === '/api/v1/auth/reset-password' && method === 'POST') {
+      const body = (await parseBody(req)) as unknown as ResetPasswordPayload;
+      if (!body.token || !body.newPassword) {
+        sendJson(res, 400, { success: false, error: { message: 'Token dan kata sandi baru wajib disertakan.' } });
+        return;
+      }
+
+      try {
+        const result = await authTenantDomainService.resetPassword(body);
+        sendJson(res, 200, { success: true, data: result });
+      } catch (err: any) {
+        sendJson(res, 400, { success: false, error: { message: err.message } });
+      }
       return;
     }
 
@@ -223,6 +325,67 @@ const server = http.createServer(async (req: http.IncomingMessage, res: http.Ser
     }
 
     // ===========================================================================
+    // TENANT STAFF INVITATIONS (Kasir, Gudang, Driver)
+    // ===========================================================================
+
+    // POST /api/v1/tenant/staff/invite
+    if (pathname === '/api/v1/tenant/staff/invite' && method === 'POST') {
+      const tenantId = (req.headers['x-tenant-id'] as string) || 'c4b8e219-9831-482a-bc91-23a9cf8e12d4';
+      const body = (await parseBody(req)) as unknown as InviteStaffPayload;
+      body.tenantId = body.tenantId || tenantId;
+
+      if (!body.email || !body.fullName || !body.role) {
+        sendJson(res, 400, {
+          success: false,
+          error: { message: 'Email, Nama Lengkap, dan Peran staff wajib diisi.' },
+        });
+        return;
+      }
+
+      if (platformAdminDomainService.isOperatorEmailRegistered(body.email)) {
+        sendJson(res, 409, {
+          success: false,
+          error: { message: `Email '${body.email}' sudah terdaftar sebagai Operator Platform.` },
+        });
+        return;
+      }
+
+      try {
+        const baseUrl = getBaseUrl(req);
+        const invitation = await authTenantDomainService.inviteStaff(body, emailDispatchService, baseUrl);
+        sendJson(res, 201, { success: true, data: invitation });
+      } catch (err: any) {
+        sendJson(res, 400, { success: false, error: { message: err.message } });
+      }
+      return;
+    }
+
+    // POST /api/v1/tenant/staff/accept-invite
+    if (pathname === '/api/v1/tenant/staff/accept-invite' && method === 'POST') {
+      const body = (await parseBody(req)) as unknown as AcceptStaffInvitePayload;
+      if (!body.token || !body.password) {
+        sendJson(res, 400, { success: false, error: { message: 'Token undangan dan kata sandi baru wajib diisi.' } });
+        return;
+      }
+
+      try {
+        const session = await authTenantDomainService.acceptStaffInvite(body);
+        sendJson(res, 200, { success: true, data: session });
+      } catch (err: any) {
+        sendJson(res, 400, { success: false, error: { message: err.message } });
+      }
+      return;
+    }
+
+    // GET /api/v1/tenant/staff
+    if (pathname === '/api/v1/tenant/staff' && method === 'GET') {
+      const tenantId = (req.headers['x-tenant-id'] as string) || 'c4b8e219-9831-482a-bc91-23a9cf8e12d4';
+      const staffList = authTenantDomainService.listTenantStaff(tenantId);
+      sendJson(res, 200, { success: true, data: staffList });
+      return;
+    }
+
+    // ===========================================================================
     // ASHVIN LABS PLATFORM OPERATOR & SUPER ADMIN CONTROL PLANE ENDPOINTS
     // ===========================================================================
 
@@ -243,6 +406,70 @@ const server = http.createServer(async (req: http.IncomingMessage, res: http.Ser
       } catch (err: any) {
         sendJson(res, 401, { success: false, error: { message: err.message || 'Login operator gagal.' } });
       }
+      return;
+    }
+
+    // POST /api/v1/admin/operators/invite
+    if (pathname === '/api/v1/admin/operators/invite' && method === 'POST') {
+      const operator = getOperatorContext(req);
+      const body = (await parseBody(req)) as unknown as InviteOperatorPayload;
+
+      if (!body.email || !body.fullName || !body.role) {
+        sendJson(res, 400, {
+          success: false,
+          error: { message: 'Email, Nama Lengkap, dan Peran Operator wajib diisi.' },
+        });
+        return;
+      }
+
+      // Check global uniqueness against tenant users
+      if (authTenantDomainService.isEmailRegistered(body.email)) {
+        sendJson(res, 409, {
+          success: false,
+          error: { message: `Email '${body.email}' sudah terdaftar sebagai Merchant / Tenant User.` },
+        });
+        return;
+      }
+
+      try {
+        const baseUrl = getBaseUrl(req);
+        const invitation = await platformAdminDomainService.inviteOperator(
+          body,
+          operator,
+          emailDispatchService,
+          baseUrl,
+        );
+        sendJson(res, 201, { success: true, data: invitation });
+      } catch (err: any) {
+        sendJson(res, 400, { success: false, error: { message: err.message } });
+      }
+      return;
+    }
+
+    // POST /api/v1/admin/operators/accept-invite
+    if (pathname === '/api/v1/admin/operators/accept-invite' && method === 'POST') {
+      const body = (await parseBody(req)) as unknown as AcceptOperatorInvitePayload;
+      if (!body.token || !body.password) {
+        sendJson(res, 400, {
+          success: false,
+          error: { message: 'Token undangan operator dan kata sandi baru wajib disertakan.' },
+        });
+        return;
+      }
+
+      try {
+        const session = await platformAdminDomainService.acceptOperatorInvite(body);
+        sendJson(res, 200, { success: true, data: session });
+      } catch (err: any) {
+        sendJson(res, 400, { success: false, error: { message: err.message } });
+      }
+      return;
+    }
+
+    // GET /api/v1/admin/operators
+    if (pathname === '/api/v1/admin/operators' && method === 'GET') {
+      const operators = platformAdminDomainService.listOperatorsAndInvitations();
+      sendJson(res, 200, { success: true, data: operators });
       return;
     }
 
