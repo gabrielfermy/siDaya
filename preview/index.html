@@ -1722,8 +1722,8 @@
   <!-- FLOATING DEV SUBDOMAIN SWITCHER -->
   <div id="dev-subdomain-switcher" class="dev-subdomain-pill">
     <span style="color:var(--text-muted);">🌐:</span>
-    <a id="dev-link-merchant" class="dev-subdomain-link active" href="http://localhost:3333">🏪 Toko</a>
-    <a id="dev-link-ops" class="dev-subdomain-link" href="http://ops.localhost:3333">⚡ Ops</a>
+    <a id="dev-link-merchant" class="dev-subdomain-link active" href="http://localhost:3333/dashboard">🏪 Toko</a>
+    <a id="dev-link-ops" class="dev-subdomain-link" href="http://ops.localhost:3333/telemetry">⚡ Ops</a>
   </div>
 
   <!-- JAVASCRIPT LOGIC -->
@@ -1732,34 +1732,52 @@
     let currentTheme = 'light';
     let isPiiMasked = false;
 
+    const MERCHANT_PRESETS = {
+      'budi@berasjaya.com': { name: 'Budi Santoso', role: '👑 OWNER', avatar: 'B', tenant: 'Toko Grosir Beras Jaya Bersama' },
+      'siti@berasjaya.com': { name: 'Siti Rahma', role: '💳 KASIR (POS)', avatar: 'S', tenant: 'Toko Grosir Beras Jaya Bersama' },
+      'agus@berasjaya.com': { name: 'Agus Santoso', role: '📦 GUDANG (FIFO)', avatar: 'A', tenant: 'Toko Grosir Beras Jaya Bersama' },
+      'joko@berasjaya.com': { name: 'Joko Supir', role: '🚚 DRIVER', avatar: 'J', tenant: 'Toko Grosir Beras Jaya Bersama' },
+    };
+
+    const OPERATOR_PRESETS = {
+      'gabriel@ashvinlabs.com': { name: 'Gabriel (CEO)', role: 'SUPER_ADMIN', badgeClass: 'role-super-admin' },
+      'alex@ashvinlabs.com': { name: 'Alex (Lead Developer)', role: 'DEV_ENGINEER', badgeClass: 'role-dev-engineer' },
+      'dina@ashvinlabs.com': { name: 'Dina (Customer Ops)', role: 'OPS_SUPPORT', badgeClass: 'role-ops-support' },
+    };
+
     function detectSubdomainMode() {
       const hostname = window.location.hostname.toLowerCase();
-      const hash = window.location.hash;
+      const path = window.location.pathname.toLowerCase();
 
-      if (hostname.startsWith('ops.') || hash === '#ops' || hash === '#ops-accept-invite') {
+      if (hostname.startsWith('ops.') || path.startsWith('/telemetry') || path.startsWith('/fleet') || path.startsWith('/operators') || path.startsWith('/audit')) {
         currentPortalMode = 'OPS';
-        document.getElementById('dev-link-ops').classList.add('active');
-        document.getElementById('dev-link-merchant').classList.remove('active');
+        document.getElementById('dev-link-ops')?.classList.add('active');
+        document.getElementById('dev-link-merchant')?.classList.remove('active');
       } else {
         currentPortalMode = 'MERCHANT';
-        document.getElementById('dev-link-merchant').classList.add('active');
-        document.getElementById('dev-link-ops').classList.remove('active');
+        document.getElementById('dev-link-merchant')?.classList.add('active');
+        document.getElementById('dev-link-ops')?.classList.remove('active');
       }
-
-      renderInitialPortalGate();
     }
 
-    function renderInitialPortalGate() {
-      const merchantGate = document.getElementById('merchant-login-screen');
-      const operatorGate = document.getElementById('operator-login-screen');
+    function initTheme() {
+      const savedTheme = localStorage.getItem('sidaya_theme') || 'light';
+      currentTheme = savedTheme;
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      const icon = document.getElementById('theme-icon');
+      const iconOp = document.getElementById('theme-icon-op');
+      if (icon) icon.textContent = currentTheme === 'light' ? '☀️' : '🌙';
+      if (iconOp) iconOp.textContent = currentTheme === 'light' ? '☀️' : '🌙';
+    }
 
-      if (currentPortalMode === 'OPS') {
-        merchantGate.classList.add('hidden');
-        operatorGate.classList.remove('hidden');
-      } else {
-        merchantGate.classList.remove('hidden');
-        operatorGate.classList.add('hidden');
-      }
+    function toggleTheme() {
+      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('sidaya_theme', currentTheme);
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      const icon = document.getElementById('theme-icon');
+      const iconOp = document.getElementById('theme-icon-op');
+      if (icon) icon.textContent = currentTheme === 'light' ? '☀️' : '🌙';
+      if (iconOp) iconOp.textContent = currentTheme === 'light' ? '☀️' : '🌙';
     }
 
     /* Mobile Drawer Controls */
@@ -1779,15 +1797,6 @@
     function closeSidebarDrawer() {
       document.querySelectorAll('.sidebar').forEach(s => s.classList.remove('open'));
       document.getElementById('sidebar-backdrop')?.classList.remove('active');
-    }
-
-    function toggleTheme() {
-      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      const icon = document.getElementById('theme-icon');
-      const iconOp = document.getElementById('theme-icon-op');
-      if (icon) icon.textContent = currentTheme === 'light' ? '☀️' : '🌙';
-      if (iconOp) iconOp.textContent = currentTheme === 'light' ? '☀️' : '🌙';
     }
 
     function togglePasswordVisibility(inputId, btn) {
@@ -1925,40 +1934,114 @@
       }
     }
 
+    function applyMerchantSessionUI(session) {
+      if (!session) return;
+      const avatarEl = document.getElementById('sidebar-user-avatar');
+      const nameEl = document.getElementById('sidebar-user-name');
+      const roleEl = document.getElementById('sidebar-user-role');
+      const tenantEl = document.getElementById('sidebar-tenant-name');
+
+      if (avatarEl) avatarEl.textContent = session.avatar || session.name?.charAt(0) || 'U';
+      if (nameEl) nameEl.textContent = session.name || session.email;
+      if (roleEl) roleEl.textContent = session.role || 'MEMBER';
+      if (tenantEl && session.tenant) tenantEl.textContent = session.tenant;
+    }
+
+    function applyOperatorSessionUI(session) {
+      if (!session) return;
+      const badgeEl = document.getElementById('op-sidebar-badge');
+      const nameEl = document.getElementById('op-sidebar-name');
+
+      if (badgeEl) {
+        badgeEl.textContent = session.role || 'SUPER_ADMIN';
+        badgeEl.className = 'operator-role-badge ' + (session.badgeClass || 'role-super-admin');
+      }
+      if (nameEl) nameEl.textContent = session.name || session.email;
+    }
+
+    function getCleanRoute() {
+      let p = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+      if (!p && window.location.hash) {
+        p = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+      }
+      return p;
+    }
+
+    function navigateTo(path) {
+      if (window.location.pathname !== path) {
+        history.pushState(null, '', path);
+      }
+      handleRoute();
+    }
+
     function quickLoginPreset(email, userKey) {
       document.getElementById('merchant-login-identifier').value = email;
-      handleMerchantLoginSubmit();
+      const preset = MERCHANT_PRESETS[email] || {
+        name: email.split('@')[0],
+        role: 'STAFF',
+        avatar: email.charAt(0).toUpperCase(),
+        tenant: 'Toko Grosir Beras Jaya Bersama'
+      };
+      localStorage.setItem('sidaya_merchant_session', JSON.stringify({ email, ...preset }));
+      navigateTo('/dashboard');
     }
 
     function quickLoginOperator(email, role) {
       document.getElementById('operator-login-email').value = email;
-      handleOperatorLoginSubmit();
+      const preset = OPERATOR_PRESETS[email] || {
+        name: email.split('@')[0],
+        role: role || 'SUPER_ADMIN',
+        badgeClass: role === 'DEV_ENGINEER' ? 'role-dev-engineer' : (role === 'OPS_SUPPORT' ? 'role-ops-support' : 'role-super-admin')
+      };
+      localStorage.setItem('sidaya_operator_session', JSON.stringify({ email, ...preset }));
+      navigateTo('/telemetry');
     }
 
     function handleMerchantLoginSubmit() {
-      document.getElementById('merchant-login-screen').classList.add('hidden');
-      document.getElementById('app-shell').style.display = 'flex';
-      document.getElementById('operator-shell').classList.remove('active');
-      closeSidebarDrawer();
+      const email = document.getElementById('merchant-login-identifier').value || 'budi@berasjaya.com';
+      const preset = MERCHANT_PRESETS[email] || {
+        name: email.split('@')[0],
+        role: 'OWNER',
+        avatar: email.charAt(0).toUpperCase(),
+        tenant: 'Toko Grosir Beras Jaya Bersama'
+      };
+      localStorage.setItem('sidaya_merchant_session', JSON.stringify({ email, ...preset }));
+      navigateTo('/dashboard');
     }
 
     function handleOperatorLoginSubmit() {
-      document.getElementById('operator-login-screen').classList.add('hidden');
-      document.getElementById('app-shell').style.display = 'none';
-      document.getElementById('operator-shell').classList.add('active');
-      closeSidebarDrawer();
-      renderTenantFleet();
-      renderAuditLogs();
+      const email = document.getElementById('operator-login-email').value || 'gabriel@ashvinlabs.com';
+      const preset = OPERATOR_PRESETS[email] || {
+        name: 'Gabriel (CEO)',
+        role: 'SUPER_ADMIN',
+        badgeClass: 'role-super-admin'
+      };
+      localStorage.setItem('sidaya_operator_session', JSON.stringify({ email, ...preset }));
+      navigateTo('/telemetry');
     }
 
     function handleLogout() {
-      document.getElementById('app-shell').style.display = 'none';
-      document.getElementById('operator-shell').classList.remove('active');
+      if (currentPortalMode === 'OPS') {
+        localStorage.removeItem('sidaya_operator_session');
+      } else {
+        localStorage.removeItem('sidaya_merchant_session');
+      }
       closeSidebarDrawer();
-      renderInitialPortalGate();
+      navigateTo('/login');
     }
 
     function switchModule(mod) {
+      const urlSlug = mod === 'owner' ? 'dashboard' : (mod === 'sj' ? 'surat-jalan' : mod);
+      navigateTo('/' + urlSlug);
+      closeSidebarDrawer();
+    }
+
+    function switchOperatorTab(tab) {
+      navigateTo('/' + tab);
+      closeSidebarDrawer();
+    }
+
+    function activateModuleUI(mod) {
       document.querySelectorAll('.module-view').forEach(m => m.classList.remove('active'));
       document.querySelectorAll('.sidebar-nav .nav-item').forEach(b => b.classList.remove('active'));
       document.getElementById(`module-${mod}`)?.classList.add('active');
@@ -1974,10 +2057,9 @@
         document.getElementById('page-heading').textContent = titles[mod].title;
         document.getElementById('page-subheading').textContent = titles[mod].sub;
       }
-      closeSidebarDrawer();
     }
 
-    function switchOperatorTab(tab) {
+    function activateOperatorTabUI(tab) {
       document.querySelectorAll('.op-tab-content').forEach(c => c.style.display = 'none');
       document.querySelectorAll('#operator-shell .nav-item').forEach(b => b.classList.remove('active'));
       document.getElementById(`op-tab-${tab}`).style.display = 'block';
@@ -1993,7 +2075,88 @@
         document.getElementById('op-header-title').textContent = titles[tab].title;
         document.getElementById('op-header-sub').textContent = titles[tab].sub;
       }
-      closeSidebarDrawer();
+    }
+
+    function handleRoute() {
+      detectSubdomainMode();
+      const cleanRoute = getCleanRoute();
+
+      if (currentPortalMode === 'OPS') {
+        const sessionStr = localStorage.getItem('sidaya_operator_session');
+        if (!sessionStr) {
+          // Show operator login
+          document.getElementById('merchant-login-screen').classList.add('hidden');
+          document.getElementById('operator-login-screen').classList.remove('hidden');
+          document.getElementById('app-shell').style.display = 'none';
+          document.getElementById('operator-shell').classList.remove('active');
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+            history.replaceState(null, '', '/login');
+          }
+          return;
+        }
+
+        // Operator is logged in
+        const session = JSON.parse(sessionStr);
+        applyOperatorSessionUI(session);
+
+        document.getElementById('merchant-login-screen').classList.add('hidden');
+        document.getElementById('operator-login-screen').classList.add('hidden');
+        document.getElementById('app-shell').style.display = 'none';
+        document.getElementById('operator-shell').classList.add('active');
+
+        const validTabs = ['telemetry', 'fleet', 'operators', 'audit'];
+        let targetTab = 'telemetry';
+        if (validTabs.includes(cleanRoute)) {
+          targetTab = cleanRoute;
+        }
+
+        activateOperatorTabUI(targetTab);
+        if (window.location.pathname !== '/' + targetTab) {
+          history.replaceState(null, '', '/' + targetTab);
+        }
+        renderTenantFleet();
+        renderAuditLogs();
+
+      } else {
+        // Merchant Mode
+        const sessionStr = localStorage.getItem('sidaya_merchant_session');
+        if (!sessionStr) {
+          // Show merchant login
+          document.getElementById('merchant-login-screen').classList.remove('hidden');
+          document.getElementById('operator-login-screen').classList.add('hidden');
+          document.getElementById('app-shell').style.display = 'none';
+          document.getElementById('operator-shell').classList.remove('active');
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+            history.replaceState(null, '', '/login');
+          }
+          return;
+        }
+
+        // Merchant is logged in
+        const session = JSON.parse(sessionStr);
+        applyMerchantSessionUI(session);
+
+        document.getElementById('merchant-login-screen').classList.add('hidden');
+        document.getElementById('operator-login-screen').classList.add('hidden');
+        document.getElementById('app-shell').style.display = 'flex';
+        document.getElementById('operator-shell').classList.remove('active');
+
+        const routeMap = {
+          'dashboard': 'owner',
+          'owner': 'owner',
+          'pos': 'pos',
+          'fifo': 'fifo',
+          'sj': 'sj',
+          'surat-jalan': 'sj',
+        };
+
+        let targetMod = routeMap[cleanRoute] || 'owner';
+        activateModuleUI(targetMod);
+        const urlSlug = targetMod === 'owner' ? 'dashboard' : (targetMod === 'sj' ? 'surat-jalan' : targetMod);
+        if (window.location.pathname !== '/' + urlSlug) {
+          history.replaceState(null, '', '/' + urlSlug);
+        }
+      }
     }
 
     function togglePdpMasking() {
@@ -2084,8 +2247,11 @@
       }
     }
 
+    window.addEventListener('popstate', handleRoute);
+
     window.addEventListener('DOMContentLoaded', () => {
-      detectSubdomainMode();
+      initTheme();
+      handleRoute();
       renderCatalog();
     });
   </script>
