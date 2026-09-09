@@ -145,10 +145,10 @@ graph TB
         ObjectStorage[(S3 / MinIO\nInvoices, Logos & PDFs)]
     end
 
-    App -->|REST / RPC APIs| Gateway
-    App <-->|WebSockets (Sub-second CDC)| RealtimeServer
-    KDS <-->|WebSockets (Live Order Stream)| RealtimeServer
-    WebPortal -->|Public Checkout API| Gateway
+    App -->|"REST / RPC APIs"| Gateway
+    App <-->|"WebSockets (Sub-second CDC)"| RealtimeServer
+    KDS <-->|"WebSockets (Live Order Stream)"| RealtimeServer
+    WebPortal -->|"Public Checkout API"| Gateway
     Gateway --> AppServer
     RealtimeServer <-->|Logical Replication pgoutput| DB
     AppServer --> DB
