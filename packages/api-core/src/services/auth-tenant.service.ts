@@ -175,6 +175,15 @@ export class AuthTenantDomainService {
           branchId: 'b0000000-0000-0000-0000-000000000001',
           branchName: 'Pasar Induk Kramat Jati',
         },
+        {
+          tenantId: 'd5c9f320-1942-493b-cd02-34b0df9f23e5',
+          businessName: 'CV Sembako Nusantara Makmur',
+          subdomain: 'sembakonusantara',
+          role: 'STORE_MANAGER',
+          permissions: [PermissionKey.CATALOG_VIEW, PermissionKey.FINANCE_REPORTS],
+          branchId: 'b0000000-0000-0000-0000-000000000002',
+          branchName: 'Gudang Distribusi Cipinang',
+        },
       ],
     },
   ];
