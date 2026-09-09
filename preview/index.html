@@ -7,6 +7,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <script>
+    /* Synchronous Pre-Paint Auth State & Theme Resolver (Zero FOUC Flash) */
+    (function() {
+      try {
+        var hostname = window.location.hostname.toLowerCase();
+        var path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+        var isOps = hostname.startsWith('ops.') || path === 'telemetry' || path === 'fleet' || path === 'operators' || path === 'audit';
+        
+        var theme = localStorage.getItem('sidaya_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+
+        var hasOpsSession = !!localStorage.getItem('sidaya_operator_session');
+        var hasMerchantSession = !!localStorage.getItem('sidaya_merchant_session');
+
+        if (isOps) {
+          document.documentElement.className = hasOpsSession ? 'state-auth-ops' : 'state-unauth-ops';
+        } else {
+          document.documentElement.className = hasMerchantSession ? 'state-auth-merchant' : 'state-unauth-merchant';
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     /* ==========================================================================
        THEME VARIABLES: LIGHT ELEGANT (DEFAULT) & DARK SLEEK EXECUTIVE
@@ -120,7 +142,7 @@
     }
 
     /* ==========================================================================
-       AUTHENTICATION OVERLAYS (SECURITY-FIRST)
+       AUTHENTICATION OVERLAYS (ZERO FOUC PRE-PAINT ARCHITECTURE)
        ========================================================================== */
     .login-overlay {
       position: fixed;
@@ -132,17 +154,31 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       z-index: 80;
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
       padding: 16px;
       overflow-y: auto;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
     }
-    .login-overlay.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
+
+    .app-shell, .operator-shell {
+      display: none;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* Zero FOUC Pre-Paint Declarative Selectors */
+    html.state-unauth-merchant #merchant-login-screen {
+      display: flex !important;
+    }
+    html.state-unauth-ops #operator-login-screen {
+      display: flex !important;
+    }
+    html.state-auth-merchant #app-shell {
+      display: flex !important;
+    }
+    html.state-auth-ops #operator-shell {
+      display: flex !important;
     }
 
     .login-card {
@@ -325,23 +361,6 @@
       font-size: 0.7rem;
       font-weight: 700;
     }
-    .password-rules-checklist {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4px;
-      margin-top: 6px;
-      font-size: 0.68rem;
-      color: var(--text-muted);
-    }
-    .rule-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .rule-item.valid {
-      color: var(--accent-green);
-      font-weight: 700;
-    }
 
     .login-btn {
       width: 100%;
@@ -414,7 +433,7 @@
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-lg);
       padding: 24px 20px;
-      max-width: 500px;
+      max-width: 520px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
@@ -478,14 +497,6 @@
     /* ==========================================================================
        SIDEBAR & RESPONSIVE DRAWER ARCHITECTURE
        ========================================================================== */
-    .app-shell, .operator-shell {
-      display: none;
-      min-height: 100vh;
-      width: 100%;
-    }
-    .operator-shell.active {
-      display: flex;
-    }
 
     /* Backdrop for Mobile Drawer */
     .sidebar-backdrop {
@@ -575,15 +586,15 @@
       gap: 2px;
     }
     .tenant-badge-label {
-      font-size: 0.65rem;
+      font-size: 0.64rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     .tenant-badge-name {
-      font-size: 0.82rem;
-      font-weight: 800;
+      font-size: 0.8rem;
+      font-weight: 700;
       color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
@@ -597,28 +608,27 @@
     }
     .nav-section-label {
       font-size: 0.65rem;
-      font-weight: 800;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 0.6px;
       color: var(--text-muted);
-      padding: 6px 10px 2px 10px;
+      padding: 8px 8px 4px 8px;
     }
     .nav-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 9px 12px;
+      padding: 10px 12px;
       border-radius: var(--radius-sm);
+      background: transparent;
+      border: 1px solid transparent;
       color: var(--text-secondary);
       font-size: 0.84rem;
       font-weight: 600;
-      text-decoration: none;
       cursor: pointer;
-      transition: all 0.2s ease;
-      background: transparent;
-      border: none;
-      width: 100%;
       text-align: left;
+      transition: all 0.2s ease;
+      width: 100%;
     }
     .nav-item:hover {
       background: var(--bg-surface-elevated);
@@ -627,218 +637,185 @@
     .nav-item.active {
       background: var(--primary-soft);
       color: var(--primary);
-      font-weight: 800;
-      border-left: 3px solid var(--primary);
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      border-color: var(--primary-border);
+      font-weight: 700;
     }
     .nav-item-icon {
       font-size: 1.1rem;
+      width: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 20px;
     }
 
     .sidebar-bottom {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-subtle);
     }
     .user-profile-card {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
       padding: 6px 8px;
       border-radius: var(--radius-sm);
       background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
     }
     .user-avatar {
-      width: 30px;
-      height: 30px;
-      border-radius: var(--radius-full);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
       background: var(--primary);
       color: #FFFFFF;
       font-weight: 800;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
     }
     .user-meta {
       display: flex;
       flex-direction: column;
-      min-width: 0;
+      overflow: hidden;
     }
     .user-name {
-      font-size: 0.78rem;
-      font-weight: 800;
+      font-size: 0.82rem;
+      font-weight: 700;
       color: var(--text-primary);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
     .user-role-tag {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--primary);
+      font-size: 0.66rem;
+      color: var(--text-muted);
+      font-weight: 600;
     }
+
     .logout-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: var(--radius-sm);
-      background: transparent;
-      border: 1px solid var(--border-subtle);
+      background: var(--accent-rose-soft);
+      border: 1px solid transparent;
       color: var(--accent-rose);
       font-size: 0.78rem;
       font-weight: 700;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
-      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
       justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      width: 100%;
     }
     .logout-btn:hover {
-      background: var(--accent-rose-soft);
-      border-color: var(--accent-rose);
+      background: var(--accent-rose);
+      color: #FFFFFF;
     }
 
-    /* Main Viewport */
+    /* Main Viewport & Layout */
     .main-viewport {
       flex: 1;
       display: flex;
       flex-direction: column;
       min-width: 0;
+      min-height: 100vh;
       background: var(--bg-body);
-      position: relative;
-      padding-bottom: 80px;
     }
-
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 30;
+      z-index: 50;
       background: var(--topbar-bg);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-subtle);
-      padding: 10px 20px;
+      padding: 12px 20px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      transition: var(--theme-transition);
     }
     .topbar-left {
       display: flex;
       align-items: center;
-      gap: 10px;
-      min-width: 0;
+      gap: 12px;
     }
     .mobile-menu-toggle {
       display: none;
-      align-items: center;
-      justify-content: center;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
       width: 36px;
       height: 36px;
-      border-radius: var(--radius-sm);
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       cursor: pointer;
-      box-shadow: var(--card-shadow);
-      flex-shrink: 0;
+      color: var(--text-primary);
+      align-items: center;
+      justify-content: center;
     }
     .breadcrumb-title {
       font-size: 1.05rem;
       font-weight: 800;
-      letter-spacing: -0.3px;
       color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      letter-spacing: -0.3px;
     }
     .breadcrumb-sub {
       font-size: 0.72rem;
       color: var(--text-muted);
-      font-weight: 500;
     }
-
     .topbar-controls {
       display: flex;
       align-items: center;
       gap: 8px;
-      flex-shrink: 0;
     }
-    .control-select-box {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 4px 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .control-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-    .control-select {
-      background: transparent;
-      border: none;
-      color: var(--text-primary);
-      font-size: 0.76rem;
-      font-weight: 700;
-      cursor: pointer;
-      outline: none;
-    }
-
     .theme-toggle-btn {
-      background: var(--bg-surface);
+      background: var(--bg-surface-elevated);
       border: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-      padding: 6px 10px;
       border-radius: var(--radius-sm);
-      font-size: 0.76rem;
-      font-weight: 700;
-      cursor: pointer;
+      width: 36px;
+      height: 36px;
       display: flex;
       align-items: center;
-      gap: 4px;
-      box-shadow: var(--card-shadow);
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      color: var(--text-primary);
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--border-medium);
+      transform: scale(1.05);
     }
 
     .content-container {
       padding: 20px;
-      max-width: 1280px;
+      flex: 1;
+      max-width: 1400px;
       width: 100%;
       margin: 0 auto;
     }
 
+    /* Modules (Owner Dashboard, POS, FIFO, Surat Jalan) */
     .module-view {
       display: none;
-      animation: viewFade 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: fadeIn 0.2s ease;
     }
     .module-view.active {
       display: block;
     }
-    @keyframes viewFade {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
 
-    /* Telemetry & KPI Cards */
-    .telemetry-grid, .kpi-grid {
+    /* KPI Cards */
+    .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 14px;
       margin-bottom: 20px;
     }
-    .telemetry-card, .kpi-card {
+    .kpi-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
@@ -846,191 +823,261 @@
       box-shadow: var(--card-shadow);
       display: flex;
       flex-direction: column;
+      gap: 4px;
+      transition: var(--theme-transition);
     }
-    .telemetry-label, .kpi-title {
-      font-size: 0.7rem;
+    .kpi-title {
+      font-size: 0.72rem;
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
     }
-    .telemetry-val, .kpi-value {
-      font-size: 1.4rem;
+    .kpi-value {
+      font-size: 1.45rem;
       font-weight: 800;
       color: var(--text-primary);
-      font-family: 'JetBrains Mono', monospace;
       letter-spacing: -0.5px;
     }
-    .telemetry-sub, .kpi-sub {
+    .kpi-sub {
       font-size: 0.72rem;
-      color: var(--text-secondary);
-      margin-top: 4px;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    /* POS Layout */
+    .pos-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+    }
+    .pos-main {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      box-shadow: var(--card-shadow);
+    }
+    .pos-cart-panel {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: fit-content;
+    }
+    .product-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .product-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    /* Cart Quantity Controls */
+    .qty-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      width: 24px;
+      height: 24px;
+      font-weight: 800;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-primary);
+    }
+    .qty-btn:hover {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+      color: var(--primary);
     }
 
     /* Tables */
     .operator-table-wrap {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-md);
       box-shadow: var(--card-shadow);
       overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      margin-bottom: 20px;
-    }
-    .operator-table-header {
-      padding: 14px 18px;
-      border-bottom: 1px solid var(--border-subtle);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
     }
     .operator-table {
       width: 100%;
       border-collapse: collapse;
+      font-size: 0.82rem;
       text-align: left;
-      min-width: 550px;
     }
     .operator-table th {
-      padding: 10px 14px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid var(--border-subtle);
       background: var(--bg-surface-elevated);
+      padding: 10px 14px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.74rem;
+      text-transform: uppercase;
     }
     .operator-table td {
       padding: 12px 14px;
       border-bottom: 1px solid var(--border-subtle);
-      font-size: 0.82rem;
       color: var(--text-primary);
-      vertical-align: middle;
+    }
+    .operator-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Badges */
+    .tier-badge {
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tier-grosir-pro {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
+    }
+    .tier-starter-free {
+      background: var(--bg-surface-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
     }
 
     .operator-role-badge {
       font-size: 0.65rem;
       font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
       text-transform: uppercase;
     }
     .role-super-admin {
-      background: rgba(124, 58, 237, 0.15);
-      color: #7C3AED;
-      border: 1px solid rgba(124, 58, 237, 0.35);
+      background: #7C3AED;
+      color: #FFFFFF;
     }
     .role-dev-engineer {
-      background: rgba(37, 99, 235, 0.15);
-      color: #2563EB;
-      border: 1px solid rgba(37, 99, 235, 0.35);
+      background: #0284C7;
+      color: #FFFFFF;
     }
     .role-ops-support {
-      background: rgba(5, 150, 105, 0.15);
-      color: #059669;
-      border: 1px solid rgba(5, 150, 105, 0.35);
-    }
-
-    .tier-badge {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.68rem;
-      font-weight: 800;
-    }
-    .tier-grosir-pro {
-      background: rgba(37, 99, 235, 0.12);
-      color: var(--primary);
-    }
-    .tier-starter-free {
-      background: rgba(148, 163, 184, 0.15);
-      color: #64748B;
-    }
-
-    .pos-layout {
-      display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 16px;
-    }
-    .pos-main, .pos-cart-panel {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 16px;
-      box-shadow: var(--card-shadow);
+      background: #059669;
+      color: #FFFFFF;
     }
 
     .save-matrix-btn {
       background: var(--primary);
       color: #FFFFFF;
       border: none;
-      padding: 7px 14px;
       border-radius: var(--radius-sm);
+      padding: 8px 14px;
       font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s ease;
     }
+    .save-matrix-btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
 
-    .status-pip {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent-green);
-      display: inline-block;
+    /* Telemetry Grid */
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .telemetry-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+    .telemetry-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .telemetry-val {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 4px 0 2px 0;
+    }
+    .telemetry-sub {
+      font-size: 0.68rem;
+      color: var(--text-secondary);
+    }
+
+    /* Toast Notification System */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast-pill {
+      background: #0F172A;
+      color: #FFFFFF;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* ==========================================================================
-       📱 MOBILE RESPONSIVE BREAKPOINTS (max-width: 850px)
+       RESPONSIVE BREAKPOINTS (MOBILE & TABLET DRAWER)
        ========================================================================== */
-    @media (max-width: 850px) {
-      .app-shell, .operator-shell {
-        flex-direction: column;
-        width: 100vw;
-        overflow-x: hidden;
+    @media (max-width: 900px) {
+      .mobile-menu-toggle {
+        display: inline-flex !important;
       }
       .sidebar {
-        position: fixed;
+        position: fixed !important;
         top: 0;
         left: 0;
         bottom: 0;
-        width: 280px;
         height: 100vh;
-        z-index: 1000;
         transform: translateX(-100%);
         box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
       }
       .sidebar.open {
         transform: translateX(0);
-      }
-      .mobile-menu-toggle {
-        display: flex;
-      }
-      .main-viewport {
-        width: 100%;
-        min-width: 0;
-        padding-bottom: 70px;
-      }
-      .topbar {
-        padding: 8px 12px;
-      }
-      .breadcrumb-sub {
-        display: none;
-      }
-      .breadcrumb-title {
-        font-size: 0.95rem;
-      }
-      .content-container {
-        padding: 12px;
-      }
-      .telemetry-grid, .kpi-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
       }
       .pos-layout {
         grid-template-columns: 1fr;
@@ -1038,64 +1085,66 @@
       .preset-pill-grid {
         grid-template-columns: 1fr;
       }
-      .dev-subdomain-pill {
-        bottom: 10px;
-        right: 10px;
-        padding: 4px 8px;
-        font-size: 0.68rem;
-      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
   </style>
 </head>
 <body>
 
-  <!-- MOBILE DRAWER BACKDROP -->
+  <!-- BACKDROP FOR MOBILE DRAWER -->
   <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeSidebarDrawer()"></div>
 
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
   <!-- ========================================================================
-       1. MERCHANT LOGIN GATEWAY (SHOWN ONLY ON MERCHANT DOMAIN: localhost:3333)
+       1. MERCHANT LOGIN SCREEN
        ======================================================================== -->
   <div id="merchant-login-screen" class="login-overlay">
     <div class="login-card">
       <div class="login-brand">
         <div class="login-logo">S</div>
-        <h2 class="login-title">SiDaya Merchant Gateway</h2>
-        <p class="login-desc">Platform Toko Grosir, Stok FIFO & Kasir Multi-Cabang</p>
+        <h2 class="login-title">SiDaya Enterprise OS</h2>
+        <p class="login-desc">Sistem Manajemen Grosir, FIFO & Point of Sale</p>
         <div class="login-security-badge">
           <span>🛡️</span>
-          <span>Sesi Terenkripsi & Terisolasi via RLS</span>
+          <span>Role Matrix (RBAC) • Multi-Tenant Isolated</span>
         </div>
       </div>
 
-      <div class="preset-section-title">Pilih Akun Demo Toko (1-Click Switch):</div>
+      <div class="preset-section-title">Pilih Persona Toko (Quick Login):</div>
       <div class="preset-pill-grid">
-        <button class="preset-pill-btn" onclick="quickLoginPreset('budi@berasjaya.com', 'budi')">
+        <button class="preset-pill-btn" onclick="quickLoginPreset('budi@berasjaya.com')">
           <span>👑 Budi Santoso</span>
-          <span class="preset-role-badge">Owner • Toko Beras Jaya</span>
+          <span class="preset-role-badge">Owner / Billing POC</span>
         </button>
-        <button class="preset-pill-btn" onclick="quickLoginPreset('siti@berasjaya.com', 'siti')">
+        <button class="preset-pill-btn" onclick="quickLoginPreset('siti@berasjaya.com')">
           <span>💳 Siti Rahma</span>
-          <span class="preset-role-badge">Kasir • POS & PayLink</span>
+          <span class="preset-role-badge">Kasir Grosir (POS)</span>
         </button>
-        <button class="preset-pill-btn" onclick="quickLoginPreset('agus@berasjaya.com', 'agus')">
+        <button class="preset-pill-btn" onclick="quickLoginPreset('agus@berasjaya.com')">
           <span>📦 Agus Santoso</span>
-          <span class="preset-role-badge">Gudang • Inbound & FIFO</span>
+          <span class="preset-role-badge">Gudang & FIFO Lot</span>
         </button>
-        <button class="preset-pill-btn" onclick="quickLoginPreset('joko@berasjaya.com', 'joko')">
+        <button class="preset-pill-btn" onclick="quickLoginPreset('joko@berasjaya.com')">
           <span>🚚 Joko Supir</span>
-          <span class="preset-role-badge">Driver • Surat Jalan</span>
+          <span class="preset-role-badge">Driver Logistik</span>
         </button>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Email atau Nomor WhatsApp</label>
-        <input id="merchant-login-identifier" type="text" class="form-input" value="budi@berasjaya.com" placeholder="contoh: budi@berasjaya.com">
+        <label class="form-label">Email / WhatsApp Pengguna</label>
+        <input id="merchant-login-identifier" type="text" class="form-input" value="budi@berasjaya.com" placeholder="nama@toko.com atau 0812xxxxxxxx">
       </div>
 
       <div class="form-group">
-        <label class="form-label">Kata Sandi / PIN Staf</label>
+        <label class="form-label">Kata Sandi</label>
         <div class="password-input-wrap">
-          <input id="merchant-login-password" type="password" class="form-input" value="Password123!" placeholder="Kata sandi atau PIN">
+          <input id="merchant-login-password" type="password" class="form-input" value="Password123!" placeholder="Kata Sandi Akun Toko">
           <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('merchant-login-password', this)">👁️</button>
         </div>
       </div>
@@ -1105,20 +1154,20 @@
       </button>
 
       <div class="login-action-links">
-        <a class="login-action-link" onclick="openForgotPasswordModal()">🔑 Lupa Kata Sandi?</a>
-        <a class="login-action-link" onclick="openOwnerRegistrationModal()" style="color:var(--accent-green);">✨ Daftarkan Toko Baru (Owner)</a>
+        <a class="login-action-link" onclick="openOwnerRegistrationModal()">✨ Daftar Toko Baru (Owner)</a>
+        <a class="login-action-link" onclick="openForgotPasswordModal()">Lupa Kata Sandi?</a>
       </div>
 
       <div class="login-footer-meta">
-        Sesi terisolasi per-tenant. Akses hanya untuk staf toko dan pemilik resmi.
+        Staf toko (Kasir, Gudang, Driver) bergabung melalui tautan undangan resmi dari Pemilik Toko.
       </div>
     </div>
   </div>
 
   <!-- ========================================================================
-       2. ASHVIN LABS OPERATOR LOGIN GATEWAY (SHOWN ONLY ON ops.localhost:3333)
+       2. OPERATOR CONTROL PLANE LOGIN SCREEN
        ======================================================================== -->
-  <div id="operator-login-screen" class="login-overlay hidden">
+  <div id="operator-login-screen" class="login-overlay">
     <div class="login-card" style="border-color: rgba(124, 58, 237, 0.4);">
       <div class="login-brand">
         <div class="login-logo" style="background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);">⚡</div>
@@ -1179,15 +1228,17 @@
   </div>
 
   <!-- ========================================================================
-       3. MODAL: OWNER SELF-REGISTRATION
+       3. MODALS
        ======================================================================== -->
+  
+  <!-- MODAL: OWNER REGISTRATION -->
   <div id="modal-owner-reg" class="modal-overlay hidden">
     <div class="modal-card">
-      <button class="modal-close-btn" onclick="closeModal('modal-owner-reg')">✕</button>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
       <div style="margin-bottom: 16px;">
         <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">✨ Daftarkan Toko & Akun Pemilik (Owner)</h3>
         <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
-          Registrasi mandiri hanya berlaku untuk Pemilik Toko (Billing POC). Staf toko lainnya didaftarkan via undangan.
+          Registrasi mandiri hanya berlaku untuk Pemilik Toko (Billing POC). Staf toko didaftarkan via undangan.
         </p>
       </div>
 
@@ -1215,14 +1266,14 @@
         </div>
         <div class="form-group">
           <label class="form-label">Alamat Email Resmi Pemilik</label>
-          <input id="reg-owner-email" type="email" class="form-input" required placeholder="owner@bisnis.com (Mendukung alias +)">
+          <input id="reg-owner-email" type="email" class="form-input" required placeholder="owner@bisnis.com">
         </div>
 
         <div style="font-size:0.72rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin:12px 0 6px 0;">3. Keamanan Kata Sandi</div>
         <div class="form-group">
           <label class="form-label">Kata Sandi Baru</label>
           <div class="password-input-wrap">
-            <input id="reg-owner-password" type="password" class="form-input" required placeholder="Min 8 karakter, huruf besar, angka, spesial" oninput="checkPasswordStrength('reg-owner-password', 'reg-strength-fill', 'reg-strength-label', 'reg-rules')">
+            <input id="reg-owner-password" type="password" class="form-input" required placeholder="Min 8 karakter, huruf besar, angka, spesial" oninput="checkPasswordStrength('reg-owner-password', 'reg-strength-fill', 'reg-strength-label')">
             <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-owner-password', this)">👁️</button>
           </div>
           <div class="password-strength-wrap">
@@ -1236,14 +1287,6 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Konfirmasi Kata Sandi</label>
-          <div class="password-input-wrap">
-            <input id="reg-owner-confirm-password" type="password" class="form-input" required placeholder="Ketik ulang kata sandi">
-            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-owner-confirm-password', this)">👁️</button>
-          </div>
-        </div>
-
         <button type="submit" class="login-btn" style="margin-top:8px; background:var(--accent-green);">
           🚀 Daftarkan Toko & Kirim Email Verifikasi
         </button>
@@ -1251,16 +1294,14 @@
     </div>
   </div>
 
-  <!-- ========================================================================
-       4. MODAL: FORGOT PASSWORD
-       ======================================================================== -->
+  <!-- MODAL: FORGOT PASSWORD -->
   <div id="modal-forgot-password" class="modal-overlay hidden">
     <div class="modal-card">
-      <button class="modal-close-btn" onclick="closeModal('modal-forgot-password')">✕</button>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
       <div style="margin-bottom: 16px;">
         <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">🔑 Atur Ulang Kata Sandi</h3>
         <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
-          Masukkan email terdaftar Anda untuk menerima link reset kata sandi via Resend.
+          Masukkan email terdaftar Anda untuk menerima tautan pemulihan kata sandi via Resend.
         </p>
       </div>
 
@@ -1269,25 +1310,15 @@
           <label class="form-label">Alamat Email Terdaftar</label>
           <input id="forgot-email" type="email" class="form-input" required placeholder="contoh: budi@berasjaya.com">
         </div>
-
-        <button type="submit" class="login-btn">
-          ✉️ Kirim Tautan Atur Ulang Sandi
-        </button>
+        <button type="submit" class="login-btn">✉️ Kirim Tautan Atur Ulang Sandi</button>
       </form>
-
-      <div id="forgot-success-box" style="display:none; margin-top:14px; padding:12px; border-radius:var(--radius-sm); background:var(--accent-green-soft); border:1px solid var(--accent-green-border); font-size:0.78rem; color:var(--accent-green);">
-        ✅ Tautan atur ulang kata sandi telah dikirimkan ke email Anda via Resend!
-        <div id="simulated-reset-link" style="margin-top:6px;"></div>
-      </div>
     </div>
   </div>
 
-  <!-- ========================================================================
-       5. MODAL: INVITE OPERATOR (SUPER ADMIN)
-       ======================================================================== -->
+  <!-- MODAL: INVITE OPERATOR -->
   <div id="modal-invite-operator" class="modal-overlay hidden">
     <div class="modal-card">
-      <button class="modal-close-btn" onclick="closeModal('modal-invite-operator')">✕</button>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
       <div style="margin-bottom: 16px;">
         <span class="operator-role-badge role-super-admin" style="margin-bottom:6px; display:inline-block;">SUPER ADMIN ONLY</span>
         <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">⚡ Undang Platform Operator Baru</h3>
@@ -1301,17 +1332,14 @@
           <label class="form-label">Email Operator (Corporate)</label>
           <input id="ops-invite-email" type="email" class="form-input" required placeholder="contoh: maya@ashvinlabs.com">
         </div>
-
         <div class="form-group">
           <label class="form-label">Nama Lengkap</label>
           <input id="ops-invite-name" type="text" class="form-input" required placeholder="contoh: Maya Audit Specialist">
         </div>
-
         <div class="form-group">
           <label class="form-label">Nomor Telepon</label>
           <input id="ops-invite-phone" type="tel" class="form-input" required placeholder="0811xxxxxxxx">
         </div>
-
         <div class="form-group">
           <label class="form-label">Peran & Tingkat Otoritas (RBAC)</label>
           <select id="ops-invite-role" class="form-input">
@@ -1321,16 +1349,115 @@
             <option value="SUPER_ADMIN">SUPER_ADMIN (Akses Penuh)</option>
           </select>
         </div>
-
         <button type="submit" class="login-btn" style="background:linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);">
-          ✉️ Terbitkan Undangan Operator via Resend
+          ✉️ Terbitkan Undangan Operator
         </button>
       </form>
     </div>
   </div>
 
+  <!-- MODAL: INVITE MERCHANT STAFF -->
+  <div id="modal-invite-staff" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      <div style="margin-bottom: 16px;">
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">👥 Undang Staf Toko Baru</h3>
+        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
+          Kirim tautan undangan resmi untuk kasir, staf gudang, atau driver armada.
+        </p>
+      </div>
+
+      <form onsubmit="handleInviteStaffSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap Staf</label>
+          <input id="staff-invite-name" type="text" class="form-input" required placeholder="contoh: Rahmat Hidayat">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Alamat Email Staf</label>
+          <input id="staff-invite-email" type="email" class="form-input" required placeholder="rahmat@berasjaya.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">No. WhatsApp</label>
+          <input id="staff-invite-phone" type="tel" class="form-input" required placeholder="0813xxxxxxxx">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Penugasan Peran (Role Matrix)</label>
+          <select id="staff-invite-role" class="form-input">
+            <option value="KASIR">💳 Kasir Grosir (POS)</option>
+            <option value="GUDANG">📦 Staf Gudang & FIFO</option>
+            <option value="DRIVER">🚚 Driver Logistik (Surat Jalan)</option>
+          </select>
+        </div>
+        <button type="submit" class="login-btn" style="background:var(--primary);">
+          ✉️ Terbitkan Undangan Staf
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: INBOUND FIFO BATCH -->
+  <div id="modal-inbound-lot" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      <div style="margin-bottom: 16px;">
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">📦 Catat Inbound Lot Baru (Barang Masuk)</h3>
+        <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
+          Setiap penerimaan barang dicatat sebagai lot tersendiri dengan urutan batch FIFO yang ketat.
+        </p>
+      </div>
+
+      <form onsubmit="handleInboundLotSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Pilih Komoditas Produk</label>
+          <select id="inbound-sku" class="form-input">
+            <option value="RJL-50KG">Beras Rojolele 50KG (Karung)</option>
+            <option value="MGO-2L">Minyak Goreng 2L (Pouch)</option>
+            <option value="GUL-1KG">Gula Pasir Kristal 1KG (Bungkus)</option>
+            <option value="TRG-25KG">Tepung Terigu Segitiga 25KG (Sak)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nama Supplier / Produsen</label>
+          <input id="inbound-supplier" type="text" class="form-input" required placeholder="contoh: PT Lumbung Padi Soloraya">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div class="form-group">
+            <label class="form-label">Jumlah Unit Masuk</label>
+            <input id="inbound-qty" type="number" min="1" class="form-input" required placeholder="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Harga Modal per Unit (Rp)</label>
+            <input id="inbound-cost" type="number" min="1000" class="form-input" required placeholder="570000">
+          </div>
+        </div>
+        <button type="submit" class="login-btn" style="background:var(--accent-green);">
+          📥 Simpan Batch Lot Inbound
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CHECKOUT SUCCESS & RECEIPT -->
+  <div id="modal-receipt" class="modal-overlay hidden">
+    <div class="modal-card" style="text-align: center;">
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      <div style="font-size: 3rem; margin-bottom: 8px;">🎉</div>
+      <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--accent-green);" id="receipt-title">Transaksi Berhasil!</h3>
+      <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;" id="receipt-invoice-no">No. Faktur: INV-20260909-001</p>
+      
+      <div id="receipt-fifo-breakdown" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px; margin: 16px 0; text-align: left; font-size: 0.78rem;">
+        <!-- Filled by JS -->
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button class="login-btn" style="background: var(--primary);" onclick="closeModal()">Selesai & Transaksi Baru</button>
+        <button class="login-btn" style="background: var(--bg-surface-elevated); color: var(--text-primary); border: 1px solid var(--border-medium);" onclick="switchModule('sj'); closeModal();">🚚 Lihat Surat Jalan</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ========================================================================
-       6. AUTHENTICATED MERCHANT SHELL
+       4. AUTHENTICATED MERCHANT SHELL
        ======================================================================== -->
   <div id="app-shell" class="app-shell">
     <aside class="sidebar" id="merchant-sidebar">
@@ -1395,7 +1522,7 @@
         </div>
 
         <div class="topbar-controls">
-          <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()">
+          <button class="theme-toggle-btn" onclick="toggleTheme()">
             <span id="theme-icon">☀️</span>
           </button>
         </div>
@@ -1406,34 +1533,34 @@
         <section id="module-owner" class="module-view active">
           <div class="kpi-grid">
             <div class="kpi-card">
-              <span class="kpi-title">Omzet Bulan Berjalan</span>
-              <span class="kpi-value">Rp428.500.000</span>
-              <span class="kpi-sub">↑ 14.8% vs bulan lalu</span>
+              <span class="kpi-title">Omzet Transaksi</span>
+              <span class="kpi-value" id="kpi-omzet">Rp 428.500.000</span>
+              <span class="kpi-sub" id="kpi-omzet-sub">Live dihitung dari pesanan POS</span>
             </div>
             <div class="kpi-card">
-              <span class="kpi-title">Stok Lot Aktif (FIFO)</span>
-              <span class="kpi-value" id="kpi-total-lots">140 Karung</span>
-              <span class="kpi-sub">2 Lot Terdaftar</span>
-            </div>
-            <div class="kpi-card">
-              <span class="kpi-title">Piutang Dagang</span>
-              <span class="kpi-value">Rp38.200.000</span>
-              <span class="kpi-sub" style="color:var(--accent-rose);">4 Faktur Mendekati Tempo</span>
+              <span class="kpi-title">Total Stok Lot Aktif</span>
+              <span class="kpi-value" id="kpi-total-lots">140 Unit</span>
+              <span class="kpi-sub" id="kpi-lots-sub">2 Lot Terdaftar</span>
             </div>
             <div class="kpi-card">
               <span class="kpi-title">Surat Jalan Terbit</span>
-              <span class="kpi-value">12 Pengiriman</span>
-              <span class="kpi-sub">1 Armada di Jalan</span>
+              <span class="kpi-value" id="kpi-total-sj">1 Pengiriman</span>
+              <span class="kpi-sub">Armada Logistik Aktif</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-title">Status Langganan</span>
+              <span class="kpi-value" style="color:var(--primary); font-size:1.2rem;">GROSIR_PRO</span>
+              <span class="kpi-sub" style="color:var(--accent-green);">Multi-Terminal & FIFO Aktif</span>
             </div>
           </div>
 
           <div class="operator-table-wrap" style="padding:16px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
               <div>
-                <h3 style="font-size:1rem; font-weight:800; color:var(--text-primary);">👥 Manajemen Tim Staf</h3>
-                <p style="font-size:0.74rem; color:var(--text-muted);">Semua staf toko onboarding melalui link undangan resmi.</p>
+                <h3 style="font-size:1rem; font-weight:800; color:var(--text-primary);">👥 Manajemen Tim & Staf Toko</h3>
+                <p style="font-size:0.74rem; color:var(--text-muted);">Semua staf onboarding melalui link undangan resmi pemilik toko.</p>
               </div>
-              <button class="save-matrix-btn" onclick="alert('Fitur undangan staf siap digunakan!')">
+              <button class="save-matrix-btn" onclick="openModal('invite-staff')">
                 ➕ Undang Staf Baru
               </button>
             </div>
@@ -1443,36 +1570,11 @@
                 <tr>
                   <th>Nama Staf</th>
                   <th>Kontak / Email</th>
-                  <th>Peran</th>
+                  <th>Peran (Role)</th>
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody id="tenant-staff-tbody">
-                <tr>
-                  <td><strong>Budi Santoso</strong> <span class="tier-badge tier-grosir-pro">OWNER</span></td>
-                  <td>budi@berasjaya.com</td>
-                  <td>Owner / Billing POC</td>
-                  <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">VERIFIED</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Siti Rahma</strong></td>
-                  <td>siti@berasjaya.com</td>
-                  <td>Kasir (POS)</td>
-                  <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">VERIFIED</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Agus Santoso</strong></td>
-                  <td>agus@berasjaya.com</td>
-                  <td>Gudang (FIFO)</td>
-                  <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">VERIFIED</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Joko Supir</strong></td>
-                  <td>joko@berasjaya.com</td>
-                  <td>Driver Logistik</td>
-                  <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">VERIFIED</span></td>
-                </tr>
-              </tbody>
+              <tbody id="tenant-staff-tbody"></tbody>
             </table>
           </div>
         </section>
@@ -1483,23 +1585,40 @@
             <div class="pos-main">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <div>
-                  <h3 style="font-size:1.05rem; font-weight:800;">🛒 Kasir Grosir POS</h3>
-                  <div style="font-size:0.72rem; color:var(--text-muted);"><span class="status-pip"></span> Shift: Siti Rahma</div>
+                  <h3 style="font-size:1.05rem; font-weight:800;">🛒 Katalog Komoditas Grosir</h3>
+                  <div style="font-size:0.72rem; color:var(--text-muted);">Klik produk untuk memasukkan ke keranjang kasir.</div>
                 </div>
-                <span class="tier-badge tier-starter-free">🔒 COGS Masked</span>
+                <span class="tier-badge tier-starter-free">🔒 COGS Masked Kasir</span>
               </div>
-              <div id="pos-catalog-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px;"></div>
+              <div id="pos-catalog-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:12px;"></div>
             </div>
 
             <div class="pos-cart-panel">
-              <h4 style="font-weight:800; font-size:0.95rem; margin-bottom:10px;">Keranjang Transaksi</h4>
-              <div id="pos-cart-list" style="display:flex; flex-direction:column; gap:6px; margin-bottom:12px;"></div>
-              <div style="border-top:1px solid var(--border-subtle); padding-top:10px;">
-                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.05rem; color:var(--accent-green);">
-                  <span>Total Tagihan:</span>
-                  <span id="pos-grand-total">Rp 12.103.000</span>
+              <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                  <h4 style="font-weight:800; font-size:0.95rem;">Keranjang Belanja</h4>
+                  <button style="background:none; border:none; font-size:0.75rem; color:var(--accent-rose); font-weight:700; cursor:pointer;" onclick="store.dispatch('POS_CLEAR_CART')">Kosongkan</button>
                 </div>
-                <button class="login-btn" style="margin-top:12px; background:var(--accent-green);" onclick="alert('Transaksi Tunai Selesai!')">Bayar Tunai</button>
+                <div id="pos-cart-list" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px; max-height:260px; overflow-y:auto;"></div>
+              </div>
+
+              <div style="border-top:1px solid var(--border-subtle); padding-top:12px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:4px;">
+                  <span>Jumlah Item:</span>
+                  <span id="pos-cart-qty">0 Unit</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.1rem; color:var(--accent-green); margin-bottom:12px;">
+                  <span>Total Tagihan:</span>
+                  <span id="pos-grand-total">Rp 0</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <button class="login-btn" style="background:var(--accent-green);" onclick="handlePosCheckout('TUNAI')">
+                    💵 Bayar Tunai (Potong FIFO Otomatis)
+                  </button>
+                  <button class="login-btn" style="background:var(--primary);" onclick="handlePosCheckout('QRIS')">
+                    📱 Bayar PayLink QRIS
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1508,33 +1627,39 @@
         <!-- MODULE 3: FIFO -->
         <section id="module-fifo" class="module-view">
           <div class="operator-table-wrap" style="padding:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <h3 style="font-weight:800; font-size:1.05rem;">📦 Urutan Alokasi Batch FIFO (Beras Rojolele 50KG)</h3>
-              <button class="save-matrix-btn" onclick="simulateFifoAllocation()">Uji Alokasi 50 Karung</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+              <div>
+                <h3 style="font-weight:800; font-size:1.05rem;">📦 Antrean Batch Lot FIFO (First-In, First-Out)</h3>
+                <p style="font-size:0.74rem; color:var(--text-muted);">Stok terlama otomatis dipotong terlebih dahulu saat penjualan.</p>
+              </div>
+              <button class="save-matrix-btn" style="background:var(--accent-green);" onclick="openModal('inbound-lot')">
+                ➕ Catat Inbound Lot Baru
+              </button>
             </div>
-            <div id="lot-timeline-container" style="display:flex; flex-direction:column; gap:8px;"></div>
-            <div id="fifo-sim-result" style="display:none; margin-top:12px; padding:10px; background:var(--primary-soft); border-radius:var(--radius-sm); font-size:0.8rem;"></div>
+
+            <div id="lot-timeline-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+
+            <div style="margin-top:20px; padding:14px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
+              <h4 style="font-weight:800; font-size:0.88rem; margin-bottom:8px;">🧪 Simulator Alokasi Lot FIFO Interaktif</h4>
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                <input id="fifo-sim-input" type="number" min="1" value="50" class="form-input" style="max-width:180px;" placeholder="Jumlah Karung">
+                <button class="save-matrix-btn" onclick="runFifoSimulation()">Uji Alokasi FIFO</button>
+              </div>
+              <div id="fifo-sim-result" style="display:none; margin-top:12px; padding:12px; background:var(--primary-soft); border-radius:var(--radius-sm); font-size:0.8rem;"></div>
+            </div>
           </div>
         </section>
 
         <!-- MODULE 4: SURAT JALAN -->
         <section id="module-sj" class="module-view">
-          <div class="operator-table-wrap" style="padding:16px; max-width:600px; margin:0 auto;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:12px;">
+          <div class="operator-table-wrap" style="padding:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
               <div>
-                <h3 style="font-weight:800; font-size:1.05rem;">SURAT JALAN (DELIVERY ORDER)</h3>
-                <div style="font-size:0.72rem; color:var(--text-muted);">No: SJ-20260908-0129 • Driver: Joko Supir</div>
+                <h3 style="font-weight:800; font-size:1.05rem;">🚚 Surat Jalan & Logistik Pengiriman</h3>
+                <p style="font-size:0.74rem; color:var(--text-muted);">Manifest pengiriman armada tanpa menampilkan nilai modal (COGS Privacy).</p>
               </div>
-              <span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">SIAP DIKIRIM</span>
             </div>
-            <div style="background:var(--bg-surface-elevated); padding:10px; border-radius:var(--radius-sm); font-size:0.76rem; line-height:1.5; margin-bottom:12px;">
-              <div><strong>Penerima:</strong> Pak Haji Rahmat (0812-9876-5432)</div>
-              <div><strong>Alamat:</strong> Jl. Raya Bogor KM 22, Kramat Jati</div>
-              <div><strong>Muatan:</strong> 20 Karung Beras Rojolele 50KG</div>
-            </div>
-            <div style="font-size:0.72rem; background:var(--accent-green-soft); color:var(--accent-green); padding:6px 10px; border-radius:6px; font-weight:700;">
-              🛡️ Nilai finansial dan modal disembunyikan sepenuhnya dari surat jalan driver.
-            </div>
+            <div id="surat-jalan-list" style="display:flex; flex-direction:column; gap:12px;"></div>
           </div>
         </section>
       </main>
@@ -1542,7 +1667,7 @@
   </div>
 
   <!-- ========================================================================
-       7. AUTHENTICATED ASHVIN LABS OPERATOR COMMAND CENTER
+       5. AUTHENTICATED ASHVIN LABS OPERATOR COMMAND CENTER
        ======================================================================== -->
   <div id="operator-shell" class="operator-shell">
     <aside class="sidebar" id="operator-sidebar">
@@ -1615,12 +1740,12 @@
           <div class="telemetry-grid">
             <div class="telemetry-card">
               <div class="telemetry-label"><span>Platform GMV</span></div>
-              <div class="telemetry-val" style="color:var(--primary);">Rp 612.700.000</div>
+              <div class="telemetry-val" id="op-total-gmv" style="color:var(--primary);">Rp 612.700.000</div>
               <div class="telemetry-sub">Total omset agregat tenant</div>
             </div>
             <div class="telemetry-card">
               <div class="telemetry-label"><span>Active Fleet</span></div>
-              <div class="telemetry-val">2 Tenants</div>
+              <div class="telemetry-val" id="op-total-tenants">2 Tenants</div>
               <div class="telemetry-sub">Toko Beras Jaya & Sembako Nusantara</div>
             </div>
             <div class="telemetry-card">
@@ -1639,10 +1764,10 @@
         <!-- TAB 2: TENANT FLEET -->
         <div id="op-tab-fleet" class="op-tab-content" style="display:none;">
           <div class="operator-table-wrap">
-            <div class="operator-table-header">
+            <div style="padding:14px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); flex-wrap:wrap; gap:10px;">
               <div style="font-weight:800; font-size:0.95rem;">🏢 Direktori Armada Tenant Aktif</div>
               <button id="pdp-mask-btn" class="save-matrix-btn" style="background:#7C3AED;" onclick="togglePdpMasking()">
-                🛡️ Toggle Sensor PII (UU PDP)
+                🛡️ Toggle Sensor PII (UU PDP No. 27/2022)
               </button>
             </div>
             <table class="operator-table">
@@ -1651,7 +1776,7 @@
                   <th>Nama Bisnis</th>
                   <th>Subdomain</th>
                   <th>Kontak Pemilik (UU PDP)</th>
-                  <th>Tier</th>
+                  <th>Tier Langganan</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -1668,7 +1793,7 @@
                 <h3 style="font-weight:800; font-size:1rem;">⚡ Manajemen Operator Ashvin Labs</h3>
                 <p style="font-size:0.74rem; color:var(--text-muted);">Operator baru hanya melalui undangan Super Admin.</p>
               </div>
-              <button class="save-matrix-btn" style="background:linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);" onclick="openOperatorInviteModal()">
+              <button class="save-matrix-btn" style="background:linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);" onclick="openModal('invite-operator')">
                 ➕ Undang Operator Baru
               </button>
             </div>
@@ -1682,26 +1807,7 @@
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody id="operator-list-tbody">
-                <tr>
-                  <td><strong>Gabriel (CEO)</strong></td>
-                  <td>gabriel@ashvinlabs.com</td>
-                  <td><span class="operator-role-badge role-super-admin">SUPER_ADMIN</span></td>
-                  <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">AKTIF</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Alex (Lead Developer)</strong></td>
-                  <td>alex@ashvinlabs.com</td>
-                  <td><span class="operator-role-badge role-dev-engineer">DEV_ENGINEER</span></td>
-                  <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">AKTIF</span></td>
-                </tr>
-                <tr>
-                  <td><strong>Dina (Customer Ops)</strong></td>
-                  <td>dina@ashvinlabs.com</td>
-                  <td><span class="operator-role-badge role-ops-support">OPS_SUPPORT</span></td>
-                  <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">AKTIF</span></td>
-                </tr>
-              </tbody>
+              <tbody id="operator-list-tbody"></tbody>
             </table>
           </div>
         </div>
@@ -1709,7 +1815,7 @@
         <!-- TAB 4: AUDIT TRAIL -->
         <div id="op-tab-audit" class="op-tab-content" style="display:none;">
           <div class="operator-table-wrap">
-            <div class="operator-table-header">
+            <div style="padding:14px 16px; border-bottom:1px solid var(--border-subtle);">
               <div style="font-weight:800; font-size:0.95rem;">📜 Immutable Operator Audit Logs</div>
             </div>
             <div id="audit-log-container" style="padding:14px;"></div>
@@ -1726,12 +1832,16 @@
     <a id="dev-link-ops" class="dev-subdomain-link" href="http://ops.localhost:3333/telemetry">⚡ Ops</a>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+  <!-- ========================================================================
+       JAVASCRIPT: ENTERPRISE REACTIVE STATE MANAGEMENT ENGINE
+       ======================================================================== -->
   <script>
-    let currentPortalMode = 'MERCHANT';
-    let currentTheme = 'light';
-    let isPiiMasked = false;
-
+    /**
+     * ==========================================================================
+     * ⚡ SIDAYA ENTERPRISE STATE STORE
+     * Unidirectional, Reactive, Persistent & Cross-Tab Synchronized
+     * ==========================================================================
+     */
     const MERCHANT_PRESETS = {
       'budi@berasjaya.com': { name: 'Budi Santoso', role: '👑 OWNER', avatar: 'B', tenant: 'Toko Grosir Beras Jaya Bersama' },
       'siti@berasjaya.com': { name: 'Siti Rahma', role: '💳 KASIR (POS)', avatar: 'S', tenant: 'Toko Grosir Beras Jaya Bersama' },
@@ -1745,58 +1855,1002 @@
       'dina@ashvinlabs.com': { name: 'Dina (Customer Ops)', role: 'OPS_SUPPORT', badgeClass: 'role-ops-support' },
     };
 
-    function detectSubdomainMode() {
-      const hostname = window.location.hostname.toLowerCase();
-      const path = window.location.pathname.toLowerCase();
+    const INITIAL_DEFAULT_STATE = {
+      version: 2,
+      ui: {
+        theme: 'light',
+        portalMode: 'MERCHANT',
+        activePath: 'dashboard',
+        sidebarOpen: false,
+        activeModal: null,
+      },
+      auth: {
+        merchantUser: {
+          email: 'budi@berasjaya.com',
+          name: 'Budi Santoso',
+          role: '👑 OWNER',
+          avatar: 'B',
+          tenant: 'Toko Grosir Beras Jaya Bersama'
+        },
+        operatorUser: {
+          email: 'gabriel@ashvinlabs.com',
+          name: 'Gabriel (CEO)',
+          role: 'SUPER_ADMIN',
+          badgeClass: 'role-super-admin'
+        }
+      },
+      catalog: [
+        { sku: 'RJL-50KG', name: 'Beras Rojolele 50KG', category: 'Beras', unit: 'Karung', price: 617500, icon: '🌾' },
+        { sku: 'MGO-2L', name: 'Minyak Goreng 2L', category: 'Minyak', unit: 'Pouch', price: 91500, icon: '🌻' },
+        { sku: 'GUL-1KG', name: 'Gula Pasir Kristal 1KG', category: 'Gula', unit: 'Bungkus', price: 18500, icon: '🍚' },
+        { sku: 'TRG-25KG', name: 'Tepung Terigu Segitiga 25KG', category: 'Tepung', unit: 'Sak', price: 235000, icon: '🍞' }
+      ],
+      inventoryLots: [
+        { id: 'LOT-RJL-2026-0828', sku: 'RJL-50KG', qtyInitial: 40, qtyRemaining: 40, unitCost: 560000, receivedDate: '28 Agu 2026', supplier: 'PT Lumbung Padi Soloraya', isOldest: true },
+        { id: 'LOT-RJL-2026-0906', sku: 'RJL-50KG', qtyInitial: 100, qtyRemaining: 100, unitCost: 575000, receivedDate: '06 Sep 2026', supplier: 'Koperasi Tani Makmur', isOldest: false },
+        { id: 'LOT-MGO-2026-0830', sku: 'MGO-2L', qtyInitial: 360, qtyRemaining: 360, unitCost: 82000, receivedDate: '30 Agu 2026', supplier: 'PT Wilmar Agro', isOldest: true },
+        { id: 'LOT-GUL-2026-0901', sku: 'GUL-1KG', qtyInitial: 250, qtyRemaining: 250, unitCost: 16200, receivedDate: '01 Sep 2026', supplier: 'PG Madukismo', isOldest: true },
+        { id: 'LOT-TRG-2026-0902', sku: 'TRG-25KG', qtyInitial: 80, qtyRemaining: 80, unitCost: 215000, receivedDate: '02 Sep 2026', supplier: 'PT Bogasari Flour Mills', isOldest: true }
+      ],
+      cart: [
+        { sku: 'RJL-50KG', name: 'Beras Rojolele 50KG', unitPrice: 617500, qty: 20, subtotal: 12350000 }
+      ],
+      sales: [
+        {
+          id: 'INV-20260908-001',
+          createdAt: '08 Sep 2026 14:30',
+          customer: 'Pak Haji Rahmat',
+          totalAmount: 12350000,
+          paymentMethod: 'TUNAI',
+          status: 'SELESAI',
+          items: [{ sku: 'RJL-50KG', name: 'Beras Rojolele 50KG', qty: 20, unitPrice: 617500 }],
+          allocations: [{ lotId: 'LOT-RJL-2026-0828', qty: 20 }]
+        }
+      ],
+      suratJalan: [
+        {
+          id: 'SJ-20260908-0129',
+          invoiceId: 'INV-20260908-001',
+          driverName: 'Joko Supir',
+          recipientName: 'Pak Haji Rahmat (0812-9876-5432)',
+          address: 'Jl. Raya Bogor KM 22, Kramat Jati, Jakarta Timur',
+          items: '20 Karung Beras Rojolele 50KG',
+          status: 'SIAP_DIKIRIM',
+          createdAt: '08 Sep 2026 14:35'
+        }
+      ],
+      staff: [
+        { name: 'Budi Santoso', email: 'budi@berasjaya.com', phone: '081234567890', role: '👑 Owner / Billing POC', status: 'VERIFIED' },
+        { name: 'Siti Rahma', email: 'siti@berasjaya.com', phone: '081288881111', role: '💳 Kasir Grosir (POS)', status: 'VERIFIED' },
+        { name: 'Agus Santoso', email: 'agus@berasjaya.com', phone: '081288882222', role: '📦 Gudang & FIFO', status: 'VERIFIED' },
+        { name: 'Joko Supir', email: 'joko@berasjaya.com', phone: '081288883333', role: '🚚 Driver Logistik', status: 'VERIFIED' }
+      ],
+      operator: {
+        isPiiMasked: true,
+        tenants: [
+          { name: 'Toko Grosir Beras Jaya', subdomain: 'berasjaya', rawOwner: 'Budi Santoso (+6281234567890)', maskedOwner: 'B*** S*** (+6281****7890)', tier: 'GROSIR_PRO', status: 'ACTIVE', gmv: 428500000 },
+          { name: 'CV Sembako Nusantara', subdomain: 'sembakonusantara', rawOwner: 'Hendro Wijaya (+6281398765432)', maskedOwner: 'H*** W*** (+6281****5432)', tier: 'STARTER_FREE', status: 'ACTIVE', gmv: 184200000 }
+        ],
+        operators: [
+          { name: 'Gabriel (CEO)', email: 'gabriel@ashvinlabs.com', role: 'SUPER_ADMIN', status: 'ACTIVE' },
+          { name: 'Alex (Lead Developer)', email: 'alex@ashvinlabs.com', role: 'DEV_ENGINEER', status: 'ACTIVE' },
+          { name: 'Dina (Customer Ops)', email: 'dina@ashvinlabs.com', role: 'OPS_SUPPORT', status: 'ACTIVE' }
+        ],
+        auditLogs: [
+          { id: 1, action: 'PLATFORM_INITIALIZATION', actor: 'gabriel@ashvinlabs.com', details: 'Operator initialized multi-tenant clusters', time: '08 Sep 2026 09:00' },
+          { id: 2, action: 'TENANT_SUBSCRIPTION_UPDATE', actor: 'gabriel@ashvinlabs.com', details: 'Tenant berasjaya upgraded to GROSIR_PRO', time: '08 Sep 2026 10:15' },
+          { id: 3, action: 'OPERATOR_INVITED', actor: 'gabriel@ashvinlabs.com', details: 'Invited maya@ashvinlabs.com (AUDIT_COMPLIANCE)', time: '09 Sep 2026 08:30' }
+        ]
+      }
+    };
 
-      if (hostname.startsWith('ops.') || path.startsWith('/telemetry') || path.startsWith('/fleet') || path.startsWith('/operators') || path.startsWith('/audit')) {
-        currentPortalMode = 'OPS';
-        document.getElementById('dev-link-ops')?.classList.add('active');
-        document.getElementById('dev-link-merchant')?.classList.remove('active');
-      } else {
-        currentPortalMode = 'MERCHANT';
-        document.getElementById('dev-link-merchant')?.classList.add('active');
-        document.getElementById('dev-link-ops')?.classList.remove('active');
+    class SiDayaStateStore {
+      constructor() {
+        this.subscribers = new Set();
+        this.state = this.loadState();
+      }
+
+      getInitialPortalMode() {
+        const hostname = window.location.hostname.toLowerCase();
+        const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+        if (hostname.startsWith('ops.') || path === 'telemetry' || path === 'fleet' || path === 'operators' || path === 'audit') {
+          return 'OPS';
+        }
+        return 'MERCHANT';
+      }
+
+      getInitialPath(portalMode) {
+        const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+        if (path && path !== '') return path;
+        return portalMode === 'OPS' ? 'telemetry' : 'dashboard';
+      }
+
+      loadState() {
+        const portalMode = this.getInitialPortalMode();
+        const activePath = this.getInitialPath(portalMode);
+        
+        let stored = null;
+        try {
+          const raw = localStorage.getItem('sidaya_store_v2');
+          if (raw) stored = JSON.parse(raw);
+        } catch (e) {}
+
+        const merged = stored && stored.version === 2 ? stored : JSON.parse(JSON.stringify(INITIAL_DEFAULT_STATE));
+
+        // Sync route and mode dynamically with URL
+        merged.ui.portalMode = portalMode;
+        merged.ui.activePath = activePath;
+        merged.ui.theme = localStorage.getItem('sidaya_theme') || merged.ui.theme || 'light';
+        merged.ui.sidebarOpen = false;
+        merged.ui.activeModal = null;
+
+        return merged;
+      }
+
+      saveState() {
+        try {
+          localStorage.setItem('sidaya_store_v2', JSON.stringify(this.state));
+          localStorage.setItem('sidaya_theme', this.state.ui.theme);
+          if (this.state.auth.merchantUser) {
+            localStorage.setItem('sidaya_merchant_session', JSON.stringify(this.state.auth.merchantUser));
+          } else {
+            localStorage.removeItem('sidaya_merchant_session');
+          }
+          if (this.state.auth.operatorUser) {
+            localStorage.setItem('sidaya_operator_session', JSON.stringify(this.state.auth.operatorUser));
+          } else {
+            localStorage.removeItem('sidaya_operator_session');
+          }
+        } catch (e) {}
+      }
+
+      getState() {
+        return this.state;
+      }
+
+      subscribe(fn) {
+        this.subscribers.add(fn);
+        return () => this.subscribers.delete(fn);
+      }
+
+      notify() {
+        this.saveState();
+        this.subscribers.forEach(sub => sub(this.state));
+      }
+
+      dispatch(action, payload) {
+        switch (action) {
+          case 'NAVIGATE': {
+            const raw = (payload || '').replace(/^\/+|\/+$/g, '').toLowerCase();
+            this.state.ui.activePath = raw || (this.state.ui.portalMode === 'OPS' ? 'telemetry' : 'dashboard');
+            this.state.ui.sidebarOpen = false;
+            break;
+          }
+          case 'TOGGLE_THEME': {
+            this.state.ui.theme = this.state.ui.theme === 'light' ? 'dark' : 'light';
+            break;
+          }
+          case 'TOGGLE_SIDEBAR': {
+            this.state.ui.sidebarOpen = !this.state.ui.sidebarOpen;
+            break;
+          }
+          case 'CLOSE_SIDEBAR': {
+            this.state.ui.sidebarOpen = false;
+            break;
+          }
+          case 'OPEN_MODAL': {
+            this.state.ui.activeModal = payload;
+            break;
+          }
+          case 'CLOSE_MODAL': {
+            this.state.ui.activeModal = null;
+            break;
+          }
+          case 'LOGIN_MERCHANT': {
+            this.state.auth.merchantUser = payload;
+            this.state.ui.activePath = 'dashboard';
+            showToast(`Selamat datang, ${payload.name}!`, 'success');
+            break;
+          }
+          case 'LOGIN_OPERATOR': {
+            this.state.auth.operatorUser = payload;
+            this.state.ui.activePath = 'telemetry';
+            showToast(`Operator ${payload.name} terautentikasi.`, 'success');
+            break;
+          }
+          case 'LOGOUT': {
+            if (this.state.ui.portalMode === 'OPS') {
+              this.state.auth.operatorUser = null;
+            } else {
+              this.state.auth.merchantUser = null;
+            }
+            this.state.ui.activePath = 'login';
+            this.state.ui.sidebarOpen = false;
+            showToast('Anda telah keluar.', 'info');
+            break;
+          }
+          
+          /* POS Actions */
+          case 'POS_ADD_TO_CART': {
+            const product = payload;
+            const existing = this.state.cart.find(c => c.sku === product.sku);
+            if (existing) {
+              existing.qty += 1;
+              existing.subtotal = existing.qty * existing.unitPrice;
+            } else {
+              this.state.cart.push({
+                sku: product.sku,
+                name: product.name,
+                unitPrice: product.price,
+                qty: 1,
+                subtotal: product.price
+              });
+            }
+            showToast(`Ditambahkan: ${product.name}`, 'info');
+            break;
+          }
+          case 'POS_UPDATE_QTY': {
+            const { sku, delta } = payload;
+            const idx = this.state.cart.findIndex(c => c.sku === sku);
+            if (idx !== -1) {
+              this.state.cart[idx].qty += delta;
+              if (this.state.cart[idx].qty <= 0) {
+                this.state.cart.splice(idx, 1);
+              } else {
+                this.state.cart[idx].subtotal = this.state.cart[idx].qty * this.state.cart[idx].unitPrice;
+              }
+            }
+            break;
+          }
+          case 'POS_CLEAR_CART': {
+            this.state.cart = [];
+            showToast('Keranjang dikosongkan.', 'info');
+            break;
+          }
+          case 'POS_CHECKOUT': {
+            if (this.state.cart.length === 0) {
+              showToast('Keranjang masih kosong!', 'error');
+              return;
+            }
+
+            const paymentMethod = payload || 'TUNAI';
+            const invId = `INV-20260909-${String(this.state.sales.length + 1).padStart(3, '0')}`;
+            const sjId = `SJ-20260909-${String(this.state.suratJalan.length + 1).padStart(4, '0')}`;
+            
+            let totalAmount = 0;
+            const allocations = [];
+
+            // Perform FIFO lot deduction for each cart item
+            this.state.cart.forEach(cartItem => {
+              totalAmount += cartItem.subtotal;
+              let needed = cartItem.qty;
+
+              // Find lots matching this SKU, oldest first
+              const matchingLots = this.state.inventoryLots.filter(l => l.sku === cartItem.sku && l.qtyRemaining > 0);
+              
+              for (const lot of matchingLots) {
+                if (needed <= 0) break;
+                const take = Math.min(needed, lot.qtyRemaining);
+                lot.qtyRemaining -= take;
+                needed -= take;
+                allocations.push({
+                  sku: cartItem.sku,
+                  productName: cartItem.name,
+                  lotId: lot.id,
+                  qtyDeducted: take,
+                  qtyRemaining: lot.qtyRemaining
+                });
+              }
+
+              // Update oldest tags
+              const remainingLotsForSku = this.state.inventoryLots.filter(l => l.sku === cartItem.sku && l.qtyRemaining > 0);
+              matchingLots.forEach(l => l.isOldest = false);
+              if (remainingLotsForSku.length > 0) {
+                remainingLotsForSku[0].isOldest = true;
+              }
+            });
+
+            // Create Sales Record
+            this.state.sales.unshift({
+              id: invId,
+              createdAt: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+              customer: 'Pelanggan Walk-In',
+              totalAmount,
+              paymentMethod,
+              status: 'SELESAI',
+              items: [...this.state.cart],
+              allocations
+            });
+
+            // Create Surat Jalan Record
+            const itemsSummary = this.state.cart.map(c => `${c.qty}x ${c.name}`).join(', ');
+            this.state.suratJalan.unshift({
+              id: sjId,
+              invoiceId: invId,
+              driverName: 'Joko Supir',
+              recipientName: 'Toko Mitra Berkah (0812-7777-9999)',
+              address: 'Pasar Induk Kramat Jati Blok C No. 12',
+              items: itemsSummary,
+              status: 'SIAP_DIKIRIM',
+              createdAt: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+            });
+
+            // Add Audit Log
+            this.state.operator.auditLogs.unshift({
+              id: Date.now(),
+              action: 'POS_TRANSACTION_COMPLETED',
+              actor: this.state.auth.merchantUser?.email || 'kasir@berasjaya.com',
+              details: `Faktur: ${invId} • Total: ${formatRupiah(totalAmount)} (${paymentMethod})`,
+              time: 'Baru Saja'
+            });
+
+            // Open Receipt Modal
+            this.state.cart = [];
+            this.state.ui.activeModal = 'receipt';
+            renderReceiptModal(invId, totalAmount, paymentMethod, allocations);
+            break;
+          }
+
+          /* Inventory & FIFO Actions */
+          case 'FIFO_ADD_INBOUND_LOT': {
+            const { sku, supplier, qty, unitCost } = payload;
+            const dateStr = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            const lotId = `LOT-${sku.split('-')[0]}-${Date.now().toString().slice(-4)}`;
+
+            const isFirst = !this.state.inventoryLots.some(l => l.sku === sku && l.qtyRemaining > 0);
+
+            this.state.inventoryLots.push({
+              id: lotId,
+              sku,
+              qtyInitial: qty,
+              qtyRemaining: qty,
+              unitCost,
+              receivedDate: dateStr,
+              supplier,
+              isOldest: isFirst
+            });
+
+            this.state.operator.auditLogs.unshift({
+              id: Date.now(),
+              action: 'INBOUND_LOT_RECEIVED',
+              actor: this.state.auth.merchantUser?.email || 'gudang@berasjaya.com',
+              details: `Lot: ${lotId} • SKU: ${sku} • Qty: ${qty} • Supplier: ${supplier}`,
+              time: 'Baru Saja'
+            });
+
+            showToast(`Lot baru ${lotId} berhasil dicatat!`, 'success');
+            break;
+          }
+
+          /* Staff Actions */
+          case 'STAFF_INVITE': {
+            this.state.staff.push({
+              name: payload.name,
+              email: payload.email,
+              phone: payload.phone,
+              role: payload.role,
+              status: 'VERIFIED'
+            });
+            showToast(`Staf ${payload.name} berhasil ditambahkan!`, 'success');
+            break;
+          }
+
+          /* Surat Jalan Driver Lifecycle */
+          case 'SJ_UPDATE_STATUS': {
+            const { sjId, status } = payload;
+            const sj = this.state.suratJalan.find(s => s.id === sjId);
+            if (sj) {
+              sj.status = status;
+              showToast(`Surat Jalan ${sjId} diperbarui: ${status}`, 'success');
+            }
+            break;
+          }
+
+          /* Operator Control Plane Actions */
+          case 'OPS_TOGGLE_PII_MASK': {
+            this.state.operator.isPiiMasked = !this.state.operator.isPiiMasked;
+            showToast(this.state.operator.isPiiMasked ? '🛡️ Sensor PII UU PDP Aktif' : '🔓 Mode Break-Glass Terbuka', 'info');
+            break;
+          }
+          case 'OPS_INVITE_OPERATOR': {
+            this.state.operator.operators.push({
+              name: payload.fullName,
+              email: payload.email,
+              role: payload.role,
+              status: 'ACTIVE'
+            });
+            this.state.operator.auditLogs.unshift({
+              id: Date.now(),
+              action: 'OPERATOR_INVITED',
+              actor: this.state.auth.operatorUser?.email || 'gabriel@ashvinlabs.com',
+              details: `Invited ${payload.email} (${payload.role})`,
+              time: 'Baru Saja'
+            });
+            showToast(`Operator ${payload.fullName} berhasil diundang!`, 'success');
+            break;
+          }
+        }
+
+        this.notify();
       }
     }
 
-    function initTheme() {
-      const savedTheme = localStorage.getItem('sidaya_theme') || 'light';
-      currentTheme = savedTheme;
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      const icon = document.getElementById('theme-icon');
-      const iconOp = document.getElementById('theme-icon-op');
-      if (icon) icon.textContent = currentTheme === 'light' ? '☀️' : '🌙';
-      if (iconOp) iconOp.textContent = currentTheme === 'light' ? '☀️' : '🌙';
-    }
+    // Global Store Singleton
+    const store = new SiDayaStateStore();
 
-    function toggleTheme() {
-      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-      localStorage.setItem('sidaya_theme', currentTheme);
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      const icon = document.getElementById('theme-icon');
-      const iconOp = document.getElementById('theme-icon-op');
-      if (icon) icon.textContent = currentTheme === 'light' ? '☀️' : '🌙';
-      if (iconOp) iconOp.textContent = currentTheme === 'light' ? '☀️' : '🌙';
-    }
+    /**
+     * ==========================================================================
+     * 🖥️ DETERMINISTIC UI RENDERER (Pure Reactive Subscriber)
+     * ==========================================================================
+     */
+    function renderUI(state) {
+      // 1. Synchronize Theme
+      document.documentElement.setAttribute('data-theme', state.ui.theme);
+      const iconMerchant = document.getElementById('theme-icon');
+      const iconOps = document.getElementById('theme-icon-op');
+      if (iconMerchant) iconMerchant.textContent = state.ui.theme === 'light' ? '☀️' : '🌙';
+      if (iconOps) iconOps.textContent = state.ui.theme === 'light' ? '☀️' : '🌙';
 
-    /* Mobile Drawer Controls */
-    function toggleSidebarDrawer() {
-      const sidebars = document.querySelectorAll('.sidebar');
+      // 2. Synchronize Dev Subdomain Links
+      const linkMerchant = document.getElementById('dev-link-merchant');
+      const linkOps = document.getElementById('dev-link-ops');
+      if (linkMerchant) linkMerchant.classList.toggle('active', state.ui.portalMode === 'MERCHANT');
+      if (linkOps) linkOps.classList.toggle('active', state.ui.portalMode === 'OPS');
+
+      // 3. Synchronize Mobile Drawer
       const backdrop = document.getElementById('sidebar-backdrop');
-      const isOpen = Array.from(sidebars).some(s => s.classList.contains('open'));
+      const sidebars = document.querySelectorAll('.sidebar');
+      if (backdrop) backdrop.classList.toggle('active', state.ui.sidebarOpen);
+      sidebars.forEach(s => s.classList.toggle('open', state.ui.sidebarOpen));
 
-      if (isOpen) {
-        closeSidebarDrawer();
+      // 4. Synchronize Modals
+      const modalMap = {
+        'owner-reg': 'modal-owner-reg',
+        'forgot-pwd': 'modal-forgot-password',
+        'invite-operator': 'modal-invite-operator',
+        'invite-staff': 'modal-invite-staff',
+        'inbound-lot': 'modal-inbound-lot',
+        'receipt': 'modal-receipt'
+      };
+      Object.entries(modalMap).forEach(([key, elementId]) => {
+        const el = document.getElementById(elementId);
+        if (el) {
+          if (state.ui.activeModal === key) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+
+      // 5. Portal & Route Rendering
+      if (state.ui.portalMode === 'OPS') {
+        const isAuth = !!state.auth.operatorUser;
+        document.documentElement.className = isAuth ? 'state-auth-ops' : 'state-unauth-ops';
+
+        if (!isAuth) {
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+            history.replaceState(null, '', '/login');
+          }
+          return;
+        }
+
+        // Render Operator Profile
+        const opUser = state.auth.operatorUser;
+        const opBadge = document.getElementById('op-sidebar-badge');
+        const opName = document.getElementById('op-sidebar-name');
+        if (opBadge) {
+          opBadge.textContent = opUser.role || 'SUPER_ADMIN';
+          opBadge.className = 'operator-role-badge ' + (opUser.badgeClass || 'role-super-admin');
+        }
+        if (opName) opName.textContent = opUser.name || opUser.email;
+
+        // Render Active Operator Tab
+        const validTabs = ['telemetry', 'fleet', 'operators', 'audit'];
+        let activeTab = validTabs.includes(state.ui.activePath) ? state.ui.activePath : 'telemetry';
+
+        document.querySelectorAll('.op-tab-content').forEach(c => c.style.display = 'none');
+        document.querySelectorAll('#operator-shell .nav-item').forEach(b => b.classList.remove('active'));
+        
+        const targetTabEl = document.getElementById(`op-tab-${activeTab}`);
+        const targetNavEl = document.getElementById(`nav-op-${activeTab}`);
+        if (targetTabEl) targetTabEl.style.display = 'block';
+        if (targetNavEl) targetNavEl.classList.add('active');
+
+        const tabTitles = {
+          telemetry: { title: '🌐 Platform Telemetry & Metrics', sub: 'Pemantauan performa cluster & database live.' },
+          fleet: { title: '🏢 Tenant Fleet Directory', sub: 'Daftar semua penyewa, langganan tier, & sensor PDP.' },
+          operators: { title: '⚡ Manajemen Tim Operator', sub: 'Undang dan kelola operator sistem Ashvin Labs.' },
+          audit: { title: '📜 Operator Audit Trail', sub: 'Log aktivitas operator yang tidak dapat diubah (immutable).' }
+        };
+        if (tabTitles[activeTab]) {
+          document.getElementById('op-header-title').textContent = tabTitles[activeTab].title;
+          document.getElementById('op-header-sub').textContent = tabTitles[activeTab].sub;
+        }
+
+        if (window.location.pathname !== '/' + activeTab) {
+          history.replaceState(null, '', '/' + activeTab);
+        }
+
+        // Render Operator Components
+        renderTenantFleetTable(state.operator.tenants, state.operator.isPiiMasked);
+        renderOperatorListTable(state.operator.operators);
+        renderAuditLogsList(state.operator.auditLogs);
+
       } else {
-        sidebars.forEach(s => s.classList.add('open'));
-        backdrop?.classList.add('active');
+        // Merchant Portal Mode
+        const isAuth = !!state.auth.merchantUser;
+        document.documentElement.className = isAuth ? 'state-auth-merchant' : 'state-unauth-merchant';
+
+        if (!isAuth) {
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+            history.replaceState(null, '', '/login');
+          }
+          return;
+        }
+
+        // Render Merchant User Profile
+        const mUser = state.auth.merchantUser;
+        const avatarEl = document.getElementById('sidebar-user-avatar');
+        const nameEl = document.getElementById('sidebar-user-name');
+        const roleEl = document.getElementById('sidebar-user-role');
+        const tenantEl = document.getElementById('sidebar-tenant-name');
+
+        if (avatarEl) avatarEl.textContent = mUser.avatar || mUser.name?.charAt(0) || 'U';
+        if (nameEl) nameEl.textContent = mUser.name || mUser.email;
+        if (roleEl) roleEl.textContent = mUser.role || 'MEMBER';
+        if (tenantEl && mUser.tenant) tenantEl.textContent = mUser.tenant;
+
+        // Render Active Module
+        const routeMap = {
+          'dashboard': 'owner',
+          'owner': 'owner',
+          'pos': 'pos',
+          'fifo': 'fifo',
+          'sj': 'sj',
+          'surat-jalan': 'sj',
+        };
+        let activeMod = routeMap[state.ui.activePath] || 'owner';
+
+        document.querySelectorAll('.module-view').forEach(m => m.classList.remove('active'));
+        document.querySelectorAll('.sidebar-nav .nav-item').forEach(b => b.classList.remove('active'));
+        document.getElementById(`module-${activeMod}`)?.classList.add('active');
+        document.getElementById(`nav-${activeMod}`)?.classList.add('active');
+
+        const modTitles = {
+          owner: { title: 'Dashboard Owner & Hak Akses', sub: 'Pantau metrik finansial, stok, dan staf.' },
+          pos: { title: 'Kasir Grosir (POS)', sub: 'Transaksi penjualan, PayLink QRIS & cetak struk.' },
+          fifo: { title: 'Inbound & Gudang FIFO', sub: 'Penerimaan stok lot, alokasi FIFO & masa simpan.' },
+          sj: { title: 'Surat Jalan Driver', sub: 'Manifest armada logistik & serah terima barang.' }
+        };
+        if (modTitles[activeMod]) {
+          document.getElementById('page-heading').textContent = modTitles[activeMod].title;
+          document.getElementById('page-subheading').textContent = modTitles[activeMod].sub;
+        }
+
+        const urlSlug = activeMod === 'owner' ? 'dashboard' : (activeMod === 'sj' ? 'surat-jalan' : activeMod);
+        if (window.location.pathname !== '/' + urlSlug) {
+          history.replaceState(null, '', '/' + urlSlug);
+        }
+
+        // Render Merchant Components
+        renderOwnerDashboardMetrics(state);
+        renderStaffTable(state.staff);
+        renderPosCatalog(state.catalog, state.inventoryLots);
+        renderPosCart(state.cart);
+        renderFifoTimeline(state.catalog, state.inventoryLots);
+        renderSuratJalanList(state.suratJalan);
       }
     }
 
-    function closeSidebarDrawer() {
-      document.querySelectorAll('.sidebar').forEach(s => s.classList.remove('open'));
-      document.getElementById('sidebar-backdrop')?.classList.remove('active');
+    /**
+     * ==========================================================================
+     * 🧩 SUB-COMPONENT RENDERING HELPERS
+     * ==========================================================================
+     */
+    function formatRupiah(amount) {
+      return 'Rp ' + Number(amount || 0).toLocaleString('id-ID');
+    }
+
+    function renderOwnerDashboardMetrics(state) {
+      const totalSales = state.sales.reduce((sum, s) => sum + s.totalAmount, 0) + 428500000;
+      const totalLotsRemaining = state.inventoryLots.reduce((sum, l) => sum + l.qtyRemaining, 0);
+
+      const omzetEl = document.getElementById('kpi-omzet');
+      const lotsEl = document.getElementById('kpi-total-lots');
+      const sjEl = document.getElementById('kpi-total-sj');
+
+      if (omzetEl) omzetEl.textContent = formatRupiah(totalSales);
+      if (lotsEl) lotsEl.textContent = `${totalLotsRemaining} Unit`;
+      if (sjEl) sjEl.textContent = `${state.suratJalan.length} Pengiriman`;
+    }
+
+    function renderStaffTable(staffList) {
+      const tbody = document.getElementById('tenant-staff-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = staffList.map(s => `
+        <tr>
+          <td><strong>${s.name}</strong></td>
+          <td>${s.email} (${s.phone})</td>
+          <td><span class="tier-badge ${s.role.includes('Owner') ? 'tier-grosir-pro' : 'tier-starter-free'}">${s.role}</span></td>
+          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${s.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderPosCatalog(catalog, lots) {
+      const grid = document.getElementById('pos-catalog-grid');
+      if (!grid) return;
+      grid.innerHTML = catalog.map(p => {
+        const availableStock = lots.filter(l => l.sku === p.sku).reduce((sum, l) => sum + l.qtyRemaining, 0);
+        return `
+          <div class="product-card" onclick="store.dispatch('POS_ADD_TO_CART', ${JSON.stringify(p).replace(/"/g, '&quot;')})">
+            <div>
+              <div style="font-size:1.8rem; margin-bottom:4px;">${p.icon}</div>
+              <strong style="font-size:0.86rem; color:var(--text-primary);">${p.name}</strong>
+              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">Stok FIFO: <strong>${availableStock} ${p.unit}</strong></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+              <span style="font-weight:800; color:var(--primary); font-size:0.92rem;">${formatRupiah(p.price)}</span>
+              <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem;">+ Tambah</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderPosCart(cart) {
+      const el = document.getElementById('pos-cart-list');
+      const qtyEl = document.getElementById('pos-cart-qty');
+      const grandEl = document.getElementById('pos-grand-total');
+
+      if (!el) return;
+
+      if (cart.length === 0) {
+        el.innerHTML = `<div style="text-align:center; padding:24px 0; color:var(--text-muted); font-size:0.78rem;">Keranjang belanja kasir kosong.</div>`;
+        if (qtyEl) qtyEl.textContent = '0 Unit';
+        if (grandEl) grandEl.textContent = 'Rp 0';
+        return;
+      }
+
+      let totalQty = 0;
+      let grandTotal = 0;
+
+      el.innerHTML = cart.map(item => {
+        totalQty += item.qty;
+        grandTotal += item.subtotal;
+        return `
+          <div style="background:var(--bg-surface-elevated); padding:8px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; font-size:0.8rem;">${item.name}</div>
+              <div style="font-size:0.7rem; color:var(--text-muted);">${formatRupiah(item.unitPrice)} / unit</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <button class="qty-btn" onclick="store.dispatch('POS_UPDATE_QTY', { sku: '${item.sku}', delta: -1 })">-</button>
+              <span style="font-weight:800; font-size:0.82rem; min-width:18px; text-align:center;">${item.qty}</span>
+              <button class="qty-btn" onclick="store.dispatch('POS_UPDATE_QTY', { sku: '${item.sku}', delta: 1 })">+</button>
+              <strong style="font-size:0.84rem; min-width:85px; text-align:right; margin-left:4px;">${formatRupiah(item.subtotal)}</strong>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (qtyEl) qtyEl.textContent = `${totalQty} Unit`;
+      if (grandEl) grandEl.textContent = formatRupiah(grandTotal);
+    }
+
+    function renderFifoTimeline(catalog, lots) {
+      const container = document.getElementById('lot-timeline-container');
+      if (!container) return;
+
+      container.innerHTML = lots.map(l => {
+        const product = catalog.find(c => c.sku === l.sku) || { name: l.sku, unit: 'Unit' };
+        const percent = Math.round((l.qtyRemaining / l.qtyInitial) * 100);
+        return `
+          <div style="background:var(--bg-surface-elevated); padding:12px 14px; border-radius:var(--radius-sm); border:1px solid ${l.isOldest ? 'var(--accent-amber)' : 'var(--border-subtle)'};">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="tier-badge" style="background:${l.isOldest ? 'var(--accent-amber-soft)' : 'var(--primary-soft)'}; color:${l.isOldest ? 'var(--accent-amber)' : 'var(--primary)'};">
+                  ${l.isOldest ? '⭐ LOT TERTUA (FIFO PRIORITAS 1)' : 'LOT BATCH STANDBY'}
+                </span>
+                <strong style="font-size:0.85rem;">${l.id}</strong>
+                <span style="font-size:0.75rem; color:var(--text-secondary);">(${product.name})</span>
+              </div>
+              <div style="font-size:0.78rem; font-weight:700;">
+                Sisa: <span style="color:var(--primary); font-size:0.9rem;">${l.qtyRemaining}</span> / ${l.qtyInitial} ${product.unit} (${percent}%)
+              </div>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:6px;">
+              <span>Supplier: <strong>${l.supplier}</strong> • Masuk: ${l.receivedDate}</span>
+              <span>Modal Beli: <strong>${formatRupiah(l.unitCost)}</strong> / ${product.unit}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function runFifoSimulation() {
+      const qtyInput = document.getElementById('fifo-sim-input');
+      const requested = parseInt(qtyInput?.value || '50', 10);
+      const resBox = document.getElementById('fifo-sim-result');
+      if (!resBox) return;
+
+      const lots = store.getState().inventoryLots.filter(l => l.sku === 'RJL-50KG' && l.qtyRemaining > 0);
+      let needed = requested;
+      const breakdown = [];
+
+      for (const lot of lots) {
+        if (needed <= 0) break;
+        const take = Math.min(needed, lot.qtyRemaining);
+        const remainingAfter = lot.qtyRemaining - take;
+        needed -= take;
+        breakdown.push({
+          lotId: lot.id,
+          take,
+          remainingAfter,
+          status: remainingAfter === 0 ? 'Habis (0)' : `Sisa ${remainingAfter}`
+        });
+      }
+
+      resBox.style.display = 'block';
+      resBox.innerHTML = `
+        <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">Hasil Simulasi Alokasi FIFO (${requested} Karung):</div>
+        ${breakdown.map((b, i) => `
+          <div style="margin-bottom:3px;">
+            ${i + 1}. <strong>${b.lotId}</strong>: Alokasi <strong>${b.take} Karung</strong> (${b.status}).
+          </div>
+        `).join('')}
+        ${needed > 0 ? `<div style="color:var(--accent-rose); font-weight:700; margin-top:4px;">⚠️ Stok tidak cukup untuk ${needed} karung lagi.</div>` : `<div style="color:var(--accent-green); font-weight:700; margin-top:4px;">✅ Urutan batch tertua dieksekusi secara otomatis!</div>`}
+      `;
+    }
+
+    function renderSuratJalanList(sjList) {
+      const container = document.getElementById('surat-jalan-list');
+      if (!container) return;
+
+      container.innerHTML = sjList.map(sj => {
+        let statusBadge = `<span class="tier-badge" style="background:var(--accent-amber-soft); color:var(--accent-amber);">SIAP DIKIRIM</span>`;
+        if (sj.status === 'DALAM_PERJALANAN') {
+          statusBadge = `<span class="tier-badge" style="background:var(--primary-soft); color:var(--primary);">🚚 DALAM PERJALANAN</span>`;
+        } else if (sj.status === 'TERKIRIM') {
+          statusBadge = `<span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">✅ TERKIRIM & DITERIMA</span>`;
+        }
+
+        return `
+          <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:8px; margin-bottom:10px;">
+              <div>
+                <strong style="font-size:0.95rem;">${sj.id}</strong>
+                <span style="font-size:0.72rem; color:var(--text-muted); margin-left:8px;">Faktur: ${sj.invoiceId} • Waktu: ${sj.createdAt}</span>
+              </div>
+              ${statusBadge}
+            </div>
+            <div style="font-size:0.78rem; line-height:1.6; margin-bottom:10px;">
+              <div><strong>Penerima:</strong> ${sj.recipientName}</div>
+              <div><strong>Tujuan:</strong> ${sj.address}</div>
+              <div><strong>Muatan:</strong> ${sj.items}</div>
+              <div><strong>Driver Armada:</strong> ${sj.driverName}</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <div style="font-size:0.68rem; color:var(--accent-green); font-weight:700;">
+                🛡️ COGS Privacy: Harga modal disembunyikan sepenuhnya dari kurir.
+              </div>
+              <div style="display:flex; gap:6px;">
+                ${sj.status === 'SIAP_DIKIRIM' ? `
+                  <button class="save-matrix-btn" onclick="store.dispatch('SJ_UPDATE_STATUS', { sjId: '${sj.id}', status: 'DALAM_PERJALANAN' })">🚚 Berangkat Antar</button>
+                ` : ''}
+                ${sj.status === 'DALAM_PERJALANAN' ? `
+                  <button class="save-matrix-btn" style="background:var(--accent-green);" onclick="store.dispatch('SJ_UPDATE_STATUS', { sjId: '${sj.id}', status: 'TERKIRIM' })">✅ Konfirmasi Serah Terima</button>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderReceiptModal(invId, total, method, allocations) {
+      document.getElementById('receipt-invoice-no').textContent = `No. Faktur: ${invId} • Metode: ${method}`;
+      const el = document.getElementById('receipt-fifo-breakdown');
+      if (!el) return;
+      el.innerHTML = `
+        <div style="font-weight:800; margin-bottom:6px; color:var(--text-primary);">Total Dibayar: ${formatRupiah(total)}</div>
+        <div style="font-size:0.72rem; font-weight:700; color:var(--accent-green); margin-bottom:6px;">📦 Rincian Alokasi Lot FIFO:</div>
+        ${allocations.map(a => `
+          <div style="margin-bottom:2px; font-size:0.72rem;">
+            • ${a.productName}: <strong>${a.qtyDeducted} unit</strong> diambil dari <code>${a.lotId}</code> (Sisa: ${a.qtyRemaining})
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function renderTenantFleetTable(tenants, isMasked) {
+      const tbody = document.getElementById('tenant-fleet-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = tenants.map(t => `
+        <tr>
+          <td><strong>${t.name}</strong></td>
+          <td><code>${t.subdomain}</code></td>
+          <td>${isMasked ? t.maskedOwner : t.rawOwner}</td>
+          <td><span class="tier-badge ${t.tier === 'GROSIR_PRO' ? 'tier-grosir-pro' : 'tier-starter-free'}">${t.tier}</span></td>
+          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${t.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderOperatorListTable(operators) {
+      const tbody = document.getElementById('operator-list-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = operators.map(op => `
+        <tr>
+          <td><strong>${op.name}</strong></td>
+          <td>${op.email}</td>
+          <td><span class="operator-role-badge ${op.role === 'SUPER_ADMIN' ? 'role-super-admin' : (op.role === 'DEV_ENGINEER' ? 'role-dev-engineer' : 'role-ops-support')}">${op.role}</span></td>
+          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${op.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAuditLogsList(logs) {
+      const container = document.getElementById('audit-log-container');
+      if (!container) return;
+      container.innerHTML = `
+        <div style="font-size:0.78rem; line-height:1.7;">
+          ${logs.map(l => `<div>• <strong>[${l.action}]</strong> ${l.details} <span style="color:var(--text-muted); font-size:0.7rem;">(${l.time})</span></div>`).join('')}
+        </div>
+      `;
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = 'toast-pill';
+      toast.innerHTML = `<span>${type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️')}</span> <span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    /**
+     * ==========================================================================
+     * 🎮 EVENT HANDLERS & DISPATCH WRAPPERS
+     * ==========================================================================
+     */
+    function toggleTheme() { store.dispatch('TOGGLE_THEME'); }
+    function toggleSidebarDrawer() { store.dispatch('TOGGLE_SIDEBAR'); }
+    function closeSidebarDrawer() { store.dispatch('CLOSE_SIDEBAR'); }
+
+    function switchModule(mod) {
+      const slug = mod === 'owner' ? 'dashboard' : (mod === 'sj' ? 'surat-jalan' : mod);
+      history.pushState(null, '', '/' + slug);
+      store.dispatch('NAVIGATE', slug);
+    }
+
+    function switchOperatorTab(tab) {
+      history.pushState(null, '', '/' + tab);
+      store.dispatch('NAVIGATE', tab);
+    }
+
+    function quickLoginPreset(email) {
+      const preset = MERCHANT_PRESETS[email] || {
+        name: email.split('@')[0],
+        role: 'STAFF',
+        avatar: email.charAt(0).toUpperCase(),
+        tenant: 'Toko Grosir Beras Jaya Bersama'
+      };
+      history.pushState(null, '', '/dashboard');
+      store.dispatch('LOGIN_MERCHANT', { email, ...preset });
+    }
+
+    function handleMerchantLoginSubmit() {
+      const email = document.getElementById('merchant-login-identifier').value || 'budi@berasjaya.com';
+      quickLoginPreset(email);
+    }
+
+    function quickLoginOperator(email, role) {
+      const preset = OPERATOR_PRESETS[email] || {
+        name: email.split('@')[0],
+        role: role || 'SUPER_ADMIN',
+        badgeClass: role === 'DEV_ENGINEER' ? 'role-dev-engineer' : (role === 'OPS_SUPPORT' ? 'role-ops-support' : 'role-super-admin')
+      };
+      history.pushState(null, '', '/telemetry');
+      store.dispatch('LOGIN_OPERATOR', { email, ...preset });
+    }
+
+    function handleOperatorLoginSubmit() {
+      const email = document.getElementById('operator-login-email').value || 'gabriel@ashvinlabs.com';
+      quickLoginOperator(email, 'SUPER_ADMIN');
+    }
+
+    function handleLogout() {
+      history.pushState(null, '', '/login');
+      store.dispatch('LOGOUT');
+    }
+
+    function togglePdpMasking() {
+      store.dispatch('OPS_TOGGLE_PII_MASK');
+    }
+
+    function handlePosCheckout(method) {
+      store.dispatch('POS_CHECKOUT', method);
+    }
+
+    function openModal(modalKey) { store.dispatch('OPEN_MODAL', modalKey); }
+    function closeModal() { store.dispatch('CLOSE_MODAL'); }
+    function openOwnerRegistrationModal() { store.dispatch('OPEN_MODAL', 'owner-reg'); }
+    function openForgotPasswordModal() { store.dispatch('OPEN_MODAL', 'forgot-pwd'); }
+
+    function handleInboundLotSubmit(e) {
+      e.preventDefault();
+      const sku = document.getElementById('inbound-sku').value;
+      const supplier = document.getElementById('inbound-supplier').value;
+      const qty = parseInt(document.getElementById('inbound-qty').value, 10);
+      const unitCost = parseInt(document.getElementById('inbound-cost').value, 10);
+
+      store.dispatch('FIFO_ADD_INBOUND_LOT', { sku, supplier, qty, unitCost });
+      store.dispatch('CLOSE_MODAL');
+    }
+
+    function handleInviteStaffSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('staff-invite-name').value;
+      const email = document.getElementById('staff-invite-email').value;
+      const phone = document.getElementById('staff-invite-phone').value;
+      const role = document.getElementById('staff-invite-role').value;
+
+      store.dispatch('STAFF_INVITE', { name, email, phone, role });
+      store.dispatch('CLOSE_MODAL');
+    }
+
+    function handleInviteOperatorSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('ops-invite-email').value;
+      const fullName = document.getElementById('ops-invite-name').value;
+      const phone = document.getElementById('ops-invite-phone').value;
+      const role = document.getElementById('ops-invite-role').value;
+
+      store.dispatch('OPS_INVITE_OPERATOR', { email, fullName, phone, role });
+      store.dispatch('CLOSE_MODAL');
+    }
+
+    async function handleOwnerRegistrationSubmit(e) {
+      e.preventDefault();
+      const payload = {
+        businessName: document.getElementById('reg-biz-name').value,
+        subdomain: document.getElementById('reg-biz-subdomain').value,
+        phoneNumber: document.getElementById('reg-biz-phone').value,
+        ownerName: document.getElementById('reg-owner-name').value,
+        email: document.getElementById('reg-owner-email').value,
+        password: document.getElementById('reg-owner-password').value,
+      };
+      try {
+        await fetch('http://localhost:4000/api/v1/auth/register-owner', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } catch (err) {}
+      store.dispatch('CLOSE_MODAL');
+      showToast(`🎉 Registrasi Berhasil! Verifikasi dikirim ke ${payload.email}`, 'success');
+    }
+
+    async function handleForgotPasswordSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('forgot-email').value;
+      try {
+        await fetch('http://localhost:4000/api/v1/auth/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+      } catch (err) {}
+      store.dispatch('CLOSE_MODAL');
+      showToast(`✉️ Tautan reset sandi dikirim ke ${email}`, 'success');
     }
 
     function togglePasswordVisibility(inputId, btn) {
@@ -1851,409 +2905,28 @@
       }
     }
 
-    function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
+    // Subscribe UI renderer to store
+    store.subscribe(renderUI);
 
-    function openOwnerRegistrationModal() { openModal('modal-owner-reg'); }
-    function openForgotPasswordModal() { openModal('modal-forgot-password'); }
-    function openOperatorInviteModal() { openModal('modal-invite-operator'); }
-
-    async function handleOwnerRegistrationSubmit(e) {
-      e.preventDefault();
-      const pwd = document.getElementById('reg-owner-password').value;
-      const confirmPwd = document.getElementById('reg-owner-confirm-password').value;
-
-      if (pwd !== confirmPwd) {
-        alert('❌ Konfirmasi kata sandi tidak cocok!');
-        return;
+    // Cross-Tab Synchronization
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'sidaya_store_v2' && e.newValue) {
+        try {
+          const remoteState = JSON.parse(e.newValue);
+          Object.assign(store.state, remoteState);
+          renderUI(store.getState());
+        } catch (err) {}
       }
-
-      const payload = {
-        businessName: document.getElementById('reg-biz-name').value,
-        subdomain: document.getElementById('reg-biz-subdomain').value,
-        phoneNumber: document.getElementById('reg-biz-phone').value,
-        ownerName: document.getElementById('reg-owner-name').value,
-        email: document.getElementById('reg-owner-email').value,
-        password: pwd,
-      };
-
-      try {
-        const res = await fetch('http://localhost:4000/api/v1/auth/register-owner', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        closeModal('modal-owner-reg');
-        alert('🎉 Registrasi Berhasil!\nEmail verifikasi dikirim via Resend ke ' + payload.email);
-      } catch (err) {
-        closeModal('modal-owner-reg');
-        alert('🎉 Registrasi Berhasil (Mode Offline)!');
-      }
-    }
-
-    async function handleForgotPasswordSubmit(e) {
-      e.preventDefault();
-      const email = document.getElementById('forgot-email').value;
-      try {
-        await fetch('http://localhost:4000/api/v1/auth/forgot-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
-        document.getElementById('forgot-success-box').style.display = 'block';
-      } catch (err) {
-        document.getElementById('forgot-success-box').style.display = 'block';
-      }
-    }
-
-    async function handleInviteOperatorSubmit(e) {
-      e.preventDefault();
-      const payload = {
-        email: document.getElementById('ops-invite-email').value,
-        fullName: document.getElementById('ops-invite-name').value,
-        phoneNumber: document.getElementById('ops-invite-phone').value,
-        role: document.getElementById('ops-invite-role').value,
-      };
-
-      try {
-        await fetch('http://localhost:4000/api/v1/admin/operators/invite', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Operator-Role': 'SUPER_ADMIN',
-            'X-Operator-Email': 'gabriel@ashvinlabs.com',
-          },
-          body: JSON.stringify(payload),
-        });
-        closeModal('modal-invite-operator');
-        alert('✅ Undangan Operator berhasil dikirimkan via Resend ke ' + payload.email);
-      } catch (err) {
-        closeModal('modal-invite-operator');
-        alert('✅ Undangan Operator berhasil dibuat!');
-      }
-    }
-
-    function applyMerchantSessionUI(session) {
-      if (!session) return;
-      const avatarEl = document.getElementById('sidebar-user-avatar');
-      const nameEl = document.getElementById('sidebar-user-name');
-      const roleEl = document.getElementById('sidebar-user-role');
-      const tenantEl = document.getElementById('sidebar-tenant-name');
-
-      if (avatarEl) avatarEl.textContent = session.avatar || session.name?.charAt(0) || 'U';
-      if (nameEl) nameEl.textContent = session.name || session.email;
-      if (roleEl) roleEl.textContent = session.role || 'MEMBER';
-      if (tenantEl && session.tenant) tenantEl.textContent = session.tenant;
-    }
-
-    function applyOperatorSessionUI(session) {
-      if (!session) return;
-      const badgeEl = document.getElementById('op-sidebar-badge');
-      const nameEl = document.getElementById('op-sidebar-name');
-
-      if (badgeEl) {
-        badgeEl.textContent = session.role || 'SUPER_ADMIN';
-        badgeEl.className = 'operator-role-badge ' + (session.badgeClass || 'role-super-admin');
-      }
-      if (nameEl) nameEl.textContent = session.name || session.email;
-    }
-
-    function getCleanRoute() {
-      let p = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-      if (!p && window.location.hash) {
-        p = window.location.hash.replace(/^#\/?/, '').toLowerCase();
-      }
-      return p;
-    }
-
-    function navigateTo(path) {
-      if (window.location.pathname !== path) {
-        history.pushState(null, '', path);
-      }
-      handleRoute();
-    }
-
-    function quickLoginPreset(email, userKey) {
-      document.getElementById('merchant-login-identifier').value = email;
-      const preset = MERCHANT_PRESETS[email] || {
-        name: email.split('@')[0],
-        role: 'STAFF',
-        avatar: email.charAt(0).toUpperCase(),
-        tenant: 'Toko Grosir Beras Jaya Bersama'
-      };
-      localStorage.setItem('sidaya_merchant_session', JSON.stringify({ email, ...preset }));
-      navigateTo('/dashboard');
-    }
-
-    function quickLoginOperator(email, role) {
-      document.getElementById('operator-login-email').value = email;
-      const preset = OPERATOR_PRESETS[email] || {
-        name: email.split('@')[0],
-        role: role || 'SUPER_ADMIN',
-        badgeClass: role === 'DEV_ENGINEER' ? 'role-dev-engineer' : (role === 'OPS_SUPPORT' ? 'role-ops-support' : 'role-super-admin')
-      };
-      localStorage.setItem('sidaya_operator_session', JSON.stringify({ email, ...preset }));
-      navigateTo('/telemetry');
-    }
-
-    function handleMerchantLoginSubmit() {
-      const email = document.getElementById('merchant-login-identifier').value || 'budi@berasjaya.com';
-      const preset = MERCHANT_PRESETS[email] || {
-        name: email.split('@')[0],
-        role: 'OWNER',
-        avatar: email.charAt(0).toUpperCase(),
-        tenant: 'Toko Grosir Beras Jaya Bersama'
-      };
-      localStorage.setItem('sidaya_merchant_session', JSON.stringify({ email, ...preset }));
-      navigateTo('/dashboard');
-    }
-
-    function handleOperatorLoginSubmit() {
-      const email = document.getElementById('operator-login-email').value || 'gabriel@ashvinlabs.com';
-      const preset = OPERATOR_PRESETS[email] || {
-        name: 'Gabriel (CEO)',
-        role: 'SUPER_ADMIN',
-        badgeClass: 'role-super-admin'
-      };
-      localStorage.setItem('sidaya_operator_session', JSON.stringify({ email, ...preset }));
-      navigateTo('/telemetry');
-    }
-
-    function handleLogout() {
-      if (currentPortalMode === 'OPS') {
-        localStorage.removeItem('sidaya_operator_session');
-      } else {
-        localStorage.removeItem('sidaya_merchant_session');
-      }
-      closeSidebarDrawer();
-      navigateTo('/login');
-    }
-
-    function switchModule(mod) {
-      const urlSlug = mod === 'owner' ? 'dashboard' : (mod === 'sj' ? 'surat-jalan' : mod);
-      navigateTo('/' + urlSlug);
-      closeSidebarDrawer();
-    }
-
-    function switchOperatorTab(tab) {
-      navigateTo('/' + tab);
-      closeSidebarDrawer();
-    }
-
-    function activateModuleUI(mod) {
-      document.querySelectorAll('.module-view').forEach(m => m.classList.remove('active'));
-      document.querySelectorAll('.sidebar-nav .nav-item').forEach(b => b.classList.remove('active'));
-      document.getElementById(`module-${mod}`)?.classList.add('active');
-      document.getElementById(`nav-${mod}`)?.classList.add('active');
-
-      const titles = {
-        owner: { title: 'Dashboard Owner & Hak Akses', sub: 'Pantau metrik finansial, stok, dan staf.' },
-        pos: { title: 'Kasir Grosir (POS)', sub: 'Transaksi penjualan, PayLink QRIS & cetak struk.' },
-        fifo: { title: 'Inbound & Gudang FIFO', sub: 'Penerimaan stok lot, alokasi FIFO & masa simpan.' },
-        sj: { title: 'Surat Jalan Driver', sub: 'Manifest armada logistik & serah terima barang.' }
-      };
-      if (titles[mod]) {
-        document.getElementById('page-heading').textContent = titles[mod].title;
-        document.getElementById('page-subheading').textContent = titles[mod].sub;
-      }
-    }
-
-    function activateOperatorTabUI(tab) {
-      document.querySelectorAll('.op-tab-content').forEach(c => c.style.display = 'none');
-      document.querySelectorAll('#operator-shell .nav-item').forEach(b => b.classList.remove('active'));
-      document.getElementById(`op-tab-${tab}`).style.display = 'block';
-      document.getElementById(`nav-op-${tab}`)?.classList.add('active');
-
-      const titles = {
-        telemetry: { title: '🌐 Platform Telemetry & Metrics', sub: 'Pemantauan performa cluster & database live.' },
-        fleet: { title: '🏢 Tenant Fleet Directory', sub: 'Daftar semua penyewa, langganan tier, & sensor PDP.' },
-        operators: { title: '⚡ Manajemen Tim Operator', sub: 'Undang dan kelola operator sistem Ashvin Labs.' },
-        audit: { title: '📜 Operator Audit Trail', sub: 'Log aktivitas operator yang tidak dapat diubah (immutable).' }
-      };
-      if (titles[tab]) {
-        document.getElementById('op-header-title').textContent = titles[tab].title;
-        document.getElementById('op-header-sub').textContent = titles[tab].sub;
-      }
-    }
-
-    function handleRoute() {
-      detectSubdomainMode();
-      const cleanRoute = getCleanRoute();
-
-      if (currentPortalMode === 'OPS') {
-        const sessionStr = localStorage.getItem('sidaya_operator_session');
-        if (!sessionStr) {
-          // Show operator login
-          document.getElementById('merchant-login-screen').classList.add('hidden');
-          document.getElementById('operator-login-screen').classList.remove('hidden');
-          document.getElementById('app-shell').style.display = 'none';
-          document.getElementById('operator-shell').classList.remove('active');
-          if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
-            history.replaceState(null, '', '/login');
-          }
-          return;
-        }
-
-        // Operator is logged in
-        const session = JSON.parse(sessionStr);
-        applyOperatorSessionUI(session);
-
-        document.getElementById('merchant-login-screen').classList.add('hidden');
-        document.getElementById('operator-login-screen').classList.add('hidden');
-        document.getElementById('app-shell').style.display = 'none';
-        document.getElementById('operator-shell').classList.add('active');
-
-        const validTabs = ['telemetry', 'fleet', 'operators', 'audit'];
-        let targetTab = 'telemetry';
-        if (validTabs.includes(cleanRoute)) {
-          targetTab = cleanRoute;
-        }
-
-        activateOperatorTabUI(targetTab);
-        if (window.location.pathname !== '/' + targetTab) {
-          history.replaceState(null, '', '/' + targetTab);
-        }
-        renderTenantFleet();
-        renderAuditLogs();
-
-      } else {
-        // Merchant Mode
-        const sessionStr = localStorage.getItem('sidaya_merchant_session');
-        if (!sessionStr) {
-          // Show merchant login
-          document.getElementById('merchant-login-screen').classList.remove('hidden');
-          document.getElementById('operator-login-screen').classList.add('hidden');
-          document.getElementById('app-shell').style.display = 'none';
-          document.getElementById('operator-shell').classList.remove('active');
-          if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
-            history.replaceState(null, '', '/login');
-          }
-          return;
-        }
-
-        // Merchant is logged in
-        const session = JSON.parse(sessionStr);
-        applyMerchantSessionUI(session);
-
-        document.getElementById('merchant-login-screen').classList.add('hidden');
-        document.getElementById('operator-login-screen').classList.add('hidden');
-        document.getElementById('app-shell').style.display = 'flex';
-        document.getElementById('operator-shell').classList.remove('active');
-
-        const routeMap = {
-          'dashboard': 'owner',
-          'owner': 'owner',
-          'pos': 'pos',
-          'fifo': 'fifo',
-          'sj': 'sj',
-          'surat-jalan': 'sj',
-        };
-
-        let targetMod = routeMap[cleanRoute] || 'owner';
-        activateModuleUI(targetMod);
-        const urlSlug = targetMod === 'owner' ? 'dashboard' : (targetMod === 'sj' ? 'surat-jalan' : targetMod);
-        if (window.location.pathname !== '/' + urlSlug) {
-          history.replaceState(null, '', '/' + urlSlug);
-        }
-      }
-    }
-
-    function togglePdpMasking() {
-      isPiiMasked = !isPiiMasked;
-      renderTenantFleet();
-    }
-
-    function renderTenantFleet() {
-      const tbody = document.getElementById('tenant-fleet-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = `
-        <tr>
-          <td><strong>Toko Grosir Beras Jaya</strong></td>
-          <td><code>berasjaya</code></td>
-          <td>${isPiiMasked ? 'B*** S*** (+6281****7890)' : 'Budi Santoso (+6281234567890)'}</td>
-          <td><span class="tier-badge tier-grosir-pro">GROSIR_PRO</span></td>
-          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">ACTIVE</span></td>
-        </tr>
-        <tr>
-          <td><strong>CV Sembako Nusantara</strong></td>
-          <td><code>sembakonusantara</code></td>
-          <td>${isPiiMasked ? 'H*** W*** (+6281****5432)' : 'Hendro Wijaya (+6281398765432)'}</td>
-          <td><span class="tier-badge tier-starter-free">STARTER_FREE</span></td>
-          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">ACTIVE</span></td>
-        </tr>
-      `;
-    }
-
-    function renderAuditLogs() {
-      const container = document.getElementById('audit-log-container');
-      if (!container) return;
-      container.innerHTML = `
-        <div style="font-size:0.78rem; line-height:1.7;">
-          <div>• <strong>[PLATFORM_INITIALIZATION]</strong> Operator: <code>gabriel@ashvinlabs.com</code></div>
-          <div>• <strong>[TENANT_SUBSCRIPTION_UPDATE]</strong> Tier: GROSIR_PRO</div>
-          <div>• <strong>[OPERATOR_INVITED]</strong> Target: <code>maya@ashvinlabs.com</code></div>
-        </div>
-      `;
-    }
-
-    function simulateFifoAllocation() {
-      const res = document.getElementById('fifo-sim-result');
-      res.style.display = 'block';
-      res.innerHTML = `
-        <div style="font-weight:800; color:var(--primary); margin-bottom:4px;">Hasil Alokasi FIFO (50 Karung):</div>
-        <div>1. Lot 1 (LOT-RJL-2026-0828): 40 karung (Habis).</div>
-        <div>2. Lot 2 (LOT-RJL-2026-0906): 10 karung (Sisa 90).</div>
-        <div style="color:var(--accent-green); font-weight:700; margin-top:4px;">✅ Stok terlama keluar terlebih dahulu!</div>
-      `;
-    }
-
-    function renderCatalog() {
-      const grid = document.getElementById('pos-catalog-grid');
-      if (!grid) return;
-      grid.innerHTML = `
-        <div style="background:var(--bg-surface-elevated); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-          <strong style="font-size:0.85rem;">Beras Rojolele 50KG</strong>
-          <div style="font-size:0.7rem; color:var(--text-muted);">Stok: 140 Karung</div>
-          <div style="font-weight:800; color:var(--primary); margin-top:4px; font-size:0.9rem;">Rp 617.500</div>
-        </div>
-        <div style="background:var(--bg-surface-elevated); padding:10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-          <strong style="font-size:0.85rem;">Minyak Goreng 2L</strong>
-          <div style="font-size:0.7rem; color:var(--text-muted);">Stok: 360 Pouch</div>
-          <div style="font-weight:800; color:var(--primary); margin-top:4px; font-size:0.9rem;">Rp 91.500</div>
-        </div>
-      `;
-      const cart = document.getElementById('pos-cart-list');
-      if (cart) {
-        cart.innerHTML = `
-          <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
-            <span>20x Beras Rojolele 50KG</span>
-            <strong>Rp 12.350.000</strong>
-          </div>
-        `;
-      }
-      const lots = document.getElementById('lot-timeline-container');
-      if (lots) {
-        lots.innerHTML = `
-          <div style="background:var(--bg-surface-elevated); padding:8px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-            <span class="tier-badge" style="background:var(--accent-amber-soft); color:var(--accent-amber);">⭐ LOT TERTUA (FIFO PRIORITAS 1)</span>
-            <div style="font-weight:700; margin-top:2px; font-size:0.82rem;">LOT-RJL-2026-0828 (40 Karung)</div>
-          </div>
-          <div style="background:var(--bg-surface-elevated); padding:8px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle);">
-            <span class="tier-badge" style="background:var(--primary-soft); color:var(--primary);">LOT 2 (PRIORITAS 2)</span>
-            <div style="font-weight:700; margin-top:2px; font-size:0.82rem;">LOT-RJL-2026-0906 (100 Karung)</div>
-          </div>
-        `;
-      }
-    }
-
-    window.addEventListener('popstate', handleRoute);
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initTheme();
-      handleRoute();
-      renderCatalog();
     });
+
+    // Listen for browser Back/Forward navigation
+    window.addEventListener('popstate', () => {
+      const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+      store.dispatch('NAVIGATE', path);
+    });
+
+    // Initial render
+    renderUI(store.getState());
   </script>
 </body>
 </html>
