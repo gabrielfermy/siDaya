@@ -10,6 +10,49 @@ To satisfy the core requirements of **extreme modularity** (where features can b
 2. **Offline-First Client Architecture** (React Native Expo + Local SQLite/WatermelonDB) with deterministic conflict resolution.
 3. **Pluggable Domain Modules with Dynamic Tenant Feature Entitlements**.
 4. **Tenant User, Role & Shift Governance** (Fast cashier PIN switching, shift cash balancing, and COGS privacy protection).
+5. **Discreet Dual-Plane Multi-Tenancy** (Two independent, purpose-built UIs reading the same unified multi-tenant dataset).
+
+### 1.1 Dual-Plane Architecture: Tenant Workspace OS vs. Operator Control Plane
+
+The platform is strictly partitioned into two discreet, end-to-end system planes that read and operate on the same unified PostgreSQL multi-tenant data layer:
+
+```
++---------------------------------------------------------------------------------------------------------------+
+|                                      UNIFIED MULTI-TENANT POSTGRESQL 17 DATA SET                              |
+|           (Row-Level Security, Tenant Schema Shards, Immutable Audit Logs, Dynamic PDP Masking)              |
++---------------------------------------+-----------------------------------------------------------------------+
+                                        |
+                 +----------------------+----------------------+
+                 |                                             |
+                 v                                             v
++-----------------------------------------------+ +-------------------------------------------------------------+
+|        SYSTEM 1: TENANT WORKSPACE OS          | |          SYSTEM 2: OPERATOR CONTROL PLANE                   |
+|     (Merchant Plane • [tenant].sidaya.id)     | |         (Ashvin Labs Plane • ops.sidaya.id)                 |
++-----------------------------------------------+ +-------------------------------------------------------------+
+| Target: Toko Owner, Kasir, Gudang, Driver     | | Target: Ashvin Labs CEO, Devs, Ops Support, Compliance      |
+| End-to-End Merchant Lifecycle:                | | End-to-End Platform Lifecycle:                              |
+|  1. Inbound Dock & Batch Lot FIFO Receiving   | |  1. Tenant Fleet Provisioning & Subdomain Routing           |
+|  2. Master Barcode Catalog (EAN-13 / SKU)     | |  2. Dynamic Tier Entitlement & Feature Flag Engine          |
+|  3. High-Speed POS Kasir & Barcode Fast-Scan  | |  3. Automated SaaS Subscription Billing & Dunning Engine    |
+|  4. Surat Jalan Dispatch & Driver POD         | |  4. Cluster Telemetry, P99 Latency & Connection Pool Health |
+|  5. Piutang Ledger & WhatsApp PayLink QRIS    | |  5. UU PDP No. 27/2022 PII Dynamic Data Masking Guard       |
+|  6. Role Matrix RBAC & Fast PIN Switch        | |  6. Immutable Cross-Tenant Operator Forensic Audit Trail    |
+|  7. Store Settings & Printer Hardware Pairing | |  7. Threat Detection, WAF Rate Limiting & Shard Migration   |
++-----------------------------------------------+ +-------------------------------------------------------------+
+```
+
+1. **System 1: Tenant Workspace OS (Merchant Plane)**:
+   - **Audience**: Business Owners, Store Managers, Counter Cashiers, Warehouse Pickers, and Logistics Delivery Drivers.
+   - **Domain**: `[subdomain].sidaya.id` or `app.sidaya.id`.
+   - **Isolation**: Strictly isolated at the database layer via PostgreSQL Row Level Security (`tenant_id = current_setting('app.current_tenant_id')`). Each tenant only sees their own transactions, stock lots, customers, and staff.
+   - **Modularity**: Structured into the **9 Pillars of Enterprise ERP Architecture** with interactive "Coming Soon" showcase placeholders for roadmap features.
+
+2. **System 2: Operator Control Plane (Ashvin Labs Management Plane)**:
+   - **Audience**: Ashvin Labs internal team (`SUPER_ADMIN`, `DEV_ENGINEER`, `OPS_SUPPORT`, `AUDIT_COMPLIANCE`).
+   - **Domain**: `ops.sidaya.id` or `ops.localhost:3333`.
+   - **Cross-Tenant Fleet Governance**: Provides aggregate platform telemetri (GMV, active tenant count, p95/p99 API latency, DB connection pool utilization), tenant lifecycle provisioning (create, upgrade/downgrade tier, suspend/reactivate), and immutable operator audit logs.
+   - **Privacy Guard (UU PDP No. 27/2022)**: Enforces dynamic masking of tenant Personally Identifiable Information (PII) for customer support agents with an explicit "break-glass" emergency unmasking mechanism that creates an immutable forensic audit trail.
+
 
 ```
 +---------------------------------------------------------------------------------------------------------------+

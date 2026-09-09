@@ -605,7 +605,7 @@
     .sidebar-nav {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 6px;
     }
     .nav-section-label {
       font-size: 0.65rem;
@@ -615,16 +615,51 @@
       color: var(--text-muted);
       padding: 8px 8px 4px 8px;
     }
+    .nav-pilar-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 6px;
+    }
+    .nav-pilar-group:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    .nav-pilar-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      padding: 4px 8px 2px 8px;
+    }
+    .pilar-num {
+      color: var(--primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      background: var(--primary-soft);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.6rem;
+    }
+    .pilar-name {
+      flex: 1;
+    }
     .nav-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 12px;
+      gap: 8px;
+      padding: 7px 10px;
       border-radius: var(--radius-sm);
       background: transparent;
       border: 1px solid transparent;
       color: var(--text-secondary);
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       text-align: left;
@@ -642,11 +677,50 @@
       font-weight: 700;
     }
     .nav-item-icon {
-      font-size: 1.05rem;
-      width: 20px;
+      font-size: 0.95rem;
+      width: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+    }
+    .nav-item-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .nav-badge-live {
+      font-size: 0.55rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      padding: 1px 5px;
+      border-radius: var(--radius-full);
+      background: var(--accent-green-soft);
+      color: var(--accent-green);
+      border: 1px solid var(--accent-green-border);
+      flex-shrink: 0;
+    }
+    .nav-item-badge {
+      font-size: 0.55rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      padding: 1px 5px;
+      border-radius: var(--radius-full);
+      background: var(--accent-amber-soft);
+      color: var(--accent-amber);
+      border: 1px solid var(--accent-amber-border);
+      flex-shrink: 0;
+    }
+    .nav-item-badge.phase-3 {
+      background: var(--accent-purple-soft);
+      color: var(--accent-purple);
+      border: 1px solid rgba(124, 58, 237, 0.3);
+    }
+    .nav-item-badge.phase-4 {
+      background: var(--primary-soft);
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
     }
 
     .sidebar-bottom {
@@ -1877,62 +1951,247 @@
         </div>
 
         <nav class="sidebar-nav">
-          <div class="nav-section-label">Manajemen Toko (Aktif)</div>
-          <button id="nav-owner" class="nav-item active" onclick="switchModule('owner')">
-            <span class="nav-item-icon">🏢</span>
-            <span>Dashboard & Hak Akses</span>
-          </button>
-          <button id="nav-pos" class="nav-item" onclick="switchModule('pos')">
-            <span class="nav-item-icon">🛒</span>
-            <span>Kasir Grosir (POS)</span>
-          </button>
-          <button id="nav-fifo" class="nav-item" onclick="switchModule('fifo')">
-            <span class="nav-item-icon">📦</span>
-            <span>Inbound & Gudang FIFO</span>
-          </button>
-          <button id="nav-sj" class="nav-item" onclick="switchModule('sj')">
-            <span class="nav-item-icon">🚚</span>
-            <span>Surat Jalan Driver</span>
-          </button>
-          <button id="nav-piutang" class="nav-item" onclick="switchModule('piutang')">
-            <span class="nav-item-icon">📒</span>
-            <span>Buku Piutang & Kasbon</span>
-          </button>
-          <button id="nav-katalog" class="nav-item" onclick="switchModule('katalog')">
-            <span class="nav-item-icon">🏷️</span>
-            <span>Katalog Produk & Barcode</span>
-          </button>
-          <button id="nav-pengaturan" class="nav-item" onclick="switchModule('pengaturan')">
-            <span class="nav-item-icon">⚙️</span>
-            <span>Pengaturan & Hardware</span>
-          </button>
+          <!-- PILAR 1: DASHBOARD -->
+          <div class="nav-pilar-group">
+            <div class="nav-pilar-header">
+              <span class="pilar-num">01</span>
+              <span class="pilar-name">Dashboard</span>
+            </div>
+            <button id="nav-owner" class="nav-item active" onclick="switchModule('owner')">
+              <span class="nav-item-icon">📊</span>
+              <span class="nav-item-text">Overview Eksekutif</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+          </div>
 
-          <div class="nav-section-label" style="margin-top:10px;">Modul Mendatang (Roadmap)</div>
-          <button id="nav-laporan" class="nav-item" onclick="switchModule('laporan')">
-            <span class="nav-item-icon">📊</span>
-            <span>Laporan Laba Rugi</span>
-            <span class="nav-item-badge">Phase 2</span>
-          </button>
-          <button id="nav-multi-gudang" class="nav-item" onclick="switchModule('multi-gudang')">
-            <span class="nav-item-icon">🏬</span>
-            <span>Multi-Gudang & Cabang</span>
-            <span class="nav-item-badge">Phase 2</span>
-          </button>
-          <button id="nav-integrasi" class="nav-item" onclick="switchModule('integrasi')">
-            <span class="nav-item-icon">🔌</span>
-            <span>Integrasi Marketplace</span>
-            <span class="nav-item-badge phase-3">Phase 3</span>
-          </button>
-          <button id="nav-ai-forecasting" class="nav-item" onclick="switchModule('ai-forecasting')">
-            <span class="nav-item-icon">🤖</span>
-            <span>AI Demand Forecasting</span>
-            <span class="nav-item-badge phase-3">Phase 3</span>
-          </button>
-          <button id="nav-pajak" class="nav-item" onclick="switchModule('pajak')">
-            <span class="nav-item-icon">🧾</span>
-            <span>Pajak & e-Faktur</span>
-            <span class="nav-item-badge phase-4">Phase 4</span>
-          </button>
+          <!-- PILAR 2: INVENTORI & MULTI-GUDANG -->
+          <div class="nav-pilar-group">
+            <div class="nav-pilar-header">
+              <span class="pilar-num">02</span>
+              <span class="pilar-name">Inventori & Gudang</span>
+            </div>
+            <button id="nav-katalog" class="nav-item" onclick="switchModule('katalog')">
+              <span class="nav-item-icon">🏷️</span>
+              <span class="nav-item-text">Katalog Master SKU</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-fifo" class="nav-item" onclick="switchModule('fifo')">
+              <span class="nav-item-icon">📦</span>
+              <span class="nav-item-text">Batch & Lot FIFO</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-multi-gudang" class="nav-item" onclick="switchModule('multi-gudang')">
+              <span class="nav-item-icon">🏬</span>
+              <span class="nav-item-text">Multi-Gudang & Cabang</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+            <button id="nav-stock-opname" class="nav-item" onclick="switchModule('stock-opname')">
+              <span class="nav-item-icon">📋</span>
+              <span class="nav-item-text">Stock Opname Audit</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+            <button id="nav-barcode-print" class="nav-item" onclick="switchModule('barcode-print')">
+              <span class="nav-item-icon">🖨️</span>
+              <span class="nav-item-text">Cetak Label Barcode</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+          </div>
+
+          <!-- PILAR 3: KONTAK CRM & SRM -->
+          <div class="nav-pilar-group">
+            <div class="nav-pilar-header">
+              <span class="pilar-num">03</span>
+              <span class="pilar-name">Kontak CRM & SRM</span>
+            </div>
+            <button id="nav-customers" class="nav-item" onclick="switchModule('customers')">
+              <span class="nav-item-icon">👥</span>
+              <span class="nav-item-text">Direktori Pelanggan</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-suppliers" class="nav-item" onclick="switchModule('suppliers')">
+              <span class="nav-item-icon">🏭</span>
+              <span class="nav-item-text">Direktori Pemasok (TOP)</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+          </div>
+
+          <!-- PILAR 4: PENGADAAN (PROCUREMENT) -->
+          <div class="nav-pilar-group">
+            <div class="nav-pilar-header">
+              <span class="pilar-num">04</span>
+              <span class="pilar-name">Pengadaan (Procurement)</span>
+            </div>
+            <button id="nav-receiving" class="nav-item" onclick="switchModule('receiving')">
+              <span class="nav-item-icon">📥</span>
+              <span class="nav-item-text">Penerimaan Barang Dock</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-po" class="nav-item" onclick="switchModule('po')">
+              <span class="nav-item-icon">📝</span>
+              <span class="nav-item-text">Surat Pesanan (PO)</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+            <button id="nav-rtv" class="nav-item" onclick="switchModule('rtv')">
+              <span class="nav-item-icon">↩️</span>
+              <span class="nav-item-text">Retur Pembelian (RTV)</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+            <button id="nav-planning" class="nav-item" onclick="switchModule('planning')">
+              <span class="nav-item-icon">📈</span>
+              <span class="nav-item-text">Perencanaan Min/Max</span>
+              <span class="nav-item-badge phase-3">Phase 3</span>
+            </button>
+          </div>
+
+          <!-- PILAR 5: PENJUALAN & KASIR POS -->
+          <div class="nav-pilar-group">
+            <div class="nav-pilar-header">
+              <span class="pilar-num">05</span>
+              <span class="pilar-name">Kasir & Penjualan</span>
+            </div>
+            <button id="nav-pos" class="nav-item" onclick="switchModule('pos')">
+              <span class="nav-item-icon">🛒</span>
+              <span class="nav-item-text">Kasir POS (Fast Scan)</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-invoices" class="nav-item" onclick="switchModule('invoices')">
+              <span class="nav-item-icon">🧾</span>
+              <span class="nav-item-text">Faktur Penjualan (Nota)</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-sales-returns" class="nav-item" onclick="switchModule('sales-returns')">
+              <span class="nav-item-icon">🔄</span>
+              <span class="nav-item-text">Retur Penjualan</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+            <button id="nav-shifts" class="nav-item" onclick="switchModule('shifts')">
+              <span class="nav-item-icon">💳</span>
+              <span class="nav-item-text">Shift & Kas Kasir (X/Z)</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+            <button id="nav-pricing" class="nav-item" onclick="switchModule('pricing')">
+              <span class="nav-item-icon">🏷️</span>
+              <span class="nav-item-text">Skema Harga Grosir</span>
+              <span class="nav-item-badge phase-3">Phase 3</span>
+            </button>
+          </div>
+
+          <!-- PILAR 6: LOGISTIK & PENGIRIMAN -->
+          <div class="nav-pilar-group">
+            <div class="nav-pilar-header">
+              <span class="pilar-num">06</span>
+              <span class="pilar-name">Logistik & Armada</span>
+            </div>
+            <button id="nav-sj" class="nav-item" onclick="switchModule('sj')">
+              <span class="nav-item-icon">🚚</span>
+              <span class="nav-item-text">Surat Jalan Driver</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-tracking" class="nav-item" onclick="switchModule('tracking')">
+              <span class="nav-item-icon">📍</span>
+              <span class="nav-item-text">Pelacakan & POD</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+          </div>
+
+          <!-- PILAR 7: KEUANGAN & AKUNTANSI -->
+          <div class="nav-pilar-group">
+            <div class="nav-pilar-header">
+              <span class="pilar-num">07</span>
+              <span class="pilar-name">Keuangan & Kas</span>
+            </div>
+            <button id="nav-piutang" class="nav-item" onclick="switchModule('piutang')">
+              <span class="nav-item-icon">📒</span>
+              <span class="nav-item-text">Buku Piutang & PayLink</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-hutang" class="nav-item" onclick="switchModule('hutang')">
+              <span class="nav-item-icon">📉</span>
+              <span class="nav-item-text">Buku Hutang Supplier</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+            <button id="nav-cash-bank" class="nav-item" onclick="switchModule('cash-bank')">
+              <span class="nav-item-icon">🏦</span>
+              <span class="nav-item-text">Kas & Rekening Bank</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+            <button id="nav-laporan" class="nav-item" onclick="switchModule('laporan')">
+              <span class="nav-item-icon">📊</span>
+              <span class="nav-item-text">Laporan Laba Rugi FIFO</span>
+              <span class="nav-item-badge">Phase 2</span>
+            </button>
+            <button id="nav-forecast" class="nav-item" onclick="switchModule('forecast')">
+              <span class="nav-item-icon">📈</span>
+              <span class="nav-item-text">Peramalan Arus Kas</span>
+              <span class="nav-item-badge phase-3">Phase 3</span>
+            </button>
+            <button id="nav-assets" class="nav-item" onclick="switchModule('assets')">
+              <span class="nav-item-icon">🏢</span>
+              <span class="nav-item-text">Aset Tetap & Depresiasi</span>
+              <span class="nav-item-badge phase-3">Phase 3</span>
+            </button>
+          </div>
+
+          <!-- PILAR 8: TIM & HAK AKSES (RBAC) -->
+          <div class="nav-pilar-group">
+            <div class="nav-pilar-header">
+              <span class="pilar-num">08</span>
+              <span class="pilar-name">Tim & Otoritas</span>
+            </div>
+            <button id="nav-users" class="nav-item" onclick="switchModule('users')">
+              <span class="nav-item-icon">👤</span>
+              <span class="nav-item-text">Daftar Staf & PIN</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-roles" class="nav-item" onclick="switchModule('roles')">
+              <span class="nav-item-icon">🛡️</span>
+              <span class="nav-item-text">Matriks Izin Checkbox</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+          </div>
+
+          <!-- PILAR 9: TATA KELOLA & SISTEM -->
+          <div class="nav-pilar-group">
+            <div class="nav-pilar-header">
+              <span class="pilar-num">09</span>
+              <span class="pilar-name">Tata Kelola & Sistem</span>
+            </div>
+            <button id="nav-audit-logs" class="nav-item" onclick="switchModule('audit-logs')">
+              <span class="nav-item-icon">📜</span>
+              <span class="nav-item-text">Audit Trail Aktivitas</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-backup" class="nav-item" onclick="switchModule('backup')">
+              <span class="nav-item-icon">💾</span>
+              <span class="nav-item-text">Backup & Export Data</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-pengaturan" class="nav-item" onclick="switchModule('pengaturan')">
+              <span class="nav-item-icon">⚙️</span>
+              <span class="nav-item-text">Pengaturan Toko & PPN</span>
+              <span class="nav-badge-live">LIVE</span>
+            </button>
+            <button id="nav-approvals" class="nav-item" onclick="switchModule('approvals')">
+              <span class="nav-item-icon">⚡</span>
+              <span class="nav-item-text">Approval Workflows</span>
+              <span class="nav-item-badge phase-3">Phase 3</span>
+            </button>
+            <button id="nav-integrasi" class="nav-item" onclick="switchModule('integrasi')">
+              <span class="nav-item-icon">🔌</span>
+              <span class="nav-item-text">Integrasi Marketplace</span>
+              <span class="nav-item-badge phase-3">Phase 3</span>
+            </button>
+            <button id="nav-ai-forecasting" class="nav-item" onclick="switchModule('ai-forecasting')">
+              <span class="nav-item-icon">🤖</span>
+              <span class="nav-item-text">AI Demand Forecast</span>
+              <span class="nav-item-badge phase-3">Phase 3</span>
+            </button>
+            <button id="nav-pajak" class="nav-item" onclick="switchModule('pajak')">
+              <span class="nav-item-icon">🧾</span>
+              <span class="nav-item-text">Pajak & e-Faktur</span>
+              <span class="nav-item-badge phase-4">Phase 4</span>
+            </button>
+          </div>
         </nav>
       </div>
 
@@ -2594,6 +2853,186 @@
           { icon: '📦', title: 'Bin Location Management', desc: 'Petakan tata letak gudang bertingkat: Zona -> Lorong -> Rak -> Bin untuk mempermudah picking.' },
           { icon: '⚖️', title: 'Rebalancing Stok Otomatis', desc: 'Rekomendasi pemindahan stok saat satu cabang mengalami kelangkaan pasokan komoditas.' },
           { icon: '🔍', title: 'Audit Opname Multi-Titik', desc: 'Lakukan stock opname serentak di berbagai lokasi gudang dengan scanner barcode handheld.' }
+        ]
+      },
+      'stock-opname': {
+        icon: '📋',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Stock Opname & Audit Fisik Berkala',
+        desc: 'Sistem audit fisik persediaan barang di rak gudang menggunakan scanner barcode genggam dengan approval penyesuaian otomatis.',
+        features: [
+          { icon: '📷', title: 'Handheld Barcode Audit', desc: 'Scan barcode rak dan palet secara beruntun untuk menghitung kuantitas fisik aktual tanpa kertas.' },
+          { icon: '⚖️', title: 'Komparasi Fisik vs Sistem', desc: 'Deteksi selisih (variance) kuantitas dan nilai rupiah secara instan sebelum melakukan penyesuaian.' },
+          { icon: '✍️', title: 'Approval Penyesuaian Bertingkat', desc: 'Setiap penyesuaian selisih stok bernilai besar memerlukan otorisasi PIN Pemilik / Manajer.' },
+          { icon: '📜', title: 'Rekam Jejak Opname Historis', desc: 'Log audit lengkap mencatat siapa yang melakukan opname, tanggal, dan alasan selisih.' }
+        ]
+      },
+      'barcode-print': {
+        icon: '🖨️',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Generator & Cetak Label Barcode Massal',
+        desc: 'Cetak stiker barcode EAN-13, Code 128, dan QR Code untuk ribuan SKU langsung ke printer thermal label stiker.',
+        features: [
+          { icon: '🏷️', title: 'Format Stiker Fleksibel', desc: 'Mendukung ukuran standar label komoditas: 33x15mm, 40x30mm, 50x20mm, dan 2-kolom / 3-kolom.' },
+          { icon: '📦', title: 'Cetak Otomatis dari PO Inbound', desc: '1-klik cetak label stiker sesuai kuantitas barang yang baru diterima di dermaga gudang.' },
+          { icon: '⚡', title: 'Batch Printing 10.000+ Label', desc: 'Proses render cepat tanpa jeda untuk penempelan barcode massal di gudang distributor.' },
+          { icon: '🔒', title: 'Integrasi SKU & Harga Modal', desc: 'Menyematkan kode barcode terenkripsi yang langsung dikenali scanner kasir POS.' }
+        ]
+      },
+      'suppliers': {
+        icon: '🏭',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Direktori Pemasok & Manajemen SRM',
+        desc: 'Database rekanan vendor, produsen komoditas, syarat pembayaran TOP (Term of Payment), dan histori pasokan.',
+        features: [
+          { icon: '🤝', title: 'Profil Vendor & Rekening', desc: 'Pencatatan bank transfer resmi, kontak sales force supplier, dan nomor rekening penerima.' },
+          { icon: '📅', title: 'Term of Payment (TOP 7-60 Hari)', desc: 'Pengaturan tempo pembayaran per pemasok dengan kalkulasi jatuh tempo otomatis pada setiap PO.' },
+          { icon: '📊', title: 'Vendor Scorecard & Kinerja', desc: 'Evaluasi ketepatan waktu pengiriman dan rasio barang retur/rusak per pemasok.' },
+          { icon: '📑', title: 'Buku Pembantu Hutang Vendor', desc: 'Rekapitulasi tagihan yang belum terbayar dan rencana pengeluaran kas dagang.' }
+        ]
+      },
+      'po': {
+        icon: '📝',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Surat Pesanan Pembelian (Purchase Order / PO)',
+        desc: 'Penerbitan PO resmi kepada supplier dengan alur persetujuan bertingkat dan integrasi penerimaan barang gudang.',
+        features: [
+          { icon: '📄', title: 'Format PO Resmi PDF/WA', desc: 'Generate dokumen PO lengkap dengan nomor referensi, spesifikasi satuan, dan klausul garansi.' },
+          { icon: '🚦', title: 'Tracking Status Siklus PO', desc: 'Pantau status pesanan: Draft -> Menunggu Approval -> Dikirim -> Diterima Sebagian -> Selesai.' },
+          { icon: '💰', title: 'Plafon Anggaran & Otorisasi', desc: 'PO bernilai di atas Rp 50.000.000 otomatis memicu permintaan approval ke smartphone Owner.' },
+          { icon: '🔗', title: 'Link Otomatis ke Inbound Dock', desc: 'Petugas gudang langsung memeriksa barang masuk berdasarkan nomor PO yang terbit.' }
+        ]
+      },
+      'rtv': {
+        icon: '↩️',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Retur Pembelian (Return to Vendor / RTV)',
+        desc: 'Alur pengembalian barang cacat, rusak, atau kadaluarsa ke supplier dengan penerbitan Nota Debet pemotong hutang.',
+        features: [
+          { icon: '📦', title: 'Klaim Garansi & Mutu', desc: 'Pencatatan alasan pengembalian (karung sobek, beras berkutu, kemasan bocor) disertai foto bukti.' },
+          { icon: '💳', title: 'Penerbitan Nota Debet Otomatis', desc: 'Sistem otomatis mengurangi saldo hutang dagang kepada supplier yang bersangkutan.' },
+          { icon: '🔄', title: 'Opsi Penggantian Barang', desc: 'Dukungan untuk alur retur ganti barang baru vs pemotongan tagihan faktur pembelian.' },
+          { icon: '📊', title: 'Laporan RTV & Kerugian', desc: 'Laporan rekapitulasi nilai barang retur per vendor untuk evaluasi kontrak pengadaan.' }
+        ]
+      },
+      'planning': {
+        icon: '📈',
+        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
+        title: 'Perencanaan Pengadaan & Reorder Min/Max',
+        desc: 'Kalkulasi kebutuhan restock cerdas berbasis kecepatan penjualan aktual dan waktu tunggu pengiriman supplier.',
+        features: [
+          { icon: '⚡', title: 'Dynamic Reorder Point', desc: 'Notifikasi otomatis saat stok mendekati batas aman (safety stock) berdasarkan lead-time.' },
+          { icon: '📦', title: 'Economic Order Quantity (EOQ)', desc: 'Rekomendasi jumlah pesanan paling efisien untuk menekan biaya simpan dan ongkos kirim.' },
+          { icon: '📉', title: 'Deteksi Slow-Moving Items', desc: 'Peringatan dini untuk tidak memesan komoditas yang mengalami penurunan tren beli.' },
+          { icon: '📅', title: 'Proyeksi Kalender Pengadaan', desc: 'Jadwal pemesanan rutin mingguan/bulanan yang terintegrasi dengan ketersediaan kas.' }
+        ]
+      },
+      'sales-returns': {
+        icon: '🔄',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Retur Penjualan (Sales Returns & Refund)',
+        desc: 'Pengelolaan pengembalian barang dari pelanggan grosir: restock ke lot FIFO, pengembalian tunai, atau potong saldo piutang.',
+        features: [
+          { icon: '🧾', title: 'Tautkan ke Nota Faktur Asli', desc: 'Pilih nomor faktur penjualan untuk memvalidasi harga beli dan kuantitas maksimal yang dapat diretur.' },
+          { icon: '📦', title: 'Restock Otomatis ke Lot FIFO', desc: 'Barang yang layak jual dikembalikan ke lot inventori aktif dengan kalkulasi HPP yang konsisten.' },
+          { icon: '💳', title: 'Penerbitan Credit Note', desc: 'Mengurangi sisa piutang kasbon pelanggan atau memproses pengembalian dana kas drawer.' },
+          { icon: '🔒', title: 'Otorisasi Khusus Retur', desc: 'Pencegahan fraud kasir dengan mewajibkan approval PIN manajer untuk transaksi retur.' }
+        ]
+      },
+      'shifts': {
+        icon: '💳',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Shift Kasir & Rekonsiliasi Kas Laporan X/Z',
+        desc: 'Manajemen pergantian kasir, pencatatan kas modal awal, setoran kas tengah shift, dan cetak Laporan Z penutupan kasir.',
+        features: [
+          { icon: '💵', title: 'Modal Kas Awal (Opening Float)', desc: 'Kasir mencatat uang receh modal kembalian sebelum register kasir dapat dibuka.' },
+          { icon: '💸', title: 'Mid-Shift Cash Drop', desc: 'Pengambilan uang tunai berlebih untuk diamankan ke brankas utama dengan tanda tangan kasir.' },
+          { icon: '📑', title: 'Cetak Laporan X & Z', desc: 'Laporan X (ringkasan sementara) dan Laporan Z (penutupan final dengan selisih kas fisik vs sistem).' },
+          { icon: '⏱️', title: 'Ganti Shift Kilat 3 Detik', desc: 'Pergantian kasir di satu tablet konter kasir cukup dengan input PIN 4-6 digit tanpa logout.' }
+        ]
+      },
+      'pricing': {
+        icon: '🏷️',
+        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
+        title: 'Skema Harga Dinamis & Promo Grosir',
+        desc: 'Konfigurasi tier grosir bertingkat, diskon kuantitas minimum, promo paket komoditas, dan komisi salesman.',
+        features: [
+          { icon: '🎯', title: 'Tier Harga Bertingkat', desc: 'Harga otomatis turun berdasarkan volume: Eceran (1-5), Grosir 1 (6-50), Grosir 2 (>50).' },
+          { icon: '🎁', title: 'Promo Beli X Gratis Y', desc: 'Aturan promo otomatis di kasir untuk bundling komoditas pelengkap (e.g. Beras + Minyak).' },
+          { icon: '👔', title: 'Komisi Penjualan Salesman', desc: 'Penghitungan otomatis komisi salesman lapangan berdasarkan margin kotor yang dihasilkan.' },
+          { icon: '⏰', title: 'Diskon Flash Sale Terjadwal', desc: 'Aktivasi potongan harga otomatis pada jam atau hari pasar tertentu.' }
+        ]
+      },
+      'tracking': {
+        icon: '📍',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Pelacakan Pengiriman & Proof of Delivery (POD)',
+        desc: 'Monitoring armada driver, status pengantaran realtime, tanda tangan digital penerima, dan upload foto serah terima barang.',
+        features: [
+          { icon: '🚚', title: 'Live Fleet Tracking', desc: 'Pantau posisi armada pengiriman barang (Dalam Perjalanan, Tiba di Lokasi, Selesai).' },
+          { icon: '✍️', title: 'Digital Signature POD', desc: 'Penerima menandatangani bukti terima langsung di layar smartphone driver.' },
+          { icon: '📸', title: 'Foto Bukti Serah Terima', desc: 'Kamera driver mengambil foto barang yang telah diturunkan di toko pelanggan.' },
+          { icon: '⚡', title: 'Update Otomatis ke Faktur', desc: 'Status faktur otomatis berubah menjadi TERKIRIM begitu driver menyelesaikan POD.' }
+        ]
+      },
+      'hutang': {
+        icon: '📉',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Buku Hutang Dagang Supplier & Jadwal Pelunasan',
+        desc: 'Pencatatan kewajiban pembayaran ke vendor, jadwal jatuh tempo, dan perencanaan pengeluaran kas dagang.',
+        features: [
+          { icon: '📅', title: 'Kalender Jatuh Tempo Hutang', desc: 'Tampilan kalender interaktif untuk memonitor tagihan supplier yang harus dilunasi minggu ini.' },
+          { icon: '💵', title: 'Pembayaran Parsial / Cicilan', desc: 'Mencatat pembayaran bertahap ke supplier dan memperbarui sisa pokok hutang secara akurat.' },
+          { icon: '⚠️', title: 'Peringatan Dini Penalti', desc: 'Notifikasi sebelum tanggal jatuh tempo untuk menghindari denda keterlambatan atau penghentian pasokan.' },
+          { icon: '📑', title: 'Rekonsiliasi Faktur Pembelian', desc: 'Pencocokan antara nota faktur supplier, bukti penerimaan gudang, dan mutasi kas.' }
+        ]
+      },
+      'cash-bank': {
+        icon: '🏦',
+        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
+        title: 'Kas & Rekening Bank Multi-Akun',
+        desc: 'Buku kas terpadu untuk Cash Drawer Kasir, Kas Kecil (Petty Cash), Rekening BCA, Mandiri, dan Settlement Payment Gateway.',
+        features: [
+          { icon: '💼', title: 'Multi-Account Balances', desc: 'Pantau posisi saldo kas fisik toko dan rekening giro bank bisnis secara terpisah dan realtime.' },
+          { icon: '🔄', title: 'Transfer & Mutasi Antar Akun', desc: 'Catat pemindahan dana dari kasir ke bank atau pengisian kas kecil operasional.' },
+          { icon: '📑', title: 'Pencatatan Biaya Operasional', desc: 'Kategorisasi pengeluaran rutin: listrik, bensin armada, gaji staf, dan konsumsi toko.' },
+          { icon: '⚖️', title: 'Rekonsiliasi Mutasi Bank', desc: 'Pencocokan mutasi m-banking dengan transaksi penjualan digital QRIS / Virtual Account.' }
+        ]
+      },
+      'forecast': {
+        icon: '📈',
+        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
+        title: 'Peramalan Arus Kas (Cash Flow Forecasting)',
+        desc: 'Proyeksi likuiditas keuangan 30-90 hari ke depan berdasarkan jadwal jatuh tempo piutang pelanggan vs hutang supplier.',
+        features: [
+          { icon: '🔮', title: 'Proyeksi Saldo 30-90 Hari', desc: 'Grafik perkiraan posisi kas masa depan untuk mengantisipasi potensi defisit likuiditas.' },
+          { icon: '⚖️', title: 'Simulasi Piutang vs Hutang', desc: 'Membandingkan estimasi penerimaan kasbon vs kewajiban pembayaran tagihan vendor.' },
+          { icon: '💡', title: 'Rekomendasi Waktu Belanja', desc: 'Saran waktu paling aman untuk melakukan pembelian grosir dalam jumlah besar.' },
+          { icon: '🚨', title: 'Peringatan Defisit Kas', desc: 'Peringatan dini jika jadwal pengeluaran kas melebihi estimasi penerimaan piutang.' }
+        ]
+      },
+      'assets': {
+        icon: '🏢',
+        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
+        title: 'Manajemen Aset Tetap & Depresiasi',
+        desc: 'Inventarisasi aset fisik operasional (armada mobil box, timbangan digital, komputer kasir, rak gudang) dengan penyusutan otomatis.',
+        features: [
+          { icon: '🚚', title: 'Daftar Aset & Nilai Perolehan', desc: 'Pencatatan tanggal beli, masa manfaat (tahun), nilai sisa, dan nomor identitas aset.' },
+          { icon: '📐', title: 'Penyusutan Garis Lurus Otomatis', desc: 'Perhitungan amortisasi bulanan otomatis yang langsung terhubung ke laporan neraca.' },
+          { icon: '🛠️', title: 'Riwayat Servis & Pemeliharaan', desc: 'Log perawatan berkala kendaraan armada dan penggantian onderdil mesin toko.' },
+          { icon: '📑', title: 'Laporan Nilai Buku Aset', desc: 'Rekapitulasi total aset tetap dan akumulasi penyusutan untuk pelaporan SPT tahunan.' }
+        ]
+      },
+      'approvals': {
+        icon: '⚡',
+        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
+        title: 'Mesin Alur Persetujuan (Approval Workflows)',
+        desc: 'Pengaturan otorisasi bertingkat untuk transaksi sensitif: PO bernilai besar, diskon khusus kasir, dan penghapusan nota transaksi.',
+        features: [
+          { icon: '⚙️', title: 'Aturan Ambang Batas (Threshold)', desc: 'Konfigurasi batas nilai: PO > Rp 50M, diskon kasir > 10%, atau void transaksi.' },
+          { icon: '📱', title: 'Push Notifikasi ke Smartphone Owner', desc: 'Owner menerima alert interaktif dengan 1-tap Setujui / Tolak dari mana saja.' },
+          { icon: '📜', title: 'Catatan Justifikasi & Audit Log', desc: 'Staf wajib mengisi alasan saat meminta approval diskon atau perubahan batas kredit.' },
+          { icon: '⏳', title: 'Batas Waktu Otorisasi', desc: 'Permintaan otomatis dibatalkan jika tidak disetujui dalam jangka waktu tertentu.' }
         ]
       },
       'integrasi': {
@@ -3303,7 +3742,8 @@
           document.getElementById('page-subheading').textContent = 'Diagnostik permintaan & pemulihan akses.';
         } else if (isRoadmapRoute) {
           document.getElementById('module-coming-soon')?.classList.add('active');
-          document.getElementById(`nav-${roadmapKey}`)?.classList.add('active');
+          const navBtn = document.getElementById(`nav-${roadmapKey}`) || document.getElementById(`nav-${currentPath}`);
+          if (navBtn) navBtn.classList.add('active');
           renderComingSoonModule(roadmapKey, false);
         } else {
           const routeMap = {
@@ -3317,7 +3757,14 @@
             'katalog': 'katalog',
             'catalog': 'katalog',
             'pengaturan': 'pengaturan',
-            'settings': 'pengaturan'
+            'settings': 'pengaturan',
+            'customers': 'owner',
+            'receiving': 'fifo',
+            'invoices': 'owner',
+            'users': 'owner',
+            'roles': 'owner',
+            'audit-logs': 'pengaturan',
+            'backup': 'pengaturan'
           };
           let activeMod = routeMap[currentPath];
 
@@ -3329,20 +3776,31 @@
             document.getElementById('page-subheading').textContent = 'Alamat URL tidak terdaftar di sistem SiDaya.';
           } else {
             document.getElementById(`module-${activeMod}`)?.classList.add('active');
-            document.getElementById(`nav-${activeMod}`)?.classList.add('active');
+            const navBtn = document.getElementById(`nav-${currentPath}`) || document.getElementById(`nav-${activeMod}`);
+            if (navBtn) navBtn.classList.add('active');
 
             const modTitles = {
               owner: { title: 'Dashboard Owner & Hak Akses', sub: 'Pantau metrik finansial, omzet, stok, dan tim staf.' },
+              dashboard: { title: 'Dashboard Owner & Hak Akses', sub: 'Pantau metrik finansial, omzet, stok, dan tim staf.' },
+              customers: { title: 'Direktori Pelanggan & CRM', sub: 'Basis data pelanggan grosir, limit piutang, dan riwayat transaksi.' },
+              invoices: { title: 'Faktur Penjualan (Nota Dagang)', sub: 'Semua faktur nota penjualan grosir dan status pelunasan.' },
+              users: { title: 'Daftar Staf & Hak Akses PIN', sub: 'Daftar pengguna terdaftar, nomor WhatsApp, dan penugasan peran.' },
+              roles: { title: 'Matriks Otoritas & Izin Modul', sub: 'Konfigurasi hak akses RBAC per peran (Owner, Kasir, Gudang, Driver).' },
               pos: { title: 'Kasir Grosir & Barcode Fast-Scan', sub: 'Transaksi penjualan, scan SKU, PayLink QRIS & cetak struk.' },
               fifo: { title: 'Inbound & Gudang FIFO', sub: 'Penerimaan stok lot, alokasi batch FIFO & masa simpan.' },
+              receiving: { title: 'Dermaga Penerimaan Barang (Inbound Dock)', sub: 'Pencatatan lot masuk, verifikasi batch FIFO, dan modal supplier.' },
               sj: { title: 'Surat Jalan Driver Logistik', sub: 'Manifest armada logistik & bukti serah terima (Proof of Delivery).' },
+              'surat-jalan': { title: 'Surat Jalan Driver Logistik', sub: 'Manifest armada logistik & bukti serah terima (Proof of Delivery).' },
               piutang: { title: 'Buku Piutang & Kasbon Dagang', sub: 'Pelacakan jatuh tempo & pengingat otomatis WhatsApp PayLink.' },
               katalog: { title: 'Master Katalog Produk & Barcode SKU', sub: 'Manajemen ribuan item komoditas, barcode EAN-13, dan COGS modal.' },
-              pengaturan: { title: 'Pengaturan Toko & Hardware', sub: 'Profil workspace bisnis, subdomain, printer pairing, & rekening.' }
+              pengaturan: { title: 'Pengaturan Toko & Hardware', sub: 'Profil workspace bisnis, subdomain, printer pairing, & rekening.' },
+              'audit-logs': { title: 'Audit Trail Aktivitas Sistem', sub: 'Rekam jejak mutasi data dan otentikasi pengguna secara kronologis.' },
+              backup: { title: 'Pencadangan & Ekspor Data Bisnis', sub: 'Ekspor database transaksi, stok opname, dan laporan keuangan.' }
             };
-            if (modTitles[activeMod]) {
-              document.getElementById('page-heading').textContent = modTitles[activeMod].title;
-              document.getElementById('page-subheading').textContent = modTitles[activeMod].sub;
+            const titleInfo = modTitles[currentPath] || modTitles[activeMod];
+            if (titleInfo) {
+              document.getElementById('page-heading').textContent = titleInfo.title;
+              document.getElementById('page-subheading').textContent = titleInfo.sub;
             }
 
             // Render Active Merchant Components
