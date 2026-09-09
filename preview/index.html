@@ -4,9 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SiDaya - Enterprise OS (Multi-Tenant, FIFO & Role Matrix)</title>
+  
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Modular Stylesheets -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/modules.css">
+
   <script>
     /* Synchronous Pre-Paint Auth State & Theme Resolver (Zero FOUC Flash) */
     (function() {
@@ -29,1516 +38,25 @@
       } catch (e) {}
     })();
   </script>
-  <style>
-    /* ==========================================================================
-       THEME VARIABLES: LIGHT ELEGANT (DEFAULT) & DARK SLEEK EXECUTIVE
-       ========================================================================== */
-    :root {
-      --theme-transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 18px;
-      --radius-full: 9999px;
-    }
-
-    /* ☀️ LIGHT ELEGANT EXECUTIVE THEME (DEFAULT) */
-    html[data-theme="light"] {
-      --bg-body: #F8FAFC;
-      --bg-surface: #FFFFFF;
-      --bg-surface-elevated: #F1F5F9;
-      --bg-surface-soft: #F8FAFC;
-      --bg-sidebar: #FFFFFF;
-      --border-subtle: #E2E8F0;
-      --border-medium: #CBD5E1;
-      --border-focus: #2563EB;
-
-      --text-primary: #0F172A;
-      --text-secondary: #475569;
-      --text-muted: #94A3B8;
-      --text-inverse: #FFFFFF;
-
-      --primary: #1D4ED8;
-      --primary-hover: #1E40AF;
-      --primary-soft: #EFF6FF;
-      --primary-border: #BFDBFE;
-      --primary-glow: rgba(29, 78, 216, 0.15);
-
-      --accent-green: #059669;
-      --accent-green-soft: #ECFDF5;
-      --accent-green-border: #A7F3D0;
-
-      --accent-amber: #D97706;
-      --accent-amber-soft: #FFFBEB;
-      --accent-amber-border: #FDE68A;
-
-      --accent-purple: #7C3AED;
-      --accent-purple-soft: #F5F3FF;
-
-      --accent-rose: #E11D48;
-      --accent-rose-soft: #FFF1F2;
-
-      --card-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
-      --card-shadow-hover: 0 10px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
-      --dock-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
-      --topbar-bg: rgba(255, 255, 255, 0.92);
-    }
-
-    /* 🌙 DARK SLEEK EXECUTIVE THEME */
-    html[data-theme="dark"] {
-      --bg-body: #070B14;
-      --bg-surface: #0F172A;
-      --bg-surface-elevated: #1E293B;
-      --bg-surface-soft: #141E33;
-      --bg-sidebar: #0B1120;
-      --border-subtle: #334155;
-      --border-medium: #475569;
-      --border-focus: #60A5FA;
-
-      --text-primary: #F8FAFC;
-      --text-secondary: #CBD5E1;
-      --text-muted: #94A3B8;
-      --text-inverse: #0F172A;
-
-      --primary: #2563EB;
-      --primary-hover: #3B82F6;
-      --primary-soft: rgba(37, 99, 235, 0.15);
-      --primary-border: rgba(37, 99, 235, 0.35);
-      --primary-glow: rgba(37, 99, 235, 0.3);
-
-      --accent-green: #10B981;
-      --accent-green-soft: rgba(16, 185, 129, 0.15);
-      --accent-green-border: rgba(16, 185, 129, 0.35);
-
-      --accent-amber: #F59E0B;
-      --accent-amber-soft: rgba(245, 158, 11, 0.15);
-      --accent-amber-border: rgba(245, 158, 11, 0.35);
-
-      --accent-purple: #8B5CF6;
-      --accent-purple-soft: rgba(139, 92, 246, 0.15);
-
-      --accent-rose: #F43F5E;
-      --accent-rose-soft: rgba(244, 63, 94, 0.15);
-
-      --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35), 0 2px 8px -1px rgba(0, 0, 0, 0.2);
-      --card-shadow-hover: 0 12px 30px -4px rgba(0, 0, 0, 0.45), 0 4px 12px -2px rgba(0, 0, 0, 0.25);
-      --dock-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.6);
-      --topbar-bg: rgba(15, 23, 42, 0.92);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      background-color: var(--bg-body);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
-      transition: var(--theme-transition);
-    }
-
-    /* ==========================================================================
-       AUTHENTICATION OVERLAYS (ZERO FOUC PRE-PAINT ARCHITECTURE)
-       ========================================================================== */
-    .login-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      z-index: 80;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      overflow-y: auto;
-    }
-
-    .app-shell, .operator-shell {
-      display: none;
-      min-height: 100vh;
-      width: 100%;
-    }
-
-    /* Zero FOUC Pre-Paint Declarative Selectors */
-    html.state-unauth-merchant #merchant-login-screen {
-      display: flex !important;
-    }
-    html.state-unauth-ops #operator-login-screen {
-      display: flex !important;
-    }
-    html.state-auth-merchant #app-shell {
-      display: flex !important;
-    }
-    html.state-auth-ops #operator-shell {
-      display: flex !important;
-    }
-
-    .login-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 28px 24px;
-      max-width: 460px;
-      width: 100%;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
-      animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-    }
-    @keyframes modalSlideUp {
-      from { opacity: 0; transform: translateY(20px) scale(0.97); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .login-brand {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .login-logo {
-      width: 48px;
-      height: 48px;
-      background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
-      color: #FFFFFF;
-      font-size: 1.5rem;
-      font-weight: 800;
-      border-radius: var(--radius-md);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 8px 20px var(--primary-glow);
-      margin-bottom: 10px;
-    }
-    .login-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-    }
-    .login-desc {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-    .login-security-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--accent-green-soft);
-      border: 1px solid var(--accent-green-border);
-      color: var(--accent-green);
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: var(--radius-full);
-      margin-top: 10px;
-    }
-
-    /* Preset Selection Pills */
-    .preset-section-title {
-      font-size: 0.72rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-    .preset-pill-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-    .preset-pill-btn {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 8px 10px;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .preset-pill-btn:hover {
-      border-color: var(--primary);
-      background: var(--primary-soft);
-      transform: translateY(-2px);
-    }
-    .preset-pill-btn span:first-child {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .preset-role-badge {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    /* Form Fields */
-    .form-group {
-      margin-bottom: 14px;
-    }
-    .form-label {
-      display: block;
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: var(--text-secondary);
-      margin-bottom: 5px;
-    }
-    .form-input {
-      width: 100%;
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 10px 12px;
-      font-size: 0.86rem;
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .form-input:focus {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px var(--primary-glow);
-    }
-
-    /* Password Input with Eye Toggle */
-    .password-input-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .password-input-wrap input {
-      padding-right: 42px;
-    }
-    .password-toggle-btn {
-      position: absolute;
-      right: 8px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      padding: 4px 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .password-toggle-btn:hover {
-      color: var(--text-primary);
-    }
-
-    /* Password Strength Meter */
-    .password-strength-wrap {
-      margin-top: 6px;
-    }
-    .password-strength-bar-bg {
-      width: 100%;
-      height: 5px;
-      background: var(--border-subtle);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-bottom: 4px;
-    }
-    .password-strength-bar-fill {
-      height: 100%;
-      width: 0%;
-      transition: width 0.3s ease, background-color 0.3s ease;
-      border-radius: 3px;
-    }
-    .password-strength-labels {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.7rem;
-      font-weight: 700;
-    }
-
-    .login-btn {
-      width: 100%;
-      background: var(--primary);
-      color: #FFFFFF;
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 12px;
-      font-size: 0.88rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 14px var(--primary-glow);
-    }
-    .login-btn:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-    }
-
-    .login-footer-meta {
-      margin-top: 14px;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      text-align: center;
-      line-height: 1.4;
-    }
-
-    .login-action-links {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 12px;
-      font-size: 0.76rem;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .login-action-link {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: 700;
-      cursor: pointer;
-      transition: color 0.2s ease;
-    }
-    .login-action-link:hover {
-      text-decoration: underline;
-    }
-
-    /* Modal Windows */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      animation: fadeIn 0.2s ease;
-    }
-    .modal-overlay.hidden {
-      display: none;
-    }
-    .modal-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 24px 20px;
-      max-width: 540px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4);
-      position: relative;
-    }
-    .modal-close-btn {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      cursor: pointer;
-      color: var(--text-secondary);
-    }
-    .modal-close-btn:hover {
-      background: var(--accent-rose-soft);
-      color: var(--accent-rose);
-      border-color: var(--accent-rose);
-    }
-
-    /* Floating Dev Subdomain Switcher */
-    .dev-subdomain-pill {
-      position: fixed;
-      bottom: 16px;
-      right: 16px;
-      z-index: 99;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-full);
-      padding: 5px 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .dev-subdomain-link {
-      color: var(--text-secondary);
-      text-decoration: none;
-      padding: 3px 8px;
-      border-radius: var(--radius-sm);
-      transition: all 0.2s ease;
-    }
-    .dev-subdomain-link.active {
-      background: var(--primary-soft);
-      color: var(--primary);
-      font-weight: 800;
-    }
-
-    /* ==========================================================================
-       SIDEBAR & RESPONSIVE DRAWER ARCHITECTURE
-       ========================================================================== */
-
-    /* Backdrop for Mobile Drawer */
-    .sidebar-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      z-index: 85;
-      display: none;
-      animation: fadeIn 0.2s ease;
-    }
-    .sidebar-backdrop.active {
-      display: block;
-    }
-
-    /* Sidebar Default Desktop */
-    .sidebar {
-      width: 270px;
-      background: var(--bg-sidebar);
-      border-right: 1px solid var(--border-subtle);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      padding: 16px 12px;
-      z-index: 90;
-      transition: var(--theme-transition), transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      flex-shrink: 0;
-      overflow-y: auto;
-    }
-    .sidebar-top {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 2px 6px;
-      text-decoration: none;
-    }
-    .sidebar-logo {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
-      color: #FFFFFF;
-      font-size: 1.2rem;
-      font-weight: 800;
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px var(--primary-glow);
-    }
-    .brand-title-wrap {
-      display: flex;
-      flex-direction: column;
-    }
-    .sidebar-brand-name {
-      font-size: 1.1rem;
-      font-weight: 800;
-      letter-spacing: -0.4px;
-      color: var(--text-primary);
-      line-height: 1.2;
-    }
-    .sidebar-brand-sub {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .sidebar-tenant-badge {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .tenant-badge-label {
-      font-size: 0.64rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .tenant-badge-name {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .sidebar-nav {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .nav-section-label {
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: var(--text-muted);
-      padding: 8px 8px 4px 8px;
-    }
-    .nav-pilar-group {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      margin-bottom: 6px;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 6px;
-    }
-    .nav-pilar-group:last-child {
-      border-bottom: none;
-      margin-bottom: 0;
-    }
-    .nav-pilar-header {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.65rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      padding: 4px 8px 2px 8px;
-    }
-    .pilar-num {
-      color: var(--primary);
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 800;
-      background: var(--primary-soft);
-      padding: 1px 4px;
-      border-radius: 3px;
-      font-size: 0.6rem;
-    }
-    .pilar-name {
-      flex: 1;
-    }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: var(--radius-sm);
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--text-secondary);
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.2s ease;
-      width: 100%;
-    }
-    .nav-item:hover {
-      background: var(--bg-surface-elevated);
-      color: var(--text-primary);
-    }
-    .nav-item.active {
-      background: var(--primary-soft);
-      color: var(--primary);
-      border-color: var(--primary-border);
-      font-weight: 700;
-    }
-    .nav-item-icon {
-      font-size: 0.95rem;
-      width: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .nav-item-text {
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .nav-badge-live {
-      font-size: 0.55rem;
-      font-weight: 800;
-      letter-spacing: 0.4px;
-      padding: 1px 5px;
-      border-radius: var(--radius-full);
-      background: var(--accent-green-soft);
-      color: var(--accent-green);
-      border: 1px solid var(--accent-green-border);
-      flex-shrink: 0;
-    }
-    .nav-item-badge {
-      font-size: 0.55rem;
-      font-weight: 800;
-      letter-spacing: 0.4px;
-      padding: 1px 5px;
-      border-radius: var(--radius-full);
-      background: var(--accent-amber-soft);
-      color: var(--accent-amber);
-      border: 1px solid var(--accent-amber-border);
-      flex-shrink: 0;
-    }
-    .nav-item-badge.phase-3 {
-      background: var(--accent-purple-soft);
-      color: var(--accent-purple);
-      border: 1px solid rgba(124, 58, 237, 0.3);
-    }
-    .nav-item-badge.phase-4 {
-      background: var(--primary-soft);
-      color: var(--primary);
-      border: 1px solid var(--primary-border);
-    }
-
-    .sidebar-bottom {
-      border-top: 1px solid var(--border-subtle);
-      padding-top: 12px;
-      margin-top: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .user-profile-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 8px;
-      border-radius: var(--radius-sm);
-      background: var(--bg-surface-elevated);
-    }
-    .user-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: var(--primary);
-      color: #FFFFFF;
-      font-weight: 800;
-      font-size: 0.82rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .user-meta {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .user-name {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .user-role-tag {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .logout-btn {
-      background: var(--accent-rose-soft);
-      border: 1px solid transparent;
-      color: var(--accent-rose);
-      font-size: 0.76rem;
-      font-weight: 700;
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.2s ease;
-      width: 100%;
-    }
-    .logout-btn:hover {
-      background: var(--accent-rose);
-      color: #FFFFFF;
-    }
-
-    /* Main Viewport & Layout */
-    .main-viewport {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      min-height: 100vh;
-      background: var(--bg-body);
-    }
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: var(--topbar-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: var(--theme-transition);
-    }
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .mobile-menu-toggle {
-      display: none;
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      width: 36px;
-      height: 36px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      color: var(--text-primary);
-      align-items: center;
-      justify-content: center;
-    }
-    .breadcrumb-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      letter-spacing: -0.3px;
-    }
-    .breadcrumb-sub {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-    }
-    .topbar-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .theme-toggle-btn {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 1rem;
-      transition: all 0.2s ease;
-      color: var(--text-primary);
-    }
-    .theme-toggle-btn:hover {
-      border-color: var(--border-medium);
-      transform: scale(1.05);
-    }
-
-    .content-container {
-      padding: 20px;
-      flex: 1;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    /* Modules */
-    .module-view {
-      display: none;
-      animation: fadeIn 0.2s ease;
-    }
-    .module-view.active {
-      display: block;
-    }
-
-    /* KPI Cards */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 14px;
-      margin-bottom: 20px;
-    }
-    .kpi-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      box-shadow: var(--card-shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      transition: var(--theme-transition);
-    }
-    .kpi-title {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .kpi-value {
-      font-size: 1.45rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      letter-spacing: -0.5px;
-    }
-    .kpi-sub {
-      font-size: 0.72rem;
-      color: var(--accent-green);
-      font-weight: 600;
-    }
-
-    /* POS Layout */
-    .pos-layout {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-      gap: 18px;
-    }
-    .pos-main {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 18px;
-      box-shadow: var(--card-shadow);
-    }
-    .pos-cart-panel {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 18px;
-      box-shadow: var(--card-shadow);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: fit-content;
-    }
-    .product-card {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .product-card:hover {
-      border-color: var(--primary);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px var(--primary-glow);
-    }
-
-    /* Barcode Scan Bar */
-    .barcode-scan-bar {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 14px;
-      flex-wrap: wrap;
-    }
-
-    /* Cart Quantity Controls */
-    .qty-btn {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 4px;
-      width: 24px;
-      height: 24px;
-      font-weight: 800;
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-primary);
-    }
-    .qty-btn:hover {
-      background: var(--primary-soft);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    /* Tables */
-    .operator-table-wrap {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      box-shadow: var(--card-shadow);
-      overflow-x: auto;
-    }
-    .operator-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.82rem;
-      text-align: left;
-    }
-    .operator-table th {
-      background: var(--bg-surface-elevated);
-      padding: 10px 14px;
-      font-weight: 700;
-      color: var(--text-secondary);
-      border-bottom: 1px solid var(--border-subtle);
-      font-size: 0.74rem;
-      text-transform: uppercase;
-    }
-    .operator-table td {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border-subtle);
-      color: var(--text-primary);
-    }
-    .operator-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* Badges */
-    .tier-badge {
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: var(--radius-full);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .tier-grosir-pro {
-      background: var(--primary-soft);
-      color: var(--primary);
-      border: 1px solid var(--primary-border);
-    }
-    .tier-starter-free {
-      background: var(--bg-surface-elevated);
-      color: var(--text-muted);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .operator-role-badge {
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: var(--radius-full);
-      text-transform: uppercase;
-    }
-    .role-super-admin {
-      background: #7C3AED;
-      color: #FFFFFF;
-    }
-    .role-dev-engineer {
-      background: #0284C7;
-      color: #FFFFFF;
-    }
-    .role-ops-support {
-      background: #059669;
-      color: #FFFFFF;
-    }
-
-    .save-matrix-btn {
-      background: var(--primary);
-      color: #FFFFFF;
-      border: none;
-      border-radius: var(--radius-sm);
-      padding: 8px 14px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .save-matrix-btn:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-    }
-
-    /* Telemetry Grid */
-    .telemetry-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .telemetry-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 14px;
-    }
-    .telemetry-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-    }
-    .telemetry-val {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin: 4px 0 2px 0;
-    }
-    .telemetry-sub {
-      font-size: 0.68rem;
-      color: var(--text-secondary);
-    }
-
-    /* Toast Notification System */
-    .toast-container {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 200;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-    .toast-pill {
-      background: #0F172A;
-      color: #FFFFFF;
-      padding: 10px 18px;
-      border-radius: var(--radius-full);
-      font-size: 0.8rem;
-      font-weight: 700;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      pointer-events: auto;
-    }
-    @keyframes toastIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ==========================================================================
-       RESPONSIVE BREAKPOINTS (MOBILE & TABLET DRAWER)
-       ========================================================================== */
-    @media (max-width: 900px) {
-      .mobile-menu-toggle {
-        display: inline-flex !important;
-      }
-      .sidebar {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        height: 100vh;
-        transform: translateX(-100%);
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
-      }
-      .sidebar.open {
-        transform: translateX(0);
-      }
-      .pos-layout {
-        grid-template-columns: 1fr;
-      }
-      .preset-pill-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Nav Item Phase Badge */
-    .nav-item-badge {
-      margin-left: auto;
-      font-size: 0.62rem;
-      font-weight: 800;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: rgba(124, 58, 237, 0.12);
-      color: #7C3AED;
-      border: 1px solid rgba(124, 58, 237, 0.3);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-    }
-    .nav-item-badge.phase-3 {
-      background: rgba(2, 132, 199, 0.12);
-      color: #0284C7;
-      border-color: rgba(2, 132, 199, 0.3);
-    }
-    .nav-item-badge.phase-4 {
-      background: rgba(5, 150, 105, 0.12);
-      color: #059669;
-      border-color: rgba(5, 150, 105, 0.3);
-    }
-
-    /* ==========================================================================
-       COMING SOON ROADMAP SHOWCASE STYLING
-       ========================================================================== */
-    .coming-soon-wrapper {
-      padding: 10px 0;
-      animation: fadeIn 0.3s ease;
-    }
-    .coming-soon-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 32px 24px;
-      box-shadow: var(--card-shadow);
-      position: relative;
-      overflow: hidden;
-    }
-    .coming-soon-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #7C3AED, #2563EB, #059669);
-    }
-    .coming-soon-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      max-width: 640px;
-      margin: 0 auto 28px auto;
-    }
-    .coming-soon-icon {
-      font-size: 3.5rem;
-      margin-bottom: 12px;
-      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
-    }
-    .coming-soon-phase-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      padding: 4px 12px;
-      border-radius: var(--radius-full);
-      background: var(--primary-soft);
-      color: var(--primary);
-      border: 1px solid var(--primary-border);
-      margin-bottom: 12px;
-    }
-    .coming-soon-title {
-      font-size: 1.6rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
-    }
-    .coming-soon-desc {
-      font-size: 0.88rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-    .coming-soon-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-    .coming-soon-feature-item {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      display: flex;
-      gap: 12px;
-    }
-    .coming-soon-feature-icon {
-      font-size: 1.4rem;
-      flex-shrink: 0;
-    }
-    .coming-soon-feature-title {
-      font-weight: 700;
-      font-size: 0.88rem;
-      color: var(--text-primary);
-      margin-bottom: 3px;
-    }
-    .coming-soon-feature-desc {
-      font-size: 0.76rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-    .coming-soon-timeline {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
-      margin-bottom: 24px;
-    }
-    .coming-soon-timeline-title {
-      font-size: 0.74rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      letter-spacing: 0.6px;
-      margin-bottom: 12px;
-    }
-    .timeline-steps {
-      display: flex;
-      justify-content: space-between;
-      position: relative;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .timeline-step {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.76rem;
-      color: var(--text-secondary);
-    }
-    .timeline-step.completed {
-      color: var(--accent-green);
-      font-weight: 700;
-    }
-    .timeline-step.active {
-      color: var(--primary);
-      font-weight: 800;
-    }
-    .timeline-bullet {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.65rem;
-      font-weight: 800;
-      background: var(--bg-surface);
-      border: 2px solid var(--border-medium);
-    }
-    .timeline-step.completed .timeline-bullet {
-      background: var(--accent-green);
-      color: #FFF;
-      border-color: var(--accent-green);
-    }
-    .timeline-step.active .timeline-bullet {
-      background: var(--primary);
-      color: #FFF;
-      border-color: var(--primary);
-      box-shadow: 0 0 10px var(--primary-glow);
-    }
-    .coming-soon-action-bar {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    /* ==========================================================================
-       STANDARD ERROR PAGES STYLING (400, 401, 403, 404, 429, 500, 503)
-       ========================================================================== */
-    .error-page-wrapper {
-      padding: 24px 0;
-      animation: fadeIn 0.25s ease;
-      max-width: 680px;
-      margin: 0 auto;
-    }
-    .error-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-lg);
-      padding: 36px 28px;
-      box-shadow: var(--card-shadow);
-      text-align: center;
-      position: relative;
-    }
-    .error-status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.74rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      padding: 4px 12px;
-      border-radius: var(--radius-full);
-      margin-bottom: 12px;
-    }
-    .error-badge-400 { background: var(--accent-amber-soft); color: var(--accent-amber); border: 1px solid var(--accent-amber-border); }
-    .error-badge-401 { background: var(--accent-purple-soft); color: var(--accent-purple); border: 1px solid rgba(124,58,237,0.3); }
-    .error-badge-403 { background: var(--accent-rose-soft); color: var(--accent-rose); border: 1px solid rgba(225,29,72,0.3); }
-    .error-badge-404 { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--primary-border); }
-    .error-badge-429 { background: var(--accent-amber-soft); color: var(--accent-amber); border: 1px solid var(--accent-amber-border); }
-    .error-badge-500 { background: var(--accent-rose-soft); color: var(--accent-rose); border: 1px solid rgba(225,29,72,0.3); }
-    .error-badge-503 { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--primary-border); }
-
-    .error-big-code {
-      font-size: 4.5rem;
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: -2px;
-      margin: 4px 0 12px 0;
-      background: linear-gradient(135deg, var(--primary) 0%, #7C3AED 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .error-big-code.code-danger {
-      background: linear-gradient(135deg, #E11D48 0%, #D97706 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .error-big-code.code-amber {
-      background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .error-title {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-    .error-desc {
-      font-size: 0.86rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      max-width: 500px;
-      margin: 0 auto 20px auto;
-    }
-
-    .error-diag-box {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 12px 16px;
-      margin-bottom: 24px;
-      text-align: left;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.74rem;
-      color: var(--text-secondary);
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .error-diag-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-    .error-copy-btn {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-medium);
-      border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 0.68rem;
-      cursor: pointer;
-      color: var(--text-primary);
-    }
-    .error-copy-btn:hover {
-      background: var(--primary-soft);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .error-actions-cluster {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    /* Floating Quick Error & Roadmap Tester Dock */
-    .error-tester-dock {
-      position: fixed;
-      bottom: 16px;
-      left: 16px;
-      z-index: 99;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-full);
-      padding: 5px 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .error-pill-btn {
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-subtle);
-      border-radius: var(--radius-sm);
-      padding: 2px 7px;
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .error-pill-btn:hover {
-      background: var(--primary-soft);
-      color: var(--primary);
-      border-color: var(--primary-border);
-    }
-  </style>
-
 </head>
 <body>
 
-  <!-- BACKDROP FOR MOBILE DRAWER -->
-  <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeSidebarDrawer()"></div>
-
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <div id="toast-container" class="toast-container"></div>
-
   <!-- ========================================================================
-       1. MERCHANT LOGIN SCREEN
+       1. MERCHANT UNIVERSAL LOGIN SCREEN
        ======================================================================== -->
   <div id="merchant-login-screen" class="login-overlay">
     <div class="login-card">
       <div class="login-brand">
         <div class="login-logo">S</div>
-        <h2 class="login-title">SiDaya Enterprise OS</h2>
-        <p class="login-desc">Sistem Manajemen Grosir, FIFO & Point of Sale</p>
+        <h2 class="login-title">SiDaya Workspace Login</h2>
+        <p class="login-desc">Sistem Operasi Multi-Tenant Distribusi Grosir & Komoditas</p>
         <div class="login-security-badge">
-          <span>🛡️</span>
-          <span>Role Matrix (RBAC) • Multi-Tenant Isolated</span>
+          <span>🔒</span>
+          <span>Keamanan Terisolasi Multi-Tenant & RBAC</span>
         </div>
       </div>
 
-      <div class="preset-section-title">Pilih Persona Toko (Quick Login):</div>
+      <div class="preset-section-title">Pilih Akun Cepat Simulasi Peran:</div>
       <div class="preset-pill-grid">
         <button class="preset-pill-btn" onclick="quickLoginPreset('budi@berasjaya.com')">
           <span>👑 Budi Santoso</span>
@@ -1550,152 +68,130 @@
         </button>
         <button class="preset-pill-btn" onclick="quickLoginPreset('agus@berasjaya.com')">
           <span>📦 Agus Santoso</span>
-          <span class="preset-role-badge">Gudang & FIFO Lot</span>
+          <span class="preset-role-badge">Gudang & Batch FIFO</span>
         </button>
         <button class="preset-pill-btn" onclick="quickLoginPreset('joko@berasjaya.com')">
           <span>🚚 Joko Supir</span>
-          <span class="preset-role-badge">Driver Logistik</span>
+          <span class="preset-role-badge">Driver Logistik (POD)</span>
         </button>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Email / WhatsApp Pengguna</label>
-        <input id="merchant-login-identifier" type="text" class="form-input" value="budi@berasjaya.com" placeholder="nama@toko.com atau 0812xxxxxxxx">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Kata Sandi</label>
-        <div class="password-input-wrap">
-          <input id="merchant-login-password" type="password" class="form-input" value="Password123!" placeholder="Kata Sandi Akun Toko">
-          <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('merchant-login-password', this)">👁️</button>
+      <form id="merchant-login-form" onsubmit="event.preventDefault(); handleMerchantLoginSubmit();">
+        <div class="form-group">
+          <label class="form-label">Email Terdaftar / Nomor WhatsApp</label>
+          <input id="merchant-login-identifier" type="text" class="form-input" required value="budi@berasjaya.com">
         </div>
-      </div>
-
-      <button class="login-btn" onclick="handleMerchantLoginSubmit()">
-        Masuk ke Workspace Toko
-      </button>
+        <div class="form-group">
+          <label class="form-label">Kata Sandi / PIN Cepat</label>
+          <div class="password-input-wrap">
+            <input id="merchant-login-password" type="password" class="form-input" required value="Password123!">
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('merchant-login-password', this)">👁️</button>
+          </div>
+        </div>
+        <button type="submit" class="login-btn">
+          <span>🚀</span> Masuk ke Workspace Toko
+        </button>
+      </form>
 
       <div class="login-action-links">
-        <a class="login-action-link" onclick="openOwnerRegistrationModal()">✨ Daftar Toko Baru (Owner)</a>
         <a class="login-action-link" onclick="openForgotPasswordModal()">Lupa Kata Sandi?</a>
+        <a class="login-action-link" onclick="openOwnerRegistrationModal()">Daftar Toko Baru (Owner) →</a>
       </div>
-
       <div class="login-footer-meta">
-        Staf toko (Kasir, Gudang, Driver) bergabung melalui tautan undangan resmi dari Pemilik Toko.
+        Subdomain routing otomatis mendeteksi tenant workspace secara transparan.
       </div>
     </div>
   </div>
 
   <!-- ========================================================================
-       2. OPERATOR CONTROL PLANE LOGIN SCREEN
+       2. ASHVIN LABS OPERATOR LOGIN SCREEN
        ======================================================================== -->
   <div id="operator-login-screen" class="login-overlay">
     <div class="login-card" style="border-color: rgba(124, 58, 237, 0.4);">
       <div class="login-brand">
         <div class="login-logo" style="background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);">⚡</div>
         <h2 class="login-title">Ashvin Labs Control Plane</h2>
-        <p class="login-desc">Platform Management & Telemetri Multi-Tenant</p>
-        <div class="login-security-badge" style="color:#7C3AED; background:var(--accent-purple-soft); border-color:rgba(124,58,237,0.3);">
-          <span>🔒</span>
-          <span>Kepatuhan UU PDP No. 27/2022 • Immutable Audit</span>
-        </div>
+        <p class="login-desc">Platform Operations & Tenant Fleet Infrastructure</p>
       </div>
 
-      <div class="preset-section-title">Pilih Persona Operator:</div>
-      <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:18px;">
+      <div class="preset-section-title">Pilih Akun Operator Simulasi:</div>
+      <div class="preset-pill-grid">
         <button class="preset-pill-btn" onclick="quickLoginOperator('gabriel@ashvinlabs.com', 'SUPER_ADMIN')">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:700;">⚡ Gabriel (CEO / Super Admin)</span>
-            <span class="operator-role-badge role-super-admin">SUPER_ADMIN</span>
-          </div>
-          <span style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">Akses penuh metrik, langganan tier, break-glass</span>
+          <span>⚡ Gabriel (CEO)</span>
+          <span class="preset-role-badge" style="color:#7C3AED;">Super Admin</span>
         </button>
         <button class="preset-pill-btn" onclick="quickLoginOperator('alex@ashvinlabs.com', 'DEV_ENGINEER')">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:700;">🛠️ Alex (Lead Developer)</span>
-            <span class="operator-role-badge role-dev-engineer">DEV_ENGINEER</span>
-          </div>
-          <span style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">Telemetri teknis, DB pool, latency p95</span>
+          <span>🛠️ Alex (Lead Dev)</span>
+          <span class="preset-role-badge" style="color:#0284C7;">Dev Engineer</span>
         </button>
         <button class="preset-pill-btn" onclick="quickLoginOperator('dina@ashvinlabs.com', 'OPS_SUPPORT')">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-weight:700;">🛡️ Dina (Customer Ops Support)</span>
-            <span class="operator-role-badge role-ops-support">OPS_SUPPORT</span>
-          </div>
-          <span style="font-size:0.68rem; color:var(--text-muted); margin-top:2px;">Direktori tenant & PII tersensor otomatis</span>
+          <span>🎧 Dina (Customer Ops)</span>
+          <span class="preset-role-badge" style="color:#059669;">Ops Support</span>
         </button>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Email Operator Ashvin Labs</label>
-        <input id="operator-login-email" type="email" class="form-input" value="gabriel@ashvinlabs.com" placeholder="nama@ashvinlabs.com">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">Kunci Akses / Kata Sandi Master</label>
-        <div class="password-input-wrap">
-          <input id="operator-login-key" type="password" class="form-input" value="Password123!" placeholder="Kata Sandi Master Operator">
-          <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('operator-login-key', this)">👁️</button>
+      <form id="operator-login-form" onsubmit="event.preventDefault(); handleOperatorLoginSubmit();">
+        <div class="form-group">
+          <label class="form-label">Email Korporat (@ashvinlabs.com)</label>
+          <input id="operator-login-email" type="email" class="form-input" required value="gabriel@ashvinlabs.com">
         </div>
-      </div>
-
-      <button class="login-btn" style="background:linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);" onclick="handleOperatorLoginSubmit()">
-        Masuk ke Control Plane Ashvin Labs
-      </button>
-
-      <div class="login-footer-meta">
-        Semua tindakan operator dicatat dalam <code>platform_operator_audit_logs</code>. Akun baru hanya melalui undangan.
-      </div>
+        <div class="form-group">
+          <label class="form-label">Kata Sandi Platform</label>
+          <div class="password-input-wrap">
+            <input id="operator-login-password" type="password" class="form-input" required value="SuperSecret123!">
+            <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('operator-login-password', this)">👁️</button>
+          </div>
+        </div>
+        <button type="submit" class="login-btn" style="background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);">
+          ⚡ Masuk ke Control Plane
+        </button>
+      </form>
     </div>
   </div>
 
   <!-- ========================================================================
-       3. MODALS
+       3. MODALS COLLECTION
        ======================================================================== -->
-  
   <!-- MODAL: OWNER REGISTRATION -->
   <div id="modal-owner-reg" class="modal-overlay hidden">
     <div class="modal-card">
       <button class="modal-close-btn" onclick="closeModal()">✕</button>
       <div style="margin-bottom: 16px;">
-        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">✨ Daftarkan Toko & Akun Pemilik (Owner)</h3>
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">🏪 Pendaftaran Pemilik Toko Baru</h3>
         <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
-          Registrasi mandiri hanya berlaku untuk Pemilik Toko (Billing POC). Staf toko didaftarkan via undangan.
+          Setiap pendaftaran owner otomatis menginisialisasi workspace tenant dan subdomain terisolasi.
         </p>
       </div>
 
-      <form id="owner-reg-form" onsubmit="handleOwnerRegistrationSubmit(event)">
-        <div style="font-size:0.72rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin-bottom:6px;">1. Informasi Bisnis</div>
-        <div class="form-group">
-          <label class="form-label">Nama Bisnis / Toko</label>
-          <input id="reg-biz-name" type="text" class="form-input" required placeholder="contoh: CV Beras Nusantara Makmur">
+      <form id="owner-registration-form" onsubmit="handleOwnerRegistrationSubmit(event)">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div class="form-group">
+            <label class="form-label">Nama Bisnis / Toko</label>
+            <input id="reg-biz-name" type="text" class="form-input" required placeholder="contoh: Beras Makmur Abadi">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subdomain Unik Toko</label>
+            <input id="reg-biz-subdomain" type="text" class="form-input" required placeholder="berasmakmur">
+          </div>
         </div>
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
           <div class="form-group">
-            <label class="form-label">Subdomain Toko</label>
-            <input id="reg-biz-subdomain" type="text" class="form-input" required placeholder="berasnusantara">
+            <label class="form-label">Nama Lengkap Owner</label>
+            <input id="reg-owner-name" type="text" class="form-input" required placeholder="H. Hendro">
           </div>
           <div class="form-group">
             <label class="form-label">No. WhatsApp Bisnis</label>
             <input id="reg-biz-phone" type="tel" class="form-input" required placeholder="0812xxxxxxxx">
           </div>
         </div>
-
-        <div style="font-size:0.72rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin:12px 0 6px 0;">2. Data Pemilik & Billing POC</div>
         <div class="form-group">
-          <label class="form-label">Nama Lengkap Pemilik</label>
-          <input id="reg-owner-name" type="text" class="form-input" required placeholder="Nama Lengkap Sesuai KTP">
+          <label class="form-label">Alamat Email Owner (Login)</label>
+          <input id="reg-owner-email" type="email" class="form-input" required placeholder="hendro@berasmakmur.com">
         </div>
         <div class="form-group">
-          <label class="form-label">Alamat Email Resmi Pemilik</label>
-          <input id="reg-owner-email" type="email" class="form-input" required placeholder="owner@bisnis.com">
-        </div>
-
-        <div style="font-size:0.72rem; font-weight:800; color:var(--primary); text-transform:uppercase; margin:12px 0 6px 0;">3. Keamanan Kata Sandi</div>
-        <div class="form-group">
-          <label class="form-label">Kata Sandi Baru</label>
+          <label class="form-label">Kata Sandi Kuat</label>
           <div class="password-input-wrap">
-            <input id="reg-owner-password" type="password" class="form-input" required placeholder="Min 8 karakter, huruf besar, angka, spesial" oninput="checkPasswordStrength('reg-owner-password', 'reg-strength-fill', 'reg-strength-label')">
+            <input id="reg-owner-password" type="password" class="form-input" required placeholder="Minimal 8 karakter" oninput="checkPasswordStrength('reg-owner-password', 'reg-strength-fill', 'reg-strength-label')">
             <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-owner-password', this)">👁️</button>
           </div>
           <div class="password-strength-wrap">
@@ -1708,7 +204,6 @@
             </div>
           </div>
         </div>
-
         <button type="submit" class="login-btn" style="margin-top:8px; background:var(--accent-green);">
           🚀 Daftarkan Toko & Kirim Email Verifikasi
         </button>
@@ -1983,9 +478,11 @@
   </div>
 
   <!-- ========================================================================
-       4. AUTHENTICATED MERCHANT SHELL (7 COMPLETE ENTERPRISE MODULES)
+       4. AUTHENTICATED MERCHANT SHELL (9 COMPLETE PILARS)
        ======================================================================== -->
   <div id="app-shell" class="app-shell">
+    <div id="sidebar-backdrop" class="sidebar-backdrop" onclick="closeSidebarDrawer()"></div>
+
     <aside class="sidebar" id="merchant-sidebar">
       <div class="sidebar-top">
         <a href="#" class="sidebar-brand">
@@ -2010,7 +507,7 @@
             </div>
             <button id="nav-owner" class="nav-item active" onclick="switchModule('owner')">
               <span class="nav-item-icon">📊</span>
-              <span class="nav-item-text">Overview Eksekutif</span>
+              <span class="nav-item-text">Dashboard</span>
               <span class="nav-badge-live">LIVE</span>
             </button>
           </div>
@@ -2240,7 +737,7 @@
             <button id="nav-pajak" class="nav-item" onclick="switchModule('pajak')">
               <span class="nav-item-icon">🧾</span>
               <span class="nav-item-text">Pajak & e-Faktur</span>
-              <span class="nav-item-badge phase-4">Phase 4</span>
+              <span class="nav-badge-phase-4">Phase 4</span>
             </button>
           </div>
         </nav>
@@ -2266,8 +763,8 @@
         <div class="topbar-left">
           <button class="mobile-menu-toggle" onclick="toggleSidebarDrawer()">☰</button>
           <div>
-            <h1 class="breadcrumb-title" id="page-heading">Dashboard Owner & Hak Akses</h1>
-            <p class="breadcrumb-sub" id="page-subheading">Pantau metrik finansial, stok, dan staf.</p>
+            <h1 class="breadcrumb-title" id="page-heading">Dashboard</h1>
+            <p class="breadcrumb-sub" id="page-subheading">Pusat kontrol operasional, metrik omzet, stok, dan tim kerja.</p>
           </div>
         </div>
 
@@ -2279,18 +776,19 @@
       </header>
 
       <main class="content-container">
-        <!-- MODULE 1: OWNER DASHBOARD -->
+        <!-- MODULE 1: OWNER DASHBOARD & SHORTCUT WIDGETS -->
         <section id="module-owner" class="module-view active">
+          <!-- Executive KPI Grid -->
           <div class="kpi-grid">
             <div class="kpi-card">
               <span class="kpi-title">Omzet Transaksi</span>
-              <span class="kpi-value" id="kpi-omzet">Rp 428.500.000</span>
+              <span class="kpi-value" id="kpi-omzet">Rp 440.850.000</span>
               <span class="kpi-sub" id="kpi-omzet-sub">Live dihitung dari pesanan POS</span>
             </div>
             <div class="kpi-card">
               <span class="kpi-title">Total Stok Lot Aktif</span>
-              <span class="kpi-value" id="kpi-total-lots">140 Unit</span>
-              <span class="kpi-sub" id="kpi-lots-sub">2 Lot Terdaftar</span>
+              <span class="kpi-value" id="kpi-total-lots">830 Unit</span>
+              <span class="kpi-sub" id="kpi-lots-sub">5 Lot Terdaftar</span>
             </div>
             <div class="kpi-card">
               <span class="kpi-title">Surat Jalan Terbit</span>
@@ -2304,6 +802,71 @@
             </div>
           </div>
 
+          <!-- Flagship Feature Shortcuts Grid -->
+          <div style="margin-bottom:14px;">
+            <h4 style="font-weight:800; font-size:0.95rem; color:var(--text-primary); margin-bottom:4px;">⚡ Pintasan Fitur Unggulan Toko</h4>
+            <p style="font-size:0.72rem; color:var(--text-muted);">Akses cepat langsung ke alur kerja utama bisnis Anda.</p>
+          </div>
+          <div class="feature-shortcuts-grid">
+            <div class="feature-shortcut-card" onclick="switchModule('pos')">
+              <div class="feature-shortcut-icon" style="background:var(--primary-soft); color:var(--primary);">🛒</div>
+              <div class="feature-shortcut-info">
+                <span class="feature-shortcut-title">Kasir POS & Scan</span>
+                <span class="feature-shortcut-desc">Barcode fast-scan & bayar</span>
+              </div>
+            </div>
+            <div class="feature-shortcut-card" onclick="openModal('inbound-lot')">
+              <div class="feature-shortcut-icon" style="background:var(--accent-green-soft); color:var(--accent-green);">📥</div>
+              <div class="feature-shortcut-info">
+                <span class="feature-shortcut-title">Inbound Lot Baru</span>
+                <span class="feature-shortcut-desc">Penerimaan stok gudang</span>
+              </div>
+            </div>
+            <div class="feature-shortcut-card" onclick="switchModule('customers')">
+              <div class="feature-shortcut-icon" style="background:var(--accent-purple-soft); color:var(--accent-purple);">👥</div>
+              <div class="feature-shortcut-info">
+                <span class="feature-shortcut-title">Direktori Pelanggan</span>
+                <span class="feature-shortcut-desc">Limit kasbon & CRM</span>
+              </div>
+            </div>
+            <div class="feature-shortcut-card" onclick="switchModule('invoices')">
+              <div class="feature-shortcut-icon" style="background:var(--accent-amber-soft); color:var(--accent-amber);">🧾</div>
+              <div class="feature-shortcut-info">
+                <span class="feature-shortcut-title">Faktur Penjualan</span>
+                <span class="feature-shortcut-desc">Rekap nota & cetak ulang</span>
+              </div>
+            </div>
+            <div class="feature-shortcut-card" onclick="switchModule('sj')">
+              <div class="feature-shortcut-icon" style="background:var(--primary-soft); color:var(--primary);">🚚</div>
+              <div class="feature-shortcut-info">
+                <span class="feature-shortcut-title">Surat Jalan Logistik</span>
+                <span class="feature-shortcut-desc">Manifest armada & POD</span>
+              </div>
+            </div>
+            <div class="feature-shortcut-card" onclick="switchModule('piutang')">
+              <div class="feature-shortcut-icon" style="background:var(--accent-rose-soft); color:var(--accent-rose);">📱</div>
+              <div class="feature-shortcut-info">
+                <span class="feature-shortcut-title">Buku Piutang & WA</span>
+                <span class="feature-shortcut-desc">Tagih kasbon via PayLink</span>
+              </div>
+            </div>
+            <div class="feature-shortcut-card" onclick="switchModule('roles')">
+              <div class="feature-shortcut-icon" style="background:var(--accent-purple-soft); color:var(--accent-purple);">🛡️</div>
+              <div class="feature-shortcut-info">
+                <span class="feature-shortcut-title">Matriks Otoritas</span>
+                <span class="feature-shortcut-desc">Hak akses RBAC 18 kunci</span>
+              </div>
+            </div>
+            <div class="feature-shortcut-card" onclick="switchModule('katalog')">
+              <div class="feature-shortcut-icon" style="background:var(--bg-surface-elevated); color:var(--text-primary);">🏷️</div>
+              <div class="feature-shortcut-info">
+                <span class="feature-shortcut-title">Katalog Master SKU</span>
+                <span class="feature-shortcut-desc">Barcode & harga modal</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cash Composition & FIFO Health -->
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-bottom:16px;">
             <!-- Arus Kas & Komposisi Penjualan -->
             <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; box-shadow:var(--card-shadow);">
@@ -2314,7 +877,7 @@
               <div style="display:flex; flex-direction:column; gap:8px; font-size:0.8rem;">
                 <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm);">
                   <span>💵 Tunai Kasir POS:</span>
-                  <strong style="color:var(--accent-green);" id="dash-cash-total">Rp 416.575.000</strong>
+                  <strong style="color:var(--accent-green);" id="dash-cash-total">Rp 428.500.000</strong>
                 </div>
                 <div style="display:flex; justify-content:space-between; padding:8px 10px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm);">
                   <span>📱 PayLink QRIS (BCA/Midtrans):</span>
@@ -2334,24 +897,19 @@
                 <button class="save-matrix-btn" style="padding:3px 8px; font-size:0.7rem;" onclick="switchModule('fifo')">Lihat Semua Lot →</button>
               </div>
               <div id="dash-fifo-preview" style="display:flex; flex-direction:column; gap:6px; font-size:0.76rem;">
-                <!-- Filled by JS -->
+                <!-- Injected by JS -->
               </div>
             </div>
           </div>
 
-          <!-- Pintasan Operasional & Live Feeds -->
+          <!-- Transaksi Terkini -->
           <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:16px; box-shadow:var(--card-shadow);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
               <div>
-                <h4 style="font-weight:800; font-size:0.95rem; color:var(--text-primary);">⚡ Pintasan Cepat & Transaksi Terkini</h4>
-                <p style="font-size:0.72rem; color:var(--text-muted);">Akses modul operasional langsung dengan satu klik.</p>
+                <h4 style="font-weight:800; font-size:0.95rem; color:var(--text-primary);">🧾 Riwayat Transaksi Penjualan Terkini</h4>
+                <p style="font-size:0.72rem; color:var(--text-muted);">Aliran transaksi kasir POS secara live.</p>
               </div>
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                <button class="save-matrix-btn" style="background:var(--primary);" onclick="switchModule('pos')">🛒 Kasir POS</button>
-                <button class="save-matrix-btn" style="background:var(--accent-green);" onclick="openModal('inbound-lot')">📥 Inbound Lot</button>
-                <button class="save-matrix-btn" style="background:#7C3AED;" onclick="switchModule('customers')">👥 Pelanggan</button>
-                <button class="save-matrix-btn" style="background:var(--accent-amber);" onclick="switchModule('piutang')">📒 Buku Piutang</button>
-              </div>
+              <button class="save-matrix-btn" style="background:var(--primary);" onclick="switchModule('invoices')">Lihat Semua Faktur →</button>
             </div>
 
             <table class="operator-table">
@@ -2690,7 +1248,7 @@
           </div>
         </section>
 
-        <!-- MODULE 8: DYNAMIC COMING SOON / ROADMAP SHOWCASE -->
+        <!-- MODULE: DYNAMIC COMING SOON / ROADMAP SHOWCASE -->
         <section id="module-coming-soon" class="module-view">
           <div class="coming-soon-wrapper">
             <div class="coming-soon-card">
@@ -2725,23 +1283,21 @@
                 </div>
               </div>
 
-              <div class="coming-soon-grid" id="cs-features-grid">
-                <!-- Injected by JS -->
-              </div>
+              <div class="coming-soon-grid" id="cs-features-grid"></div>
 
               <div class="coming-soon-action-bar">
                 <button class="save-matrix-btn" style="padding:10px 20px; font-size:0.86rem; background:linear-gradient(135deg, var(--primary) 0%, #7C3AED 100%);" onclick="handleBetaRegistration()">
                   🔔 Daftarkan Toko untuk Early Access Beta
                 </button>
                 <button class="save-matrix-btn" style="padding:10px 18px; font-size:0.86rem; background:var(--bg-surface-elevated); color:var(--text-primary); border:1px solid var(--border-medium);" onclick="switchModule('owner')">
-                  🏠 Kembali ke Dashboard Utama
+                  🏠 Kembali ke Dashboard
                 </button>
               </div>
             </div>
           </div>
         </section>
 
-        <!-- MODULE 9: STANDARD ERROR & ACCESS PAGES (400, 401, 403, 404, 429, 500, 503) -->
+        <!-- MODULE: STANDARD ERROR PAGES -->
         <section id="module-error" class="module-view">
           <div class="error-page-wrapper">
             <div class="error-card">
@@ -2772,7 +1328,7 @@
 
               <div class="error-actions-cluster" id="err-actions">
                 <button class="save-matrix-btn" style="padding:10px 20px;" onclick="switchModule('owner')">
-                  🏠 Kembali ke Dashboard Utama
+                  🏠 Kembali ke Dashboard
                 </button>
                 <button class="save-matrix-btn" style="background:var(--bg-surface-elevated); color:var(--text-primary); border:1px solid var(--border-medium);" onclick="window.location.reload()">
                   🔄 Coba Muat Ulang
@@ -2956,7 +1512,9 @@
             </div>
             <div id="audit-log-container" style="padding:14px;"></div>
           </div>
-        <!-- TAB 5: OPERATOR DYNAMIC COMING SOON -->
+        </div>
+
+        <!-- TAB 5: OPERATOR COMING SOON -->
         <div id="op-tab-coming-soon" class="op-tab-content" style="display:none;">
           <div class="coming-soon-wrapper">
             <div class="coming-soon-card" style="border-color: rgba(124,58,237,0.3);">
@@ -2983,7 +1541,7 @@
           </div>
         </div>
 
-        <!-- TAB 6: OPERATOR STANDARD ERROR PAGES -->
+        <!-- TAB 6: OPERATOR ERROR PAGES -->
         <div id="op-tab-error" class="op-tab-content" style="display:none;">
           <div class="error-page-wrapper">
             <div class="error-card" style="border-color: rgba(124,58,237,0.3);">
@@ -3045,2005 +1603,44 @@
     <a id="dev-link-ops" class="dev-subdomain-link" href="http://ops.localhost:3333/telemetry">⚡ Ops</a>
   </div>
 
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
   <!-- ========================================================================
-       JAVASCRIPT: ENTERPRISE REACTIVE STATE MANAGEMENT ENGINE (ZUSTAND STORE)
+       MODULAR JAVASCRIPT ARCHITECTURE (ORDERED LOAD)
        ======================================================================== -->
-  <script>
-    /**
-     * ==========================================================================
-     * ⚡ SIDAYA ENTERPRISE STATE STORE & METADATA DICTIONARIES
-     * Unidirectional, Reactive, Persistent & Cross-Tab Synchronized
-     * ==========================================================================
-     */
-    const ROADMAP_METADATA = {
-      'laporan': {
-        icon: '📊',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Laporan Finansial & Laba Rugi Realtime',
-        desc: 'Visibilitas akurat terhadap laba kotor harian, marjin per kategori komoditas, dan rekonsiliasi arus kas grosir otomatis.',
-        features: [
-          { icon: '📈', title: 'Live Margin & Gross Profit', desc: 'Perhitungan profitabilitas realtime yang dihitung otomatis dari HPP / COGS batch FIFO.' },
-          { icon: '🏷️', title: 'Profit Analitik Per Kategori', desc: 'Identifikasi komoditas paling menguntungkan vs barang yang lambat berputar (slow-moving).' },
-          { icon: '📑', title: 'Export Rekonsiliasi & Pajak', desc: 'Ekspor laporan keuangan format Excel & PDF untuk pembukuan atau pelaporan SPT masa.' },
-          { icon: '⚖️', title: 'Arus Kas & Piutang Aging', desc: 'Rekapitulasi kas masuk tunai, QRIS, dan tagihan kasbon yang belum terlunasi.' }
-        ]
-      },
-      'multi-gudang': {
-        icon: '🏬',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Multi-Gudang & Transfer Cabang Terpadu',
-        desc: 'Kelola alokasi stok di berbagai titik gudang regional, hub distribusi, dan cabang toko dalam satu akun terpusat.',
-        features: [
-          { icon: '🚛', title: 'Inter-Branch Stock Transfer', desc: 'Buat surat perintah mutasi stok antar cabang lengkap dengan tracking status in-transit.' },
-          { icon: '📦', title: 'Bin Location Management', desc: 'Petakan tata letak gudang bertingkat: Zona -> Lorong -> Rak -> Bin untuk mempermudah picking.' },
-          { icon: '⚖️', title: 'Rebalancing Stok Otomatis', desc: 'Rekomendasi pemindahan stok saat satu cabang mengalami kelangkaan pasokan komoditas.' },
-          { icon: '🔍', title: 'Audit Opname Multi-Titik', desc: 'Lakukan stock opname serentak di berbagai lokasi gudang dengan scanner barcode handheld.' }
-        ]
-      },
-      'stock-opname': {
-        icon: '📋',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Stock Opname & Audit Fisik Berkala',
-        desc: 'Sistem audit fisik persediaan barang di rak gudang menggunakan scanner barcode genggam dengan approval penyesuaian otomatis.',
-        features: [
-          { icon: '📷', title: 'Handheld Barcode Audit', desc: 'Scan barcode rak dan palet secara beruntun untuk menghitung kuantitas fisik aktual tanpa kertas.' },
-          { icon: '⚖️', title: 'Komparasi Fisik vs Sistem', desc: 'Deteksi selisih (variance) kuantitas dan nilai rupiah secara instan sebelum melakukan penyesuaian.' },
-          { icon: '✍️', title: 'Approval Penyesuaian Bertingkat', desc: 'Setiap penyesuaian selisih stok bernilai besar memerlukan otorisasi PIN Pemilik / Manajer.' },
-          { icon: '📜', title: 'Rekam Jejak Opname Historis', desc: 'Log audit lengkap mencatat siapa yang melakukan opname, tanggal, dan alasan selisih.' }
-        ]
-      },
-      'barcode-print': {
-        icon: '🖨️',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Generator & Cetak Label Barcode Massal',
-        desc: 'Cetak stiker barcode EAN-13, Code 128, dan QR Code untuk ribuan SKU langsung ke printer thermal label stiker.',
-        features: [
-          { icon: '🏷️', title: 'Format Stiker Fleksibel', desc: 'Mendukung ukuran standar label komoditas: 33x15mm, 40x30mm, 50x20mm, dan 2-kolom / 3-kolom.' },
-          { icon: '📦', title: 'Cetak Otomatis dari PO Inbound', desc: '1-klik cetak label stiker sesuai kuantitas barang yang baru diterima di dermaga gudang.' },
-          { icon: '⚡', title: 'Batch Printing 10.000+ Label', desc: 'Proses render cepat tanpa jeda untuk penempelan barcode massal di gudang distributor.' },
-          { icon: '🔒', title: 'Integrasi SKU & Harga Modal', desc: 'Menyematkan kode barcode terenkripsi yang langsung dikenali scanner kasir POS.' }
-        ]
-      },
-      'suppliers': {
-        icon: '🏭',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Direktori Pemasok & Manajemen SRM',
-        desc: 'Database rekanan vendor, produsen komoditas, syarat pembayaran TOP (Term of Payment), dan histori pasokan.',
-        features: [
-          { icon: '🤝', title: 'Profil Vendor & Rekening', desc: 'Pencatatan bank transfer resmi, kontak sales force supplier, dan nomor rekening penerima.' },
-          { icon: '📅', title: 'Term of Payment (TOP 7-60 Hari)', desc: 'Pengaturan tempo pembayaran per pemasok dengan kalkulasi jatuh tempo otomatis pada setiap PO.' },
-          { icon: '📊', title: 'Vendor Scorecard & Kinerja', desc: 'Evaluasi ketepatan waktu pengiriman dan rasio barang retur/rusak per pemasok.' },
-          { icon: '📑', title: 'Buku Pembantu Hutang Vendor', desc: 'Rekapitulasi tagihan yang belum terbayar dan rencana pengeluaran kas dagang.' }
-        ]
-      },
-      'po': {
-        icon: '📝',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Surat Pesanan Pembelian (Purchase Order / PO)',
-        desc: 'Penerbitan PO resmi kepada supplier dengan alur persetujuan bertingkat dan integrasi penerimaan barang gudang.',
-        features: [
-          { icon: '📄', title: 'Format PO Resmi PDF/WA', desc: 'Generate dokumen PO lengkap dengan nomor referensi, spesifikasi satuan, dan klausul garansi.' },
-          { icon: '🚦', title: 'Tracking Status Siklus PO', desc: 'Pantau status pesanan: Draft -> Menunggu Approval -> Dikirim -> Diterima Sebagian -> Selesai.' },
-          { icon: '💰', title: 'Plafon Anggaran & Otorisasi', desc: 'PO bernilai di atas Rp 50.000.000 otomatis memicu permintaan approval ke smartphone Owner.' },
-          { icon: '🔗', title: 'Link Otomatis ke Inbound Dock', desc: 'Petugas gudang langsung memeriksa barang masuk berdasarkan nomor PO yang terbit.' }
-        ]
-      },
-      'rtv': {
-        icon: '↩️',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Retur Pembelian (Return to Vendor / RTV)',
-        desc: 'Alur pengembalian barang cacat, rusak, atau kadaluarsa ke supplier dengan penerbitan Nota Debet pemotong hutang.',
-        features: [
-          { icon: '📦', title: 'Klaim Garansi & Mutu', desc: 'Pencatatan alasan pengembalian (karung sobek, beras berkutu, kemasan bocor) disertai foto bukti.' },
-          { icon: '💳', title: 'Penerbitan Nota Debet Otomatis', desc: 'Sistem otomatis mengurangi saldo hutang dagang kepada supplier yang bersangkutan.' },
-          { icon: '🔄', title: 'Opsi Penggantian Barang', desc: 'Dukungan untuk alur retur ganti barang baru vs pemotongan tagihan faktur pembelian.' },
-          { icon: '📊', title: 'Laporan RTV & Kerugian', desc: 'Laporan rekapitulasi nilai barang retur per vendor untuk evaluasi kontrak pengadaan.' }
-        ]
-      },
-      'planning': {
-        icon: '📈',
-        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
-        title: 'Perencanaan Pengadaan & Reorder Min/Max',
-        desc: 'Kalkulasi kebutuhan restock cerdas berbasis kecepatan penjualan aktual dan waktu tunggu pengiriman supplier.',
-        features: [
-          { icon: '⚡', title: 'Dynamic Reorder Point', desc: 'Notifikasi otomatis saat stok mendekati batas aman (safety stock) berdasarkan lead-time.' },
-          { icon: '📦', title: 'Economic Order Quantity (EOQ)', desc: 'Rekomendasi jumlah pesanan paling efisien untuk menekan biaya simpan dan ongkos kirim.' },
-          { icon: '📉', title: 'Deteksi Slow-Moving Items', desc: 'Peringatan dini untuk tidak memesan komoditas yang mengalami penurunan tren beli.' },
-          { icon: '📅', title: 'Proyeksi Kalender Pengadaan', desc: 'Jadwal pemesanan rutin mingguan/bulanan yang terintegrasi dengan ketersediaan kas.' }
-        ]
-      },
-      'sales-returns': {
-        icon: '🔄',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Retur Penjualan (Sales Returns & Refund)',
-        desc: 'Pengelolaan pengembalian barang dari pelanggan grosir: restock ke lot FIFO, pengembalian tunai, atau potong saldo piutang.',
-        features: [
-          { icon: '🧾', title: 'Tautkan ke Nota Faktur Asli', desc: 'Pilih nomor faktur penjualan untuk memvalidasi harga beli dan kuantitas maksimal yang dapat diretur.' },
-          { icon: '📦', title: 'Restock Otomatis ke Lot FIFO', desc: 'Barang yang layak jual dikembalikan ke lot inventori aktif dengan kalkulasi HPP yang konsisten.' },
-          { icon: '💳', title: 'Penerbitan Credit Note', desc: 'Mengurangi sisa piutang kasbon pelanggan atau memproses pengembalian dana kas drawer.' },
-          { icon: '🔒', title: 'Otorisasi Khusus Retur', desc: 'Pencegahan fraud kasir dengan mewajibkan approval PIN manajer untuk transaksi retur.' }
-        ]
-      },
-      'shifts': {
-        icon: '💳',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Shift Kasir & Rekonsiliasi Kas Laporan X/Z',
-        desc: 'Manajemen pergantian kasir, pencatatan kas modal awal, setoran kas tengah shift, dan cetak Laporan Z penutupan kasir.',
-        features: [
-          { icon: '💵', title: 'Modal Kas Awal (Opening Float)', desc: 'Kasir mencatat uang receh modal kembalian sebelum register kasir dapat dibuka.' },
-          { icon: '💸', title: 'Mid-Shift Cash Drop', desc: 'Pengambilan uang tunai berlebih untuk diamankan ke brankas utama dengan tanda tangan kasir.' },
-          { icon: '📑', title: 'Cetak Laporan X & Z', desc: 'Laporan X (ringkasan sementara) dan Laporan Z (penutupan final dengan selisih kas fisik vs sistem).' },
-          { icon: '⏱️', title: 'Ganti Shift Kilat 3 Detik', desc: 'Pergantian kasir di satu tablet konter kasir cukup dengan input PIN 4-6 digit tanpa logout.' }
-        ]
-      },
-      'pricing': {
-        icon: '🏷️',
-        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
-        title: 'Skema Harga Dinamis & Promo Grosir',
-        desc: 'Konfigurasi tier grosir bertingkat, diskon kuantitas minimum, promo paket komoditas, dan komisi salesman.',
-        features: [
-          { icon: '🎯', title: 'Tier Harga Bertingkat', desc: 'Harga otomatis turun berdasarkan volume: Eceran (1-5), Grosir 1 (6-50), Grosir 2 (>50).' },
-          { icon: '🎁', title: 'Promo Beli X Gratis Y', desc: 'Aturan promo otomatis di kasir untuk bundling komoditas pelengkap (e.g. Beras + Minyak).' },
-          { icon: '👔', title: 'Komisi Penjualan Salesman', desc: 'Penghitungan otomatis komisi salesman lapangan berdasarkan margin kotor yang dihasilkan.' },
-          { icon: '⏰', title: 'Diskon Flash Sale Terjadwal', desc: 'Aktivasi potongan harga otomatis pada jam atau hari pasar tertentu.' }
-        ]
-      },
-      'tracking': {
-        icon: '📍',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Pelacakan Pengiriman & Proof of Delivery (POD)',
-        desc: 'Monitoring armada driver, status pengantaran realtime, tanda tangan digital penerima, dan upload foto serah terima barang.',
-        features: [
-          { icon: '🚚', title: 'Live Fleet Tracking', desc: 'Pantau posisi armada pengiriman barang (Dalam Perjalanan, Tiba di Lokasi, Selesai).' },
-          { icon: '✍️', title: 'Digital Signature POD', desc: 'Penerima menandatangani bukti terima langsung di layar smartphone driver.' },
-          { icon: '📸', title: 'Foto Bukti Serah Terima', desc: 'Kamera driver mengambil foto barang yang telah diturunkan di toko pelanggan.' },
-          { icon: '⚡', title: 'Update Otomatis ke Faktur', desc: 'Status faktur otomatis berubah menjadi TERKIRIM begitu driver menyelesaikan POD.' }
-        ]
-      },
-      'hutang': {
-        icon: '📉',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Buku Hutang Dagang Supplier & Jadwal Pelunasan',
-        desc: 'Pencatatan kewajiban pembayaran ke vendor, jadwal jatuh tempo, dan perencanaan pengeluaran kas dagang.',
-        features: [
-          { icon: '📅', title: 'Kalender Jatuh Tempo Hutang', desc: 'Tampilan kalender interaktif untuk memonitor tagihan supplier yang harus dilunasi minggu ini.' },
-          { icon: '💵', title: 'Pembayaran Parsial / Cicilan', desc: 'Mencatat pembayaran bertahap ke supplier dan memperbarui sisa pokok hutang secara akurat.' },
-          { icon: '⚠️', title: 'Peringatan Dini Penalti', desc: 'Notifikasi sebelum tanggal jatuh tempo untuk menghindari denda keterlambatan atau penghentian pasokan.' },
-          { icon: '📑', title: 'Rekonsiliasi Faktur Pembelian', desc: 'Pencocokan antara nota faktur supplier, bukti penerimaan gudang, dan mutasi kas.' }
-        ]
-      },
-      'cash-bank': {
-        icon: '🏦',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Kas & Rekening Bank Multi-Akun',
-        desc: 'Buku kas terpadu untuk Cash Drawer Kasir, Kas Kecil (Petty Cash), Rekening BCA, Mandiri, dan Settlement Payment Gateway.',
-        features: [
-          { icon: '💼', title: 'Multi-Account Balances', desc: 'Pantau posisi saldo kas fisik toko dan rekening giro bank bisnis secara terpisah dan realtime.' },
-          { icon: '🔄', title: 'Transfer & Mutasi Antar Akun', desc: 'Catat pemindahan dana dari kasir ke bank atau pengisian kas kecil operasional.' },
-          { icon: '📑', title: 'Pencatatan Biaya Operasional', desc: 'Kategorisasi pengeluaran rutin: listrik, bensin armada, gaji staf, dan konsumsi toko.' },
-          { icon: '⚖️', title: 'Rekonsiliasi Mutasi Bank', desc: 'Pencocokan mutasi m-banking dengan transaksi penjualan digital QRIS / Virtual Account.' }
-        ]
-      },
-      'forecast': {
-        icon: '📈',
-        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
-        title: 'Peramalan Arus Kas (Cash Flow Forecasting)',
-        desc: 'Proyeksi likuiditas keuangan 30-90 hari ke depan berdasarkan jadwal jatuh tempo piutang pelanggan vs hutang supplier.',
-        features: [
-          { icon: '🔮', title: 'Proyeksi Saldo 30-90 Hari', desc: 'Grafik perkiraan posisi kas masa depan untuk mengantisipasi potensi defisit likuiditas.' },
-          { icon: '⚖️', title: 'Simulasi Piutang vs Hutang', desc: 'Membandingkan estimasi penerimaan kasbon vs kewajiban pembayaran tagihan vendor.' },
-          { icon: '💡', title: 'Rekomendasi Waktu Belanja', desc: 'Saran waktu paling aman untuk melakukan pembelian grosir dalam jumlah besar.' },
-          { icon: '🚨', title: 'Peringatan Defisit Kas', desc: 'Peringatan dini jika jadwal pengeluaran kas melebihi estimasi penerimaan piutang.' }
-        ]
-      },
-      'assets': {
-        icon: '🏢',
-        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
-        title: 'Manajemen Aset Tetap & Depresiasi',
-        desc: 'Inventarisasi aset fisik operasional (armada mobil box, timbangan digital, komputer kasir, rak gudang) dengan penyusutan otomatis.',
-        features: [
-          { icon: '🚚', title: 'Daftar Aset & Nilai Perolehan', desc: 'Pencatatan tanggal beli, masa manfaat (tahun), nilai sisa, dan nomor identitas aset.' },
-          { icon: '📐', title: 'Penyusutan Garis Lurus Otomatis', desc: 'Perhitungan amortisasi bulanan otomatis yang langsung terhubung ke laporan neraca.' },
-          { icon: '🛠️', title: 'Riwayat Servis & Pemeliharaan', desc: 'Log perawatan berkala kendaraan armada dan penggantian onderdil mesin toko.' },
-          { icon: '📑', title: 'Laporan Nilai Buku Aset', desc: 'Rekapitulasi total aset tetap dan akumulasi penyusutan untuk pelaporan SPT tahunan.' }
-        ]
-      },
-      'approvals': {
-        icon: '⚡',
-        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
-        title: 'Mesin Alur Persetujuan (Approval Workflows)',
-        desc: 'Pengaturan otorisasi bertingkat untuk transaksi sensitif: PO bernilai besar, diskon khusus kasir, dan penghapusan nota transaksi.',
-        features: [
-          { icon: '⚙️', title: 'Aturan Ambang Batas (Threshold)', desc: 'Konfigurasi batas nilai: PO > Rp 50M, diskon kasir > 10%, atau void transaksi.' },
-          { icon: '📱', title: 'Push Notifikasi ke Smartphone Owner', desc: 'Owner menerima alert interaktif dengan 1-tap Setujui / Tolak dari mana saja.' },
-          { icon: '📜', title: 'Catatan Justifikasi & Audit Log', desc: 'Staf wajib mengisi alasan saat meminta approval diskon atau perubahan batas kredit.' },
-          { icon: '⏳', title: 'Batas Waktu Otorisasi', desc: 'Permintaan otomatis dibatalkan jika tidak disetujui dalam jangka waktu tertentu.' }
-        ]
-      },
-      'integrasi': {
-        icon: '🔌',
-        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
-        title: 'Integrasi Marketplace & Omnichannel',
-        desc: 'Hubungkan katalog dan stok grosir Anda langsung ke platform e-commerce terkemuka di Indonesia.',
-        features: [
-          { icon: '🛍️', title: 'Shopee & Tokopedia Sync', desc: 'Sinkronisasi stok dua arah secara instan saat terjadi penjualan di toko fisik maupun marketplace.' },
-          { icon: '🎵', title: 'TikTok Shop Connector', desc: 'Otomasi penerimaan pesanan live streaming dan sinkronisasi resi pengiriman logistik.' },
-          { icon: '📦', title: 'Unified Order Management', desc: 'Satu layar terpusat untuk memproses semua pesanan online dan offline tanpa gonta-ganti aplikasi.' },
-          { icon: '⚡', title: 'Proteksi Overselling', desc: 'Sistem otomatis mengunci alokasi stok fisik sehingga mencegah pembatalan pesanan akibat stok kosong.' }
-        ]
-      },
-      'ai-forecasting': {
-        icon: '🤖',
-        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
-        title: 'AI Demand Forecasting & Smart Reorder',
-        desc: 'Kecerdasan buatan Ashvin Intelligence yang memprediksi pola belanja komoditas musiman dan menyarankan restock otomatis.',
-        features: [
-          { icon: '🔮', title: 'Prediksi Permintaan Musiman', desc: 'Analisis lonjakan kebutuhan beras/minyak menjelang Ramadhan, Idul Fitri, dan Tahun Baru.' },
-          { icon: '📦', title: 'Rekomendasi Reorder Point', desc: 'Kalkulasi otomatis jumlah order optimal ke supplier sebelum persediaan gudang menipis.' },
-          { icon: '💰', title: 'Optimalisasi Modal Kerja', desc: 'Mencegah penumpukan modal mati pada barang yang perputarannya lambat (dead stock).' },
-          { icon: '📊', title: 'Deteksi Fluktuasi Harga Pasar', desc: 'Peringatan dini saat harga gabah atau minyak kelapa sawit nasional mengalami kenaikan.' }
-        ]
-      },
-      'pajak': {
-        icon: '🧾',
-        phase: 'PHASE 4 ROADMAP • TARGET Q2 2027',
-        title: 'Pajak & e-Faktur Otomatis DJP',
-        desc: 'Kepatuhan perpajakan Indonesia terotomasi untuk distributor berbadan hukum (PT/CV) dan Pengusaha Kena Pajak (PKP).',
-        features: [
-          { icon: '🏛️', title: 'Integrasi e-Faktur DJP', desc: 'Penerbitan faktur pajak elektronik otomatis langsung saat pesanan grosir diselesaikan kasir.' },
-          { icon: '📐', title: 'Kalkulasi PPN & PPh Otomatis', desc: 'Penghitungan tarif PPN 11% / 12% dan pemotongan PPh Pasal 22 komoditas secara presisi.' },
-          { icon: '📂', title: 'Ekspor CSV Skema DJP', desc: 'Format file ekspor siap impor ke aplikasi e-Faktur desktop DJP tanpa perlu entri manual.' },
-          { icon: '🔒', title: 'Arsip Faktur Terenkripsi', desc: 'Penyimpanan bukti pungut pajak digital yang aman dan dapat diaudit sewaktu-waktu.' }
-        ]
-      },
-      'billing': {
-        icon: '💳',
-        phase: 'PHASE 2 ROADMAP • TARGET Q4 2026',
-        title: 'Automated Billing & Dunning Engine',
-        desc: 'Mesin penagihan SaaS terpadu untuk mengelola siklus langganan tenant, diskon kupon, dan isolasi akun yang menunggak.',
-        features: [
-          { icon: '💳', title: 'Recurring Subscription Billing', desc: 'Otomasi invoice bulanan/tahunan untuk tier Starter, Grosir Pro, dan Enterprise.' },
-          { icon: '⏳', title: 'Grace Period & Auto-Dunning', desc: 'Email reminder bertahap dan toleransi pembayaran sebelum akses dibatasi sementara.' },
-          { icon: '🎟️', title: 'Promo & Voucher Management', desc: 'Penerbitan kode diskon dan kupon onboarding pedagang grosir anchor.' },
-          { icon: '📊', title: 'MRR & Churn Telemetry', desc: 'Metrik keuangan SaaS live: Monthly Recurring Revenue, Net Retention, dan ARPU.' }
-        ]
-      },
-      'infra': {
-        icon: '🗄️',
-        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
-        title: 'DB Sharding & Infrastructure Telemetry',
-        desc: 'Pemantauan partisi database PostgreSQL 17 tenant, koneksi pool pgbouncer, dan replikasi multi-region cluster.',
-        features: [
-          { icon: '⚡', title: 'Tenant Shard Allocation', desc: 'Pemisahan tenant volume tinggi ke cluster database dedicated secara otomatis.' },
-          { icon: '📈', title: 'Connection Pool Metrics', desc: 'Monitor throughput koneksi aktif, idle pool, dan eksekusi query latency p99.' },
-          { icon: '🔄', title: 'Automated Failover System', desc: 'Peralihan instan ke replika standby tanpa downtime jika terjadi degradasi node.' },
-          { icon: '💾', title: 'Point-in-Time Recovery (PITR)', desc: 'Backup incremental setiap 60 detik untuk pemulihan data bencana.' }
-        ]
-      },
-      'security': {
-        icon: '🛡️',
-        phase: 'PHASE 3 ROADMAP • TARGET Q1 2027',
-        title: 'Global Threat Detection & WAF Guard',
-        desc: 'Lapisan keamanan platform enterprise untuk memitigasi serangan DDoS, credential stuffing, dan anomali akses API.',
-        features: [
-          { icon: '🛑', title: 'Brute-Force Lockout', desc: 'Pemblokiran IP otomatis setelah 10 kali percobaan login gagal berturut-turut.' },
-          { icon: '🔒', title: 'WAF Rate-Limiting Policy', desc: 'Proteksi endpoint transaksi publik dengan batas 100 req/menit per client IP.' },
-          { icon: '📜', title: 'UU PDP Compliance Guard', desc: 'Deteksi otomatis terhadap query massal yang berpotensi melanggar privasi data pribadi.' },
-          { icon: '🚨', title: 'Instant Alerting Dispatch', desc: 'Notifikasi insiden keamanan berprioritas tinggi kepada tim security engineering.' }
-        ]
-      }
-    };
-
-    const ERROR_DEFINITIONS = {
-      '400': {
-        code: '400',
-        badgeClass: 'error-badge-400',
-        badgeText: '400 • BAD REQUEST',
-        badgeIcon: '⚠️',
-        title: 'Permintaan Tidak Valid (Bad Request)',
-        desc: 'Format data formulir atau parameter query yang dikirim tidak sesuai spesifikasi sistem SiDaya.',
-        codeClass: 'code-amber',
-        statusText: '400 Bad Request (Validation Failed)'
-      },
-      '401': {
-        code: '401',
-        badgeClass: 'error-badge-401',
-        badgeText: '401 • UNAUTHORIZED',
-        badgeIcon: '🔒',
-        title: 'Sesi Anda Telah Berakhir',
-        desc: 'Masa berlaku token otentikasi telah habis demi keamanan akun toko Anda. Silakan masuk kembali.',
-        codeClass: '',
-        statusText: '401 Unauthorized (JWT Token Expired)'
-      },
-      '403': {
-        code: '403',
-        badgeClass: 'error-badge-403',
-        badgeText: '403 • FORBIDDEN',
-        badgeIcon: '🚫',
-        title: 'Akses Dibatasi (Forbidden)',
-        desc: 'Peran (role) akun Anda tidak memiliki izin untuk membuka halaman ini. Hubungi pemilik toko untuk memperbarui hak akses Anda.',
-        codeClass: 'code-danger',
-        statusText: '403 Forbidden (RBAC Capability Missing)'
-      },
-      '404': {
-        code: '404',
-        badgeClass: 'error-badge-404',
-        badgeText: '404 • NOT FOUND',
-        badgeIcon: '🔍',
-        title: 'Halaman Tidak Ditemukan',
-        desc: 'Tautan URL yang Anda tuju salah ketik, telah dihapus, atau sedang dipindahkan ke alamat baru.',
-        codeClass: '',
-        statusText: '404 Not Found (Route Unmatched)'
-      },
-      '429': {
-        code: '429',
-        badgeClass: 'error-badge-429',
-        badgeText: '429 • TOO MANY REQUESTS',
-        badgeIcon: '⏳',
-        title: 'Batas Permintaan Terlampaui',
-        desc: 'Sistem mendeteksi terlalu banyak klik atau permintaan data dalam waktu singkat. Harap tunggu beberapa saat sebelum mencoba kembali.',
-        codeClass: 'code-amber',
-        statusText: '429 Too Many Requests (Rate Limit Enforced)'
-      },
-      '500': {
-        code: '500',
-        badgeClass: 'error-badge-500',
-        badgeText: '500 • INTERNAL SERVER ERROR',
-        badgeIcon: '💥',
-        title: 'Terjadi Gangguan Server Tak Terduga',
-        desc: 'Terjadi kesalahan sistem internal pada klaster server SiDaya. Log insiden telah dicatat otomatis untuk diinvestigasi oleh teknisi kami.',
-        codeClass: 'code-danger',
-        statusText: '500 Internal Server Error (Unhandled Exception)'
-      },
-      '503': {
-        code: '503',
-        badgeClass: 'error-badge-503',
-        badgeText: '503 • SERVICE UNAVAILABLE',
-        badgeIcon: '🛠️',
-        title: 'Sistem Dalam Pemeliharaan Terjadwal',
-        desc: 'Kami sedang melakukan peningkatan performa infrastruktur server SiDaya. Layanan akan kembali normal dalam beberapa menit.',
-        codeClass: '',
-        statusText: '503 Service Unavailable (Maintenance Window)'
-      }
-    };
-
-    const MERCHANT_PRESETS = {
-      'budi@berasjaya.com': { name: 'Budi Santoso', role: '👑 OWNER', avatar: 'B', tenant: 'Toko Grosir Beras Jaya Bersama' },
-      'siti@berasjaya.com': { name: 'Siti Rahma', role: '💳 KASIR (POS)', avatar: 'S', tenant: 'Toko Grosir Beras Jaya Bersama' },
-      'agus@berasjaya.com': { name: 'Agus Santoso', role: '📦 GUDANG (FIFO)', avatar: 'A', tenant: 'Toko Grosir Beras Jaya Bersama' },
-      'joko@berasjaya.com': { name: 'Joko Supir', role: '🚚 DRIVER', avatar: 'J', tenant: 'Toko Grosir Beras Jaya Bersama' },
-    };
-
-    const OPERATOR_PRESETS = {
-      'gabriel@ashvinlabs.com': { name: 'Gabriel (CEO)', role: 'SUPER_ADMIN', badgeClass: 'role-super-admin' },
-      'alex@ashvinlabs.com': { name: 'Alex (Lead Developer)', role: 'DEV_ENGINEER', badgeClass: 'role-dev-engineer' },
-      'dina@ashvinlabs.com': { name: 'Dina (Customer Ops)', role: 'OPS_SUPPORT', badgeClass: 'role-ops-support' },
-    };
-
-    const INITIAL_DEFAULT_STATE = {
-      version: 3,
-      ui: {
-        theme: 'light',
-        portalMode: 'MERCHANT',
-        activePath: 'dashboard',
-        sidebarOpen: false,
-        activeModal: null,
-      },
-      auth: {
-        merchantUser: {
-          email: 'budi@berasjaya.com',
-          name: 'Budi Santoso',
-          role: '👑 OWNER',
-          avatar: 'B',
-          tenant: 'Toko Grosir Beras Jaya Bersama'
-        },
-        operatorUser: {
-          email: 'gabriel@ashvinlabs.com',
-          name: 'Gabriel (CEO)',
-          role: 'SUPER_ADMIN',
-          badgeClass: 'role-super-admin'
-        }
-      },
-      catalog: [
-        { sku: 'RJL-50KG', barcode: '8991001001011', name: 'Beras Rojolele 50KG', category: 'Beras', unit: 'Karung', costPrice: 560000, price: 617500, icon: '🌾' },
-        { sku: 'MGO-2L', barcode: '8992002002022', name: 'Minyak Goreng 2L', category: 'Minyak', unit: 'Pouch', costPrice: 82000, price: 91500, icon: '🌻' },
-        { sku: 'GUL-1KG', barcode: '8993003003033', name: 'Gula Pasir Kristal 1KG', category: 'Gula', unit: 'Bungkus', costPrice: 16200, price: 18500, icon: '🍚' },
-        { sku: 'TRG-25KG', barcode: '8994004004044', name: 'Tepung Terigu Segitiga 25KG', category: 'Tepung', unit: 'Sak', costPrice: 215000, price: 235000, icon: '🍞' }
-      ],
-      inventoryLots: [
-        { id: 'LOT-RJL-2026-0828', sku: 'RJL-50KG', qtyInitial: 40, qtyRemaining: 40, unitCost: 560000, receivedDate: '28 Agu 2026', supplier: 'PT Lumbung Padi Soloraya', isOldest: true },
-        { id: 'LOT-RJL-2026-0906', sku: 'RJL-50KG', qtyInitial: 100, qtyRemaining: 100, unitCost: 575000, receivedDate: '06 Sep 2026', supplier: 'Koperasi Tani Makmur', isOldest: false },
-        { id: 'LOT-MGO-2026-0830', sku: 'MGO-2L', qtyInitial: 360, qtyRemaining: 360, unitCost: 82000, receivedDate: '30 Agu 2026', supplier: 'PT Wilmar Agro', isOldest: true },
-        { id: 'LOT-GUL-2026-0901', sku: 'GUL-1KG', qtyInitial: 250, qtyRemaining: 250, unitCost: 16200, receivedDate: '01 Sep 2026', supplier: 'PG Madukismo', isOldest: true },
-        { id: 'LOT-TRG-2026-0902', sku: 'TRG-25KG', qtyInitial: 80, qtyRemaining: 80, unitCost: 215000, receivedDate: '02 Sep 2026', supplier: 'PT Bogasari Flour Mills', isOldest: true }
-      ],
-      cart: [
-        { sku: 'RJL-50KG', name: 'Beras Rojolele 50KG', unitPrice: 617500, qty: 20, subtotal: 12350000 }
-      ],
-      sales: [
-        {
-          id: 'INV-20260908-001',
-          createdAt: '08 Sep 2026 14:30',
-          customer: 'Pak Haji Rahmat',
-          totalAmount: 12350000,
-          paymentMethod: 'TUNAI',
-          status: 'SELESAI',
-          items: [{ sku: 'RJL-50KG', name: 'Beras Rojolele 50KG', qty: 20, unitPrice: 617500 }],
-          allocations: [{ lotId: 'LOT-RJL-2026-0828', qty: 20 }]
-        }
-      ],
-      suratJalan: [
-        {
-          id: 'SJ-20260908-0129',
-          invoiceId: 'INV-20260908-001',
-          driverName: 'Joko Supir',
-          recipientName: 'Pak Haji Rahmat (0812-9876-5432)',
-          address: 'Jl. Raya Bogor KM 22, Kramat Jati, Jakarta Timur',
-          items: '20 Karung Beras Rojolele 50KG',
-          status: 'SIAP_DIKIRIM',
-          createdAt: '08 Sep 2026 14:35'
-        }
-      ],
-      piutang: [
-        { id: 'PIU-01', invoiceId: 'INV-20260908-001', customer: 'Toko Berkah Abadi', phone: '081298765432', totalAmount: 12350000, remainingAmount: 7350000, dueDate: '15 Sep 2026', status: 'BELUM_LUNAS' },
-        { id: 'PIU-02', invoiceId: 'INV-20260906-089', customer: 'Warung Bu Siti', phone: '081388776655', totalAmount: 4575000, remainingAmount: 4575000, dueDate: '10 Sep 2026', status: 'JATUH_TEMPO' }
-      ],
-      customers: [
-        { id: 'CUST-001', name: 'Pak Haji Rahmat', storeName: 'Toko Barokah Jaya', phone: '081298765432', address: 'Pasar Kramat Jati Blok C-12, Jakarta Timur', creditLimit: 25000000, currentDebt: 0, totalOrders: 14, totalSpend: 142500000, tier: 'PRIME_WHOLESALE', status: 'ACTIVE' },
-        { id: 'CUST-002', name: 'Ibu Hj. Siti Aminah', storeName: 'Warung Berkah Sembako', phone: '081388776655', address: 'Jl. Raya Pasar Minggu No. 45, Jakarta Selatan', creditLimit: 10000000, currentDebt: 4575000, totalOrders: 8, totalSpend: 68200000, tier: 'GROSIR_REGULER', status: 'ACTIVE' },
-        { id: 'CUST-003', name: 'Pak Joni Pranata', storeName: 'Toko Sinar Terang', phone: '081288990011', address: 'Pasar Jatinegara Lantai Dasar No. 18, Jakarta Timur', creditLimit: 15000000, currentDebt: 7350000, totalOrders: 11, totalSpend: 95800000, tier: 'GROSIR_REGULER', status: 'ACTIVE' },
-        { id: 'CUST-004', name: 'Pak Dedi Mulyadi', storeName: 'Warung Kelontong Rejeki', phone: '081122334455', address: 'Jl. Lapangan Tembak No. 9, Cibubur', creditLimit: 5000000, currentDebt: 0, totalOrders: 5, totalSpend: 31400000, tier: 'WARUNG_CASH', status: 'ACTIVE' }
-      ],
-      staff: [
-        { name: 'Budi Santoso', email: 'budi@berasjaya.com', phone: '081234567890', role: '👑 Owner / Billing POC', status: 'VERIFIED', pinConfigured: true },
-        { name: 'Siti Rahma', email: 'siti@berasjaya.com', phone: '081288881111', role: '💳 Kasir Grosir (POS)', status: 'VERIFIED', pinConfigured: true },
-        { name: 'Agus Santoso', email: 'agus@berasjaya.com', phone: '081288882222', role: '📦 Gudang & FIFO', status: 'VERIFIED', pinConfigured: true },
-        { name: 'Joko Supir', email: 'joko@berasjaya.com', phone: '081288883333', role: '🚚 Driver Logistik', status: 'VERIFIED', pinConfigured: false }
-      ],
-      rolePermissions: {
-        OWNER: ['all'],
-        KASIR: ['pos:checkout', 'pos:apply_discount', 'shifts:operate', 'shifts:close_z'],
-        GUDANG: ['inventory:inbound_receive', 'inventory:adjust', 'inventory:opname', 'logistics:dispatch'],
-        DRIVER: ['logistics:dispatch', 'logistics:sign_pod']
-      },
-      operator: {
-        isPiiMasked: true,
-        tenants: [
-          { name: 'Toko Grosir Beras Jaya', subdomain: 'berasjaya', rawOwner: 'Budi Santoso (+6281234567890)', maskedOwner: 'B*** S*** (+6281****7890)', tier: 'GROSIR_PRO', status: 'ACTIVE', gmv: 428500000 },
-          { name: 'CV Sembako Nusantara', subdomain: 'sembakonusantara', rawOwner: 'Hendro Wijaya (+6281398765432)', maskedOwner: 'H*** W*** (+6281****5432)', tier: 'STARTER_FREE', status: 'ACTIVE', gmv: 184200000 }
-        ],
-        operators: [
-          { name: 'Gabriel (CEO)', email: 'gabriel@ashvinlabs.com', role: 'SUPER_ADMIN', status: 'ACTIVE' },
-          { name: 'Alex (Lead Developer)', email: 'alex@ashvinlabs.com', role: 'DEV_ENGINEER', status: 'ACTIVE' },
-          { name: 'Dina (Customer Ops)', email: 'dina@ashvinlabs.com', role: 'OPS_SUPPORT', status: 'ACTIVE' }
-        ],
-        auditLogs: [
-          { id: 1, action: 'PLATFORM_INITIALIZATION', actor: 'gabriel@ashvinlabs.com', details: 'Operator initialized multi-tenant clusters', time: '08 Sep 2026 09:00' },
-          { id: 2, action: 'TENANT_SUBSCRIPTION_UPDATE', actor: 'gabriel@ashvinlabs.com', details: 'Tenant berasjaya upgraded to GROSIR_PRO', time: '08 Sep 2026 10:15' },
-          { id: 3, action: 'OPERATOR_INVITED', actor: 'gabriel@ashvinlabs.com', details: 'Invited maya@ashvinlabs.com (AUDIT_COMPLIANCE)', time: '09 Sep 2026 08:30' }
-        ]
-      }
-    };
-
-    class SiDayaStateStore {
-      constructor() {
-        this.subscribers = new Set();
-        this.state = this.loadState();
-      }
-
-      getInitialPortalMode() {
-        const hostname = window.location.hostname.toLowerCase();
-        const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-        if (hostname.startsWith('ops.') || path.startsWith('ops') || path === 'telemetry' || path === 'fleet' || path === 'operators' || path === 'audit') {
-          return 'OPS';
-        }
-        return 'MERCHANT';
-      }
-
-      getInitialPath(portalMode) {
-        const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-        if (path && path !== '') return path;
-        return portalMode === 'OPS' ? 'telemetry' : 'dashboard';
-      }
-
-      loadState() {
-        const portalMode = this.getInitialPortalMode();
-        const activePath = this.getInitialPath(portalMode);
-        
-        let stored = null;
-        try {
-          const raw = localStorage.getItem('sidaya_store_v3');
-          if (raw) stored = JSON.parse(raw);
-        } catch (e) {}
-
-        const merged = stored && stored.version === 3 ? stored : JSON.parse(JSON.stringify(INITIAL_DEFAULT_STATE));
-
-        merged.ui.portalMode = portalMode;
-        merged.ui.activePath = activePath;
-        merged.ui.theme = localStorage.getItem('sidaya_theme') || merged.ui.theme || 'light';
-        merged.ui.sidebarOpen = false;
-        merged.ui.activeModal = null;
-
-        return merged;
-      }
-
-      saveState() {
-        try {
-          localStorage.setItem('sidaya_store_v3', JSON.stringify(this.state));
-          localStorage.setItem('sidaya_theme', this.state.ui.theme);
-          if (this.state.auth.merchantUser) {
-            localStorage.setItem('sidaya_merchant_session', JSON.stringify(this.state.auth.merchantUser));
-          } else {
-            localStorage.removeItem('sidaya_merchant_session');
-          }
-          if (this.state.auth.operatorUser) {
-            localStorage.setItem('sidaya_operator_session', JSON.stringify(this.state.auth.operatorUser));
-          } else {
-            localStorage.removeItem('sidaya_operator_session');
-          }
-        } catch (e) {}
-      }
-
-      getState() {
-        return this.state;
-      }
-
-      subscribe(fn) {
-        this.subscribers.add(fn);
-        return () => this.subscribers.delete(fn);
-      }
-
-      notify() {
-        this.saveState();
-        this.subscribers.forEach(sub => sub(this.state));
-      }
-
-      dispatch(action, payload) {
-        switch (action) {
-          case 'NAVIGATE': {
-            const raw = (payload || '').replace(/^\/+|\/+$/g, '').toLowerCase();
-            this.state.ui.activePath = raw || (this.state.ui.portalMode === 'OPS' ? 'telemetry' : 'dashboard');
-            this.state.ui.sidebarOpen = false;
-            break;
-          }
-          case 'TOGGLE_THEME': {
-            this.state.ui.theme = this.state.ui.theme === 'light' ? 'dark' : 'light';
-            break;
-          }
-          case 'TOGGLE_SIDEBAR': {
-            this.state.ui.sidebarOpen = !this.state.ui.sidebarOpen;
-            break;
-          }
-          case 'CLOSE_SIDEBAR': {
-            this.state.ui.sidebarOpen = false;
-            break;
-          }
-          case 'OPEN_MODAL': {
-            this.state.ui.activeModal = payload;
-            break;
-          }
-          case 'CLOSE_MODAL': {
-            this.state.ui.activeModal = null;
-            break;
-          }
-          case 'LOGIN_MERCHANT': {
-            this.state.auth.merchantUser = payload;
-            this.state.ui.activePath = 'dashboard';
-            showToast(`Selamat datang, ${payload.name}!`, 'success');
-            break;
-          }
-          case 'LOGIN_OPERATOR': {
-            this.state.auth.operatorUser = payload;
-            this.state.ui.activePath = 'telemetry';
-            showToast(`Operator ${payload.name} terautentikasi.`, 'success');
-            break;
-          }
-          case 'LOGOUT': {
-            if (this.state.ui.portalMode === 'OPS') {
-              this.state.auth.operatorUser = null;
-            } else {
-              this.state.auth.merchantUser = null;
-            }
-            this.state.ui.activePath = 'login';
-            this.state.ui.sidebarOpen = false;
-            showToast('Anda telah keluar.', 'info');
-            break;
-          }
-          
-          /* POS & Barcode Actions */
-          case 'POS_ADD_TO_CART': {
-            const product = payload;
-            const existing = this.state.cart.find(c => c.sku === product.sku);
-            if (existing) {
-              existing.qty += 1;
-              existing.subtotal = existing.qty * existing.unitPrice;
-            } else {
-              this.state.cart.push({
-                sku: product.sku,
-                name: product.name,
-                unitPrice: product.price,
-                qty: 1,
-                subtotal: product.price
-              });
-            }
-            showToast(`🛒 Ditambahkan: ${product.name}`, 'info');
-            break;
-          }
-          case 'POS_SCAN_BARCODE': {
-            const query = (payload || '').trim().toLowerCase();
-            const product = this.state.catalog.find(c => c.barcode === query || c.sku.toLowerCase() === query || c.name.toLowerCase().includes(query));
-            if (product) {
-              this.dispatch('POS_ADD_TO_CART', product);
-              showToast(`⚡ Barcode Ditemukan: ${product.name}`, 'success');
-            } else {
-              showToast(`❌ Barcode ${query} tidak ditemukan dalam katalog!`, 'error');
-            }
-            break;
-          }
-          case 'POS_UPDATE_QTY': {
-            const { sku, delta } = payload;
-            const idx = this.state.cart.findIndex(c => c.sku === sku);
-            if (idx !== -1) {
-              this.state.cart[idx].qty += delta;
-              if (this.state.cart[idx].qty <= 0) {
-                this.state.cart.splice(idx, 1);
-              } else {
-                this.state.cart[idx].subtotal = this.state.cart[idx].qty * this.state.cart[idx].unitPrice;
-              }
-            }
-            break;
-          }
-          case 'POS_CLEAR_CART': {
-            this.state.cart = [];
-            showToast('Keranjang dikosongkan.', 'info');
-            break;
-          }
-          case 'POS_CHECKOUT': {
-            if (this.state.cart.length === 0) {
-              showToast('Keranjang kasir masih kosong!', 'error');
-              return;
-            }
-            const paymentMethod = payload;
-            const grandTotal = this.state.cart.reduce((sum, item) => sum + item.subtotal, 0);
-            const invId = 'INV-' + new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(100 + Math.random() * 900);
-
-            // FIFO Automatic Inventory Lot Deduction
-            const allocations = [];
-            this.state.cart.forEach(cartItem => {
-              let qtyNeeded = cartItem.qty;
-              const matchingLots = this.state.inventoryLots
-                .filter(l => l.sku === cartItem.sku && l.qtyRemaining > 0)
-                .sort((a, b) => new Date(a.receivedDate) - new Date(b.receivedDate));
-
-              for (const lot of matchingLots) {
-                if (qtyNeeded <= 0) break;
-                const deduct = Math.min(lot.qtyRemaining, qtyNeeded);
-                lot.qtyRemaining -= deduct;
-                qtyNeeded -= deduct;
-                allocations.push({
-                  sku: cartItem.sku,
-                  productName: cartItem.name,
-                  lotId: lot.id,
-                  qtyDeducted: deduct,
-                  qtyRemaining: lot.qtyRemaining
-                });
-              }
-            });
-
-            // Add to sales
-            this.state.sales.unshift({
-              id: invId,
-              createdAt: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-              customer: 'Pelanggan Grosir Tunai',
-              totalAmount: grandTotal,
-              paymentMethod,
-              status: 'SELESAI',
-              items: [...this.state.cart],
-              allocations
-            });
-
-            // Create Surat Jalan
-            const sjId = 'SJ-' + invId.replace('INV-', '');
-            this.state.suratJalan.unshift({
-              id: sjId,
-              invoiceId: invId,
-              driverName: 'Joko Supir',
-              recipientName: 'Pelanggan Grosir (' + invId + ')',
-              address: 'Ambil di Toko / Armada Pengiriman',
-              items: this.state.cart.map(i => `${i.qty} ${i.name}`).join(', '),
-              status: 'SIAP_DIKIRIM',
-              createdAt: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
-            });
-
-            // Clear Cart
-            this.state.cart = [];
-            this.state.ui.activeModal = 'receipt';
-
-            renderReceiptModal(invId, grandTotal, paymentMethod, allocations);
-            showToast(`🎉 Pembayaran ${paymentMethod} berhasil! Faktur: ${invId}`, 'success');
-            break;
-          }
-
-          /* Catalog & Inbound Actions */
-          case 'KATALOG_ADD_PRODUCT': {
-            this.state.catalog.push(payload);
-            showToast(`Produk ${payload.name} terdaftar di katalog.`, 'success');
-            break;
-          }
-          case 'FIFO_ADD_INBOUND_LOT': {
-            const lotId = `LOT-${payload.sku}-${new Date().toISOString().slice(0,10).replace(/-/g,'')}`;
-            this.state.inventoryLots.unshift({
-              id: lotId,
-              sku: payload.sku,
-              qtyInitial: payload.qty,
-              qtyRemaining: payload.qty,
-              unitCost: payload.unitCost,
-              receivedDate: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }),
-              supplier: payload.supplier,
-              isOldest: false
-            });
-            showToast(`📦 Lot ${lotId} berhasil dicatat ke gudang!`, 'success');
-            break;
-          }
-          case 'SJ_UPDATE_STATUS': {
-            const { sjId, status } = payload;
-            const sj = this.state.suratJalan.find(s => s.id === sjId);
-            if (sj) {
-              sj.status = status;
-              showToast(`Surat Jalan ${sjId} diperbarui: ${status}`, 'success');
-            }
-            break;
-          }
-
-          /* Operator Actions */
-          case 'OPS_TOGGLE_PII_MASK': {
-            this.state.operator.isPiiMasked = !this.state.operator.isPiiMasked;
-            showToast(this.state.operator.isPiiMasked ? '🛡️ Sensor PII UU PDP Aktif' : '🔓 Mode Break-Glass Terbuka', 'info');
-            break;
-          }
-          case 'OPS_INVITE_OPERATOR': {
-            this.state.operator.operators.push({
-              name: payload.fullName,
-              email: payload.email,
-              role: payload.role,
-              status: 'ACTIVE'
-            });
-            showToast(`Operator ${payload.fullName} berhasil diundang!`, 'success');
-            break;
-          }
-
-          /* CRM & Staff Actions */
-          case 'CUSTOMER_ADD': {
-            const custId = 'CUST-' + String(this.state.customers.length + 1).padStart(3, '0');
-            this.state.customers.unshift({
-              id: custId,
-              name: payload.name,
-              storeName: payload.storeName,
-              phone: payload.phone,
-              address: payload.address,
-              creditLimit: payload.creditLimit,
-              currentDebt: 0,
-              totalOrders: 0,
-              totalSpend: 0,
-              tier: payload.tier || 'GROSIR_REGULER',
-              status: 'ACTIVE'
-            });
-            showToast(`👥 Pelanggan ${payload.storeName} (${payload.name}) berhasil didaftarkan!`, 'success');
-            break;
-          }
-          case 'STAFF_INVITE': {
-            this.state.staff.push({
-              name: payload.name,
-              email: payload.email,
-              phone: payload.phone,
-              role: payload.role,
-              status: 'VERIFIED',
-              pinConfigured: false
-            });
-            showToast(`✉️ Undangan staf dikirim ke ${payload.email}`, 'success');
-            break;
-          }
-          case 'STAFF_RESET_PIN': {
-            const st = this.state.staff.find(s => s.email === payload.email);
-            if (st) {
-              st.pinConfigured = true;
-              showToast(`🔑 PIN cepat staf ${st.name} berhasil diatur ulang (HMAC timing-safe).`, 'success');
-            }
-            break;
-          }
-          case 'ROLE_MATRIX_SAVE': {
-            this.state.rolePermissions = payload;
-            showToast('🛡️ Matriks otoritas RBAC berhasil disimpan ke workspace!', 'success');
-            break;
-          }
-        }
-
-        this.notify();
-      }
-    }
-
-    // Global Store Singleton
-    const store = new SiDayaStateStore();
-
-    /**
-     * ==========================================================================
-     * 🖥️ DETERMINISTIC UI RENDERER (Active Modules, Roadmap & Standard Errors)
-     * ==========================================================================
-     */
-    function renderUI(state) {
-      // 1. Theme
-      document.documentElement.setAttribute('data-theme', state.ui.theme);
-      const iconMerchant = document.getElementById('theme-icon');
-      const iconOps = document.getElementById('theme-icon-op');
-      if (iconMerchant) iconMerchant.textContent = state.ui.theme === 'light' ? '☀️' : '🌙';
-      if (iconOps) iconOps.textContent = state.ui.theme === 'light' ? '☀️' : '🌙';
-
-      // 2. Dev Subdomain Links
-      const linkMerchant = document.getElementById('dev-link-merchant');
-      const linkOps = document.getElementById('dev-link-ops');
-      if (linkMerchant) linkMerchant.classList.toggle('active', state.ui.portalMode === 'MERCHANT');
-      if (linkOps) linkOps.classList.toggle('active', state.ui.portalMode === 'OPS');
-
-      // 3. Mobile Drawer
-      const backdrop = document.getElementById('sidebar-backdrop');
-      const sidebars = document.querySelectorAll('.sidebar');
-      if (backdrop) backdrop.classList.toggle('active', state.ui.sidebarOpen);
-      sidebars.forEach(s => s.classList.toggle('open', state.ui.sidebarOpen));
-
-      // 4. Modals
-      const modalMap = {
-        'owner-reg': 'modal-owner-reg',
-        'forgot-pwd': 'modal-forgot-password',
-        'invite-operator': 'modal-invite-operator',
-        'invite-staff': 'modal-invite-staff',
-        'inbound-lot': 'modal-inbound-lot',
-        'add-product': 'modal-add-product',
-        'add-customer': 'modal-add-customer',
-        'receipt': 'modal-receipt'
-      };
-      Object.entries(modalMap).forEach(([key, elementId]) => {
-        const el = document.getElementById(elementId);
-        if (el) {
-          if (state.ui.activeModal === key) {
-            el.classList.remove('hidden');
-          } else {
-            el.classList.add('hidden');
-          }
-        }
-      });
-
-      const currentPath = (state.ui.activePath || '').toLowerCase();
-      const isErrorRoute = ['400', '401', '403', '404', '429', '500', '503'].includes(currentPath) || currentPath.startsWith('error/');
-      const errorCode = isErrorRoute ? (currentPath.replace('error/', '') || '404') : null;
-      const isRoadmapRoute = !!ROADMAP_METADATA[currentPath] || !!ROADMAP_METADATA[currentPath.replace('ops/', '')];
-      const roadmapKey = currentPath.replace('ops/', '');
-
-      // 5. Portal & Route Rendering
-      if (state.ui.portalMode === 'OPS') {
-        const isAuth = !!state.auth.operatorUser;
-        document.documentElement.className = isAuth ? 'state-auth-ops' : 'state-unauth-ops';
-
-        if (!isAuth) {
-          if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
-            history.replaceState(null, '', '/login');
-          }
-          return;
-        }
-
-        const opUser = state.auth.operatorUser;
-        const opBadge = document.getElementById('op-sidebar-badge');
-        const opName = document.getElementById('op-sidebar-name');
-        if (opBadge) {
-          opBadge.textContent = opUser.role || 'SUPER_ADMIN';
-          opBadge.className = 'operator-role-badge ' + (opUser.badgeClass || 'role-super-admin');
-        }
-        if (opName) opName.textContent = opUser.name || opUser.email;
-
-        document.querySelectorAll('.op-tab-content').forEach(c => c.style.display = 'none');
-        document.querySelectorAll('#operator-shell .nav-item').forEach(b => b.classList.remove('active'));
-
-        if (isErrorRoute) {
-          const targetTabEl = document.getElementById('op-tab-error');
-          if (targetTabEl) targetTabEl.style.display = 'block';
-          renderErrorPage(errorCode || '404', true, currentPath);
-          document.getElementById('op-header-title').textContent = `⚠️ Status Error ${errorCode || '404'}`;
-          document.getElementById('op-header-sub').textContent = 'Diagnostik kegagalan akses platform.';
-        } else if (isRoadmapRoute) {
-          const targetTabEl = document.getElementById('op-tab-coming-soon');
-          const targetNavEl = document.getElementById(`nav-op-${roadmapKey}`);
-          if (targetTabEl) targetTabEl.style.display = 'block';
-          if (targetNavEl) targetNavEl.classList.add('active');
-          renderComingSoonModule(roadmapKey, true);
-        } else {
-          const validTabs = ['telemetry', 'fleet', 'operators', 'audit'];
-          let activeTab = validTabs.includes(currentPath) ? currentPath : null;
-
-          if (!activeTab) {
-            // Unmatched route -> Render 404
-            const targetTabEl = document.getElementById('op-tab-error');
-            if (targetTabEl) targetTabEl.style.display = 'block';
-            renderErrorPage('404', true, currentPath);
-            document.getElementById('op-header-title').textContent = '🔍 404 • Resource Not Found';
-            document.getElementById('op-header-sub').textContent = 'Endpoint kontrol plane tidak ditemukan.';
-          } else {
-            const targetTabEl = document.getElementById(`op-tab-${activeTab}`);
-            const targetNavEl = document.getElementById(`nav-op-${activeTab}`);
-            if (targetTabEl) targetTabEl.style.display = 'block';
-            if (targetNavEl) targetNavEl.classList.add('active');
-
-            const tabTitles = {
-              telemetry: { title: '🌐 Platform Telemetry & Metrics', sub: 'Pemantauan performa cluster & database live.' },
-              fleet: { title: '🏢 Tenant Fleet Directory', sub: 'Daftar semua penyewa, langganan tier, & sensor PDP.' },
-              operators: { title: '⚡ Manajemen Tim Operator', sub: 'Undang dan kelola operator sistem Ashvin Labs.' },
-              audit: { title: '📜 Operator Audit Trail', sub: 'Log aktivitas operator yang tidak dapat diubah (immutable).' }
-            };
-            if (tabTitles[activeTab]) {
-              document.getElementById('op-header-title').textContent = tabTitles[activeTab].title;
-              document.getElementById('op-header-sub').textContent = tabTitles[activeTab].sub;
-            }
-
-            renderTenantFleetTable(state.operator.tenants, state.operator.isPiiMasked);
-            renderOperatorListTable(state.operator.operators);
-            renderAuditLogsList(state.operator.auditLogs);
-          }
-        }
-
-        if (window.location.pathname !== '/' + currentPath) {
-          history.replaceState(null, '', '/' + currentPath);
-        }
-
-      } else {
-        // Merchant Portal Mode
-        const isAuth = !!state.auth.merchantUser;
-        document.documentElement.className = isAuth ? 'state-auth-merchant' : 'state-unauth-merchant';
-
-        if (!isAuth) {
-          if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
-            history.replaceState(null, '', '/login');
-          }
-          return;
-        }
-
-        const mUser = state.auth.merchantUser;
-        const avatarEl = document.getElementById('sidebar-user-avatar');
-        const nameEl = document.getElementById('sidebar-user-name');
-        const roleEl = document.getElementById('sidebar-user-role');
-        const tenantEl = document.getElementById('sidebar-tenant-name');
-
-        if (avatarEl) avatarEl.textContent = mUser.avatar || mUser.name?.charAt(0) || 'U';
-        if (nameEl) nameEl.textContent = mUser.name || mUser.email;
-        if (roleEl) roleEl.textContent = mUser.role || 'MEMBER';
-        if (tenantEl && mUser.tenant) tenantEl.textContent = mUser.tenant;
-
-        document.querySelectorAll('.module-view').forEach(m => m.classList.remove('active'));
-        document.querySelectorAll('.sidebar-nav .nav-item').forEach(b => b.classList.remove('active'));
-
-        if (isErrorRoute) {
-          document.getElementById('module-error')?.classList.add('active');
-          renderErrorPage(errorCode || '404', false, currentPath);
-          document.getElementById('page-heading').textContent = `⚠️ Status Error ${errorCode || '404'}`;
-          document.getElementById('page-subheading').textContent = 'Diagnostik permintaan & pemulihan akses.';
-        } else if (isRoadmapRoute) {
-          document.getElementById('module-coming-soon')?.classList.add('active');
-          const navBtn = document.getElementById(`nav-${roadmapKey}`) || document.getElementById(`nav-${currentPath}`);
-          if (navBtn) navBtn.classList.add('active');
-          renderComingSoonModule(roadmapKey, false);
-        } else {
-          const routeMap = {
-            'dashboard': 'owner',
-            'owner': 'owner',
-            'pos': 'pos',
-            'fifo': 'fifo',
-            'sj': 'sj',
-            'surat-jalan': 'sj',
-            'piutang': 'piutang',
-            'katalog': 'katalog',
-            'catalog': 'katalog',
-            'pengaturan': 'pengaturan',
-            'settings': 'pengaturan',
-            'customers': 'customers',
-            'receiving': 'fifo',
-            'invoices': 'invoices',
-            'users': 'users',
-            'roles': 'roles',
-            'audit-logs': 'pengaturan',
-            'backup': 'pengaturan'
-          };
-          let activeMod = routeMap[currentPath];
-
-          if (!activeMod) {
-            // Unmatched route -> Render 404
-            document.getElementById('module-error')?.classList.add('active');
-            renderErrorPage('404', false, currentPath);
-            document.getElementById('page-heading').textContent = '🔍 404 • Halaman Tidak Ditemukan';
-            document.getElementById('page-subheading').textContent = 'Alamat URL tidak terdaftar di sistem SiDaya.';
-          } else {
-            document.getElementById(`module-${activeMod}`)?.classList.add('active');
-            const navBtn = document.getElementById(`nav-${currentPath}`) || document.getElementById(`nav-${activeMod}`);
-            if (navBtn) navBtn.classList.add('active');
-
-            const modTitles = {
-              owner: { title: 'Dashboard Owner & Hak Akses', sub: 'Pantau metrik finansial, omzet, stok, dan tim staf.' },
-              dashboard: { title: 'Dashboard Owner & Hak Akses', sub: 'Pantau metrik finansial, omzet, stok, dan tim staf.' },
-              customers: { title: 'Direktori Pelanggan & CRM', sub: 'Basis data pelanggan grosir, limit piutang, dan riwayat transaksi.' },
-              invoices: { title: 'Faktur Penjualan (Nota Dagang)', sub: 'Semua faktur nota penjualan grosir dan status pelunasan.' },
-              users: { title: 'Daftar Staf & Hak Akses PIN', sub: 'Daftar pengguna terdaftar, nomor WhatsApp, dan penugasan peran.' },
-              roles: { title: 'Matriks Otoritas & Izin Modul', sub: 'Konfigurasi hak akses RBAC per peran (Owner, Kasir, Gudang, Driver).' },
-              pos: { title: 'Kasir Grosir & Barcode Fast-Scan', sub: 'Transaksi penjualan, scan SKU, PayLink QRIS & cetak struk.' },
-              fifo: { title: 'Inbound & Gudang FIFO', sub: 'Penerimaan stok lot, alokasi batch FIFO & masa simpan.' },
-              receiving: { title: 'Dermaga Penerimaan Barang (Inbound Dock)', sub: 'Pencatatan lot masuk, verifikasi batch FIFO, dan modal supplier.' },
-              sj: { title: 'Surat Jalan Driver Logistik', sub: 'Manifest armada logistik & bukti serah terima (Proof of Delivery).' },
-              'surat-jalan': { title: 'Surat Jalan Driver Logistik', sub: 'Manifest armada logistik & bukti serah terima (Proof of Delivery).' },
-              piutang: { title: 'Buku Piutang & Kasbon Dagang', sub: 'Pelacakan jatuh tempo & pengingat otomatis WhatsApp PayLink.' },
-              katalog: { title: 'Master Katalog Produk & Barcode SKU', sub: 'Manajemen ribuan item komoditas, barcode EAN-13, dan COGS modal.' },
-              pengaturan: { title: 'Pengaturan Toko & Hardware', sub: 'Profil workspace bisnis, subdomain, printer pairing, & rekening.' },
-              'audit-logs': { title: 'Audit Trail Aktivitas Sistem', sub: 'Rekam jejak mutasi data dan otentikasi pengguna secara kronologis.' },
-              backup: { title: 'Pencadangan & Ekspor Data Bisnis', sub: 'Ekspor database transaksi, stok opname, dan laporan keuangan.' }
-            };
-            const titleInfo = modTitles[currentPath] || modTitles[activeMod];
-            if (titleInfo) {
-              document.getElementById('page-heading').textContent = titleInfo.title;
-              document.getElementById('page-subheading').textContent = titleInfo.sub;
-            }
-
-            // Render Active Merchant Components
-            renderOwnerDashboardOverview(state);
-            renderCustomerTable(state.customers || []);
-            renderStaffTable(state.staff || []);
-            renderRoleMatrixTable(state.rolePermissions || {});
-            renderInvoicesTable(state.sales || []);
-            renderPosCatalog(state.catalog, state.inventoryLots);
-            renderPosCart(state.cart);
-            renderFifoTimeline(state.catalog, state.inventoryLots);
-            renderSuratJalanList(state.suratJalan);
-            renderPiutangTable(state.piutang);
-            renderKatalogMasterTable(state.catalog, state.inventoryLots, mUser.role.includes('OWNER'));
-          }
-        }
-
-        const urlSlug = currentPath || 'dashboard';
-        if (window.location.pathname !== '/' + urlSlug) {
-          history.replaceState(null, '', '/' + urlSlug);
-        }
-      }
-    }
-
-    /**
-     * ==========================================================================
-     * 🧩 SUB-COMPONENT RENDERING HELPERS
-     * ==========================================================================
-     */
-    function formatRupiah(amount) {
-      return 'Rp ' + Number(amount || 0).toLocaleString('id-ID');
-    }
-
-    function renderOwnerDashboardOverview(state) {
-      const totalSales = state.sales.reduce((sum, s) => sum + s.totalAmount, 0) + 428500000;
-      const totalLotsRemaining = state.inventoryLots.reduce((sum, l) => sum + l.qtyRemaining, 0);
-      const totalPiutang = state.piutang.reduce((sum, p) => sum + p.remainingAmount, 0);
-
-      const omzetEl = document.getElementById('kpi-omzet');
-      const lotsEl = document.getElementById('kpi-total-lots');
-      const sjEl = document.getElementById('kpi-total-sj');
-      const piuEl = document.getElementById('kpi-total-piutang');
-
-      if (omzetEl) omzetEl.textContent = formatRupiah(totalSales);
-      if (lotsEl) lotsEl.textContent = `${totalLotsRemaining} Unit`;
-      if (sjEl) sjEl.textContent = `${state.suratJalan.length} Pengiriman`;
-      if (piuEl) piuEl.textContent = formatRupiah(totalPiutang);
-
-      const cashEl = document.getElementById('dash-cash-total');
-      const qrisEl = document.getElementById('dash-qris-total');
-      const debtEl = document.getElementById('dash-debt-total');
-      if (cashEl) cashEl.textContent = formatRupiah(totalSales - 12350000);
-      if (qrisEl) qrisEl.textContent = formatRupiah(12350000);
-      if (debtEl) debtEl.textContent = formatRupiah(totalPiutang);
-
-      const fifoPreviewEl = document.getElementById('dash-fifo-preview');
-      if (fifoPreviewEl) {
-        fifoPreviewEl.innerHTML = state.inventoryLots.slice(0, 3).map(l => {
-          const p = state.catalog.find(c => c.sku === l.sku) || { name: l.sku, unit: 'Unit' };
-          return `
-            <div style="display:flex; justify-content:space-between; padding:6px 8px; background:var(--bg-surface-elevated); border-radius:var(--radius-sm); border:1px solid ${l.isOldest ? 'var(--accent-amber)' : 'var(--border-subtle)'};">
-              <span>${l.isOldest ? '⭐ ' : ''}<strong>${l.id}</strong> (${p.name})</span>
-              <strong style="color:var(--primary);">${l.qtyRemaining} ${p.unit}</strong>
-            </div>
-          `;
-        }).join('');
-      }
-
-      const recentTbody = document.getElementById('dash-recent-sales-tbody');
-      if (recentTbody) {
-        recentTbody.innerHTML = state.sales.slice(0, 5).map(s => `
-          <tr>
-            <td><strong>${s.id}</strong></td>
-            <td>${s.createdAt}</td>
-            <td>${s.customer}</td>
-            <td style="font-weight:800; color:var(--primary);">${formatRupiah(s.totalAmount)}</td>
-            <td><span class="tier-badge ${s.paymentMethod === 'TUNAI' ? 'tier-grosir-pro' : 'tier-starter-free'}">${s.paymentMethod}</span></td>
-            <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${s.status}</span></td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    function renderCustomerTable(customers) {
-      const tbody = document.getElementById('customers-master-tbody');
-      const totalEl = document.getElementById('cust-kpi-total');
-      const plafonEl = document.getElementById('cust-kpi-plafon');
-      const debtEl = document.getElementById('cust-kpi-debt');
-      const primeEl = document.getElementById('cust-kpi-prime');
-
-      const totalPlafon = customers.reduce((sum, c) => sum + (c.creditLimit || 0), 0);
-      const totalDebt = customers.reduce((sum, c) => sum + (c.currentDebt || 0), 0);
-      const primeCount = customers.filter(c => c.tier === 'PRIME_WHOLESALE').length;
-      const debtCount = customers.filter(c => (c.currentDebt || 0) > 0).length;
-
-      if (totalEl) totalEl.textContent = `${customers.length} Toko`;
-      if (plafonEl) plafonEl.textContent = formatRupiah(totalPlafon);
-      if (debtEl) debtEl.textContent = formatRupiah(totalDebt);
-      if (primeEl) primeEl.textContent = `${primeCount} Toko`;
-
-      const debtSubEl = document.querySelector('#cust-kpi-debt + .kpi-sub');
-      if (debtSubEl) debtSubEl.textContent = `${debtCount} Pelanggan Ada Tagihan`;
-
-      if (!tbody) return;
-
-      tbody.innerHTML = customers.map(c => `
-        <tr>
-          <td>
-            <strong>${c.storeName}</strong>
-            <div style="font-size:0.72rem; color:var(--text-muted);">PIC: ${c.name} • <code>${c.id}</code></div>
-          </td>
-          <td>
-            <div>📱 <strong>${c.phone}</strong></div>
-            <div style="font-size:0.72rem; color:var(--text-secondary); max-width:240px; white-space:normal;">${c.address}</div>
-          </td>
-          <td><strong>${formatRupiah(c.creditLimit)}</strong></td>
-          <td style="font-weight:800; color:${c.currentDebt > 0 ? 'var(--accent-rose)' : 'var(--accent-green)'};">
-            ${formatRupiah(c.currentDebt)}
-            ${c.currentDebt > 0 ? `<div style="font-size:0.68rem; color:var(--accent-rose);">⚠️ Kasbon Aktif</div>` : `<div style="font-size:0.68rem; color:var(--accent-green);">Lunas</div>`}
-          </td>
-          <td>
-            <div style="font-weight:700;">${formatRupiah(c.totalSpend)}</div>
-            <div style="font-size:0.7rem; color:var(--text-muted);">${c.totalOrders} Transaksi</div>
-          </td>
-          <td>
-            <span class="tier-badge ${c.tier === 'PRIME_WHOLESALE' ? 'tier-grosir-pro' : (c.tier === 'GROSIR_REGULER' ? 'tier-starter-free' : '')}" style="${c.tier === 'WARUNG_CASH' ? 'background:var(--bg-surface-elevated); color:var(--text-secondary); border:1px solid var(--border-medium);' : ''}">
-              ${c.tier === 'PRIME_WHOLESALE' ? '⭐ PRIME' : (c.tier === 'GROSIR_REGULER' ? 'GROSIR' : 'WARUNG')}
-            </span>
-          </td>
-          <td>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              ${c.currentDebt > 0 ? `
-                <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:#059669;" onclick="store.dispatch('PIUTANG_SEND_REMINDER', { id: '${c.id}', customer: '${c.storeName}', phone: '${c.phone}', remainingAmount: ${c.currentDebt} })">📱 WA PayLink</button>
-              ` : ''}
-              <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:var(--bg-surface-elevated); color:var(--text-primary); border:1px solid var(--border-medium);" onclick="showToast('Riwayat transaksi ${c.storeName} dimuat', 'info')">📜 Riwayat</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderStaffTable(staffList) {
-      const tbody = document.getElementById('tenant-staff-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = staffList.map(s => `
-        <tr>
-          <td><strong>${s.name}</strong></td>
-          <td>${s.email} (${s.phone})</td>
-          <td><span class="tier-badge ${s.role.includes('Owner') ? 'tier-grosir-pro' : 'tier-starter-free'}">${s.role}</span></td>
-          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${s.status}</span></td>
-          <td>
-            <span class="tier-badge" style="background:${s.pinConfigured ? 'var(--accent-green-soft)' : 'var(--accent-amber-soft)'}; color:${s.pinConfigured ? 'var(--accent-green)' : 'var(--accent-amber)'};">
-              ${s.pinConfigured ? '🔒 PIN AKTIF (HMAC)' : '⚠️ BELUM ADA PIN'}
-            </span>
-          </td>
-          <td>
-            <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:var(--primary);" onclick="handleResetStaffPin('${s.email}')">
-              🔑 Reset PIN
-            </button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderRoleMatrixTable(perms) {
-      const container = document.getElementById('role-matrix-container');
-      if (!container) return;
-
-      const modules = [
-        {
-          name: '🛒 Kasir POS & Transaksi',
-          caps: [
-            { key: 'pos:view_catalog', label: 'Buka Katalog & Scan Barcode' },
-            { key: 'pos:checkout', label: 'Proses Pembayaran POS (Tunai/QRIS)' },
-            { key: 'pos:apply_discount', label: 'Berikan Diskon Khusus Grosir' },
-            { key: 'pos:void_item', label: 'Void / Hapus Item dari Transaksi' }
-          ]
-        },
-        {
-          name: '💳 Shift Kasir & Tutup Buku (Z)',
-          caps: [
-            { key: 'shifts:operate', label: 'Buka Shift Kasir & Terima Modal Kas' },
-            { key: 'shifts:close_z', label: 'Cetak Laporan Tutup Shift (Z-Report)' }
-          ]
-        },
-        {
-          name: '📦 Inventori Gudang & FIFO',
-          caps: [
-            { key: 'inventory:view_stock', label: 'Lihat Stok Live & Nomor Lot' },
-            { key: 'inventory:inbound_receive', label: 'Catat Inbound Lot Baru' },
-            { key: 'inventory:adjust', label: 'Penyesuaian Stok / Rusak (Adjustment)' },
-            { key: 'inventory:opname', label: 'Eksekusi Stock Opname Fisik' }
-          ]
-        },
-        {
-          name: '🚚 Logistik & Surat Jalan',
-          caps: [
-            { key: 'logistics:view_sj', label: 'Akses Dokumen Surat Jalan' },
-            { key: 'logistics:dispatch', label: 'Update Status Pengiriman Armada' },
-            { key: 'logistics:sign_pod', label: 'Konfirmasi Serah Terima Barang (POD)' }
-          ]
-        },
-        {
-          name: '💰 Keuangan, COGS & Laba Rugi',
-          caps: [
-            { key: 'finance:view_cogs', label: 'Lihat Harga Modal (COGS Privacy)' },
-            { key: 'finance:view_profit', label: 'Akses Laporan Laba Rugi Realtime' },
-            { key: 'finance:manage_piutang', label: 'Kelola Buku Kasbon & Penagihan WA' },
-            { key: 'finance:export_data', label: 'Ekspor Data Finansial Excel/CSV' }
-          ]
-        },
-        {
-          name: '⚙️ Tata Kelola Staf & Pengaturan',
-          caps: [
-            { key: 'system:manage_users', label: 'Undang Staf & Kelola Peran' },
-            { key: 'system:manage_settings', label: 'Ubah Subdomain & Akun Bank Settlement' }
-          ]
-        }
-      ];
-
-      const roles = [
-        { id: 'KASIR', label: '💳 Kasir Grosir' },
-        { id: 'GUDANG', label: '📦 Staf Gudang' },
-        { id: 'DRIVER', label: '🚚 Driver Logistik' }
-      ];
-
-      let html = `
-        <table class="operator-table" style="min-width:700px;">
-          <thead>
-            <tr>
-              <th style="width:40%;">Modul & Kunci Otoritas (Capability Key)</th>
-              <th style="text-align:center; width:15%;">👑 OWNER</th>
-              ${roles.map(r => `<th style="text-align:center; width:15%;">${r.label}</th>`).join('')}
-            </tr>
-          </thead>
-          <tbody>
-      `;
-
-      modules.forEach(mod => {
-        html += `
-          <tr style="background:var(--bg-surface-elevated);">
-            <td colspan="${roles.length + 2}" style="font-weight:800; color:var(--primary); font-size:0.84rem; padding:8px 12px;">
-               ${mod.name}
-            </td>
-          </tr>
-        `;
-        mod.caps.forEach(cap => {
-          html += `
-            <tr>
-              <td>
-                <div style="font-weight:700; font-size:0.8rem;">${cap.label}</div>
-                <code style="font-size:0.68rem; color:var(--text-muted);">${cap.key}</code>
-              </td>
-              <td style="text-align:center;">
-                <span class="tier-badge tier-grosir-pro" title="Owner memiliki akses tak terbatas otomatis">✓ FULL</span>
-              </td>
-              ${roles.map(r => {
-                const rolePerms = perms[r.id] || [];
-                const isChecked = rolePerms.includes(cap.key) || rolePerms.includes('all');
-                return `
-                  <td style="text-align:center;">
-                    <input type="checkbox" class="role-perm-check" data-role="${r.id}" data-key="${cap.key}" ${isChecked ? 'checked' : ''} style="width:16px; height:16px; accent-color:var(--primary); cursor:pointer;">
-                  </td>
-                `;
-              }).join('')}
-            </tr>
-          `;
-        });
-      });
-
-      html += `
-          </tbody>
-        </table>
-      `;
-
-      container.innerHTML = html;
-    }
-
-    function renderInvoicesTable(sales) {
-      const tbody = document.getElementById('invoices-tbody');
-      if (!tbody) return;
-
-      tbody.innerHTML = sales.map(s => `
-        <tr>
-          <td><strong>${s.id}</strong></td>
-          <td>${s.createdAt}</td>
-          <td><strong>${s.customer}</strong></td>
-          <td style="font-weight:800; color:var(--primary);">${formatRupiah(s.totalAmount)}</td>
-          <td><span class="tier-badge ${s.paymentMethod === 'TUNAI' ? 'tier-grosir-pro' : 'tier-starter-free'}">${s.paymentMethod}</span></td>
-          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${s.status}</span></td>
-          <td>
-            <div style="display:flex; gap:6px;">
-              <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem;" onclick="store.dispatch('OPEN_MODAL', 'receipt'); renderReceiptModal('${s.id}', ${s.totalAmount}, '${s.paymentMethod}', ${JSON.stringify(s.allocations || []).replace(/"/g, '&quot;')})">🖨️ Cetak Nota</button>
-              <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:var(--bg-surface-elevated); color:var(--text-primary); border:1px solid var(--border-medium);" onclick="switchModule('sj')">🚚 Surat Jalan</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderPosCatalog(catalog, lots) {
-      const grid = document.getElementById('pos-catalog-grid');
-      if (!grid) return;
-      grid.innerHTML = catalog.map(p => {
-        const availableStock = lots.filter(l => l.sku === p.sku).reduce((sum, l) => sum + l.qtyRemaining, 0);
-        return `
-          <div class="product-card" onclick="store.dispatch('POS_ADD_TO_CART', ${JSON.stringify(p).replace(/"/g, '&quot;')})">
-            <div>
-              <div style="font-size:1.8rem; margin-bottom:4px;">${p.icon}</div>
-              <strong style="font-size:0.86rem; color:var(--text-primary);">${p.name}</strong>
-              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">Barcode: <code>${p.barcode}</code></div>
-              <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">Stok FIFO: <strong>${availableStock} ${p.unit}</strong></div>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-              <span style="font-weight:800; color:var(--primary); font-size:0.92rem;">${formatRupiah(p.price)}</span>
-              <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem;">+ Tambah</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderPosCart(cart) {
-      const el = document.getElementById('pos-cart-list');
-      const qtyEl = document.getElementById('pos-cart-qty');
-      const grandEl = document.getElementById('pos-grand-total');
-
-      if (!el) return;
-
-      if (cart.length === 0) {
-        el.innerHTML = `<div style="text-align:center; padding:24px 0; color:var(--text-muted); font-size:0.78rem;">Keranjang belanja kasir kosong.</div>`;
-        if (qtyEl) qtyEl.textContent = '0 Unit';
-        if (grandEl) grandEl.textContent = 'Rp 0';
-        return;
-      }
-
-      let totalQty = 0;
-      let grandTotal = 0;
-
-      el.innerHTML = cart.map(item => {
-        totalQty += item.qty;
-        grandTotal += item.subtotal;
-        return `
-          <div style="background:var(--bg-surface-elevated); padding:8px 10px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div style="font-weight:700; font-size:0.8rem;">${item.name}</div>
-              <div style="font-size:0.7rem; color:var(--text-muted);">${formatRupiah(item.unitPrice)} / unit</div>
-            </div>
-            <div style="display:flex; align-items:center; gap:6px;">
-              <button class="qty-btn" onclick="store.dispatch('POS_UPDATE_QTY', { sku: '${item.sku}', delta: -1 })">-</button>
-              <span style="font-weight:800; font-size:0.82rem; min-width:18px; text-align:center;">${item.qty}</span>
-              <button class="qty-btn" onclick="store.dispatch('POS_UPDATE_QTY', { sku: '${item.sku}', delta: 1 })">+</button>
-              <strong style="font-size:0.84rem; min-width:85px; text-align:right; margin-left:4px;">${formatRupiah(item.subtotal)}</strong>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      if (qtyEl) qtyEl.textContent = `${totalQty} Unit`;
-      if (grandEl) grandEl.textContent = formatRupiah(grandTotal);
-    }
-
-    function renderFifoTimeline(catalog, lots) {
-      const container = document.getElementById('lot-timeline-container');
-      if (!container) return;
-
-      container.innerHTML = lots.map(l => {
-        const product = catalog.find(c => c.sku === l.sku) || { name: l.sku, unit: 'Unit' };
-        const percent = Math.round((l.qtyRemaining / l.qtyInitial) * 100);
-        return `
-          <div style="background:var(--bg-surface-elevated); padding:12px 14px; border-radius:var(--radius-sm); border:1px solid ${l.isOldest ? 'var(--accent-amber)' : 'var(--border-subtle)'};">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span class="tier-badge" style="background:${l.isOldest ? 'var(--accent-amber-soft)' : 'var(--primary-soft)'}; color:${l.isOldest ? 'var(--accent-amber)' : 'var(--primary)'};">
-                  ${l.isOldest ? '⭐ LOT TERTUA (FIFO PRIORITAS 1)' : 'LOT BATCH STANDBY'}
-                </span>
-                <strong style="font-size:0.85rem;">${l.id}</strong>
-                <span style="font-size:0.75rem; color:var(--text-secondary);">(${product.name})</span>
-              </div>
-              <div style="font-size:0.78rem; font-weight:700;">
-                Sisa: <span style="color:var(--primary); font-size:0.9rem;">${l.qtyRemaining}</span> / ${l.qtyInitial} ${product.unit} (${percent}%)
-              </div>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-muted); margin-top:6px;">
-              <span>Supplier: <strong>${l.supplier}</strong> • Masuk: ${l.receivedDate}</span>
-              <span>Modal Beli: <strong>${formatRupiah(l.unitCost)}</strong> / ${product.unit}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function runFifoSimulation() {
-      const qtyInput = document.getElementById('fifo-sim-input');
-      const requested = parseInt(qtyInput?.value || '50', 10);
-      const resBox = document.getElementById('fifo-sim-result');
-      if (!resBox) return;
-
-      const lots = store.getState().inventoryLots.filter(l => l.sku === 'RJL-50KG' && l.qtyRemaining > 0);
-      let needed = requested;
-      const breakdown = [];
-
-      for (const lot of lots) {
-        if (needed <= 0) break;
-        const take = Math.min(needed, lot.qtyRemaining);
-        const remainingAfter = lot.qtyRemaining - take;
-        needed -= take;
-        breakdown.push({
-          lotId: lot.id,
-          take,
-          remainingAfter,
-          status: remainingAfter === 0 ? 'Habis (0)' : `Sisa ${remainingAfter}`
-        });
-      }
-
-      resBox.style.display = 'block';
-      resBox.innerHTML = `
-        <div style="font-weight:800; color:var(--primary); margin-bottom:6px;">Hasil Simulasi Alokasi FIFO (${requested} Karung):</div>
-        ${breakdown.map((b, i) => `
-          <div style="margin-bottom:3px;">
-            ${i + 1}. <strong>${b.lotId}</strong>: Alokasi <strong>${b.take} Karung</strong> (${b.status}).
-          </div>
-        `).join('')}
-        ${needed > 0 ? `<div style="color:var(--accent-rose); font-weight:700; margin-top:4px;">⚠️ Stok tidak cukup untuk ${needed} karung lagi.</div>` : `<div style="color:var(--accent-green); font-weight:700; margin-top:4px;">✅ Urutan batch tertua dieksekusi secara otomatis!</div>`}
-      `;
-    }
-
-    function renderSuratJalanList(sjList) {
-      const container = document.getElementById('surat-jalan-list');
-      if (!container) return;
-
-      container.innerHTML = sjList.map(sj => {
-        let statusBadge = `<span class="tier-badge" style="background:var(--accent-amber-soft); color:var(--accent-amber);">SIAP DIKIRIM</span>`;
-        if (sj.status === 'DALAM_PERJALANAN') {
-          statusBadge = `<span class="tier-badge" style="background:var(--primary-soft); color:var(--primary);">🚚 DALAM PERJALANAN</span>`;
-        } else if (sj.status === 'TERKIRIM') {
-          statusBadge = `<span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">✅ TERKIRIM & DITERIMA</span>`;
-        }
-
-        return `
-          <div style="background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:8px; margin-bottom:10px;">
-              <div>
-                <strong style="font-size:0.95rem;">${sj.id}</strong>
-                <span style="font-size:0.72rem; color:var(--text-muted); margin-left:8px;">Faktur: ${sj.invoiceId} • Waktu: ${sj.createdAt}</span>
-              </div>
-              ${statusBadge}
-            </div>
-            <div style="font-size:0.78rem; line-height:1.6; margin-bottom:10px;">
-              <div><strong>Penerima:</strong> ${sj.recipientName}</div>
-              <div><strong>Tujuan:</strong> ${sj.address}</div>
-              <div><strong>Muatan:</strong> ${sj.items}</div>
-              <div><strong>Driver Armada:</strong> ${sj.driverName}</div>
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-              <div style="font-size:0.68rem; color:var(--accent-green); font-weight:700;">
-                🛡️ COGS Privacy: Harga modal disembunyikan sepenuhnya dari kurir.
-              </div>
-              <div style="display:flex; gap:6px;">
-                ${sj.status === 'SIAP_DIKIRIM' ? `
-                  <button class="save-matrix-btn" onclick="store.dispatch('SJ_UPDATE_STATUS', { sjId: '${sj.id}', status: 'DALAM_PERJALANAN' })">🚚 Berangkat Antar</button>
-                ` : ''}
-                ${sj.status === 'DALAM_PERJALANAN' ? `
-                  <button class="save-matrix-btn" style="background:var(--accent-green);" onclick="store.dispatch('SJ_UPDATE_STATUS', { sjId: '${sj.id}', status: 'TERKIRIM' })">✅ Konfirmasi Serah Terima</button>
-                ` : ''}
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderPiutangTable(piutangList) {
-      const tbody = document.getElementById('piutang-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = piutangList.map(p => `
-        <tr>
-          <td><strong>${p.invoiceId}</strong></td>
-          <td>${p.customer} (${p.phone})</td>
-          <td>${formatRupiah(p.totalAmount)}</td>
-          <td style="font-weight:800; color:${p.remainingAmount > 0 ? 'var(--accent-rose)' : 'var(--accent-green)'};">${formatRupiah(p.remainingAmount)}</td>
-          <td>${p.dueDate}</td>
-          <td>
-            <span class="tier-badge" style="background:${p.status === 'LUNAS' ? 'var(--accent-green-soft)' : (p.status === 'JATUH_TEMPO' ? 'var(--accent-rose-soft)' : 'var(--accent-amber-soft)')}; color:${p.status === 'LUNAS' ? 'var(--accent-green)' : (p.status === 'JATUH_TEMPO' ? 'var(--accent-rose)' : 'var(--accent-amber)')};">
-              ${p.status}
-            </span>
-          </td>
-          <td>
-            <div style="display:flex; gap:6px;">
-              ${p.remainingAmount > 0 ? `
-                <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:#059669;" onclick="store.dispatch('PIUTANG_SEND_REMINDER', { id: '${p.id}', customer: '${p.customer}', phone: '${p.phone}', remainingAmount: ${p.remainingAmount} })">📱 WA PayLink</button>
-                <button class="save-matrix-btn" style="padding:4px 8px; font-size:0.7rem; background:var(--primary);" onclick="store.dispatch('PIUTANG_SETTLE', { id: '${p.id}' })">✅ Lunaskan</button>
-              ` : `<span style="font-size:0.72rem; color:var(--text-muted); font-weight:700;">- Terbayar -</span>`}
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function renderKatalogMasterTable(catalog, lots, isOwner) {
-      const tbody = document.getElementById('katalog-master-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = catalog.map(p => {
-        const stock = lots.filter(l => l.sku === p.sku).reduce((sum, l) => sum + l.qtyRemaining, 0);
-        return `
-          <tr>
-            <td><code>${p.barcode}</code></td>
-            <td><strong>${p.name}</strong> <span style="font-size:0.7rem; color:var(--text-muted);">(${p.sku})</span></td>
-            <td><span class="tier-badge tier-starter-free">${p.category}</span></td>
-            <td>${p.unit}</td>
-            <td><strong>${isOwner ? formatRupiah(p.costPrice) : '🔒 Masked (Owner Only)'}</strong></td>
-            <td style="font-weight:800; color:var(--primary);">${formatRupiah(p.price)}</td>
-            <td style="font-weight:800; color:var(--accent-green);">${stock} ${p.unit}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function renderReceiptModal(invId, total, method, allocations) {
-      document.getElementById('receipt-invoice-no').textContent = `No. Faktur: ${invId} • Metode: ${method}`;
-      const el = document.getElementById('receipt-fifo-breakdown');
-      if (!el) return;
-      el.innerHTML = `
-        <div style="font-weight:800; margin-bottom:6px; color:var(--text-primary);">Total Dibayar: ${formatRupiah(total)}</div>
-        <div style="font-size:0.72rem; font-weight:700; color:var(--accent-green); margin-bottom:6px;">📦 Rincian Alokasi Lot FIFO:</div>
-        ${allocations.map(a => `
-          <div style="margin-bottom:2px; font-size:0.72rem;">
-            • ${a.productName}: <strong>${a.qtyDeducted} unit</strong> diambil dari <code>${a.lotId}</code> (Sisa: ${a.qtyRemaining})
-          </div>
-        `).join('')}
-      `;
-    }
-
-    function renderTenantFleetTable(tenants, isMasked) {
-      const tbody = document.getElementById('tenant-fleet-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = tenants.map(t => `
-        <tr>
-          <td><strong>${t.name}</strong></td>
-          <td><code>${t.subdomain}</code></td>
-          <td>${isMasked ? t.maskedOwner : t.rawOwner}</td>
-          <td><span class="tier-badge ${t.tier === 'GROSIR_PRO' ? 'tier-grosir-pro' : 'tier-starter-free'}">${t.tier}</span></td>
-          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${t.status}</span></td>
-        </tr>
-      `).join('');
-    }
-
-    function renderOperatorListTable(operators) {
-      const tbody = document.getElementById('operator-list-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = operators.map(op => `
-        <tr>
-          <td><strong>${op.name}</strong></td>
-          <td>${op.email}</td>
-          <td><span class="operator-role-badge ${op.role === 'SUPER_ADMIN' ? 'role-super-admin' : (op.role === 'DEV_ENGINEER' ? 'role-dev-engineer' : 'role-ops-support')}">${op.role}</span></td>
-          <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${op.status}</span></td>
-        </tr>
-      `).join('');
-    }
-
-    function renderAuditLogsList(logs) {
-      const container = document.getElementById('audit-log-container');
-      if (!container) return;
-      container.innerHTML = `
-        <div style="font-size:0.78rem; line-height:1.7;">
-          ${logs.map(l => `<div>• <strong>[${l.action}]</strong> ${l.details} <span style="color:var(--text-muted); font-size:0.7rem;">(${l.time})</span></div>`).join('')}
-        </div>
-      `;
-    }
-
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      if (!container) return;
-      const toast = document.createElement('div');
-      toast.className = 'toast-pill';
-      toast.innerHTML = `<span>${type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️')}</span> <span>${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(10px)';
-        toast.style.transition = 'all 0.3s ease';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
-
-    /**
-     * ==========================================================================
-     * 🚀 ROADMAP & ERROR RENDERING UTILITIES
-     * ==========================================================================
-     */
-    function renderComingSoonModule(key, isOps) {
-      const meta = ROADMAP_METADATA[key] || {
-        icon: '🚀',
-        phase: 'ROADMAP FEATURE',
-        title: 'Modul Segera Hadir',
-        desc: 'Fitur ini sedang dalam perencanaan roadmap eksekusi.',
-        features: []
-      };
-
-      const prefix = isOps ? 'op-cs' : 'cs';
-      const iconEl = document.getElementById(`${prefix}-icon`);
-      const phaseEl = document.getElementById(`${prefix}-phase-tag`);
-      const titleEl = document.getElementById(`${prefix}-title`);
-      const descEl = document.getElementById(`${prefix}-desc`);
-      const gridEl = document.getElementById(`${prefix}-features-grid`);
-
-      if (iconEl) iconEl.textContent = meta.icon;
-      if (phaseEl) phaseEl.textContent = meta.phase;
-      if (titleEl) titleEl.textContent = meta.title;
-      if (descEl) descEl.textContent = meta.desc;
-
-      if (gridEl) {
-        gridEl.innerHTML = meta.features.map(f => `
-          <div class="coming-soon-feature-item">
-            <div class="coming-soon-feature-icon">${f.icon}</div>
-            <div>
-              <div class="coming-soon-feature-title">${f.title}</div>
-              <div class="coming-soon-feature-desc">${f.desc}</div>
-            </div>
-          </div>
-        `).join('');
-      }
-
-      const headingEl = isOps ? document.getElementById('op-header-title') : document.getElementById('page-heading');
-      const subEl = isOps ? document.getElementById('op-header-sub') : document.getElementById('page-subheading');
-      if (headingEl) headingEl.textContent = `${meta.icon} ${meta.title}`;
-      if (subEl) subEl.textContent = meta.phase;
-    }
-
-    function renderErrorPage(code, isOps, requestedRoute) {
-      const err = ERROR_DEFINITIONS[code] || ERROR_DEFINITIONS['404'];
-      const prefix = isOps ? 'op-err' : 'err';
-
-      const badgeEl = document.getElementById(`${prefix}-badge`);
-      const iconEl = document.getElementById(`${prefix}-badge-icon`);
-      const badgeTextEl = document.getElementById(`${prefix}-badge-text`);
-      const codeEl = document.getElementById(`${prefix}-code`);
-      const titleEl = document.getElementById(`${prefix}-title`);
-      const descEl = document.getElementById(`${prefix}-desc`);
-      const rayIdEl = document.getElementById(`${prefix}-ray-id`);
-      const timeEl = document.getElementById(`${prefix}-timestamp`);
-      const routeEl = document.getElementById(`${prefix}-route`);
-
-      if (badgeEl) badgeEl.className = `error-status-badge ${err.badgeClass}`;
-      if (iconEl) iconEl.textContent = err.badgeIcon;
-      if (badgeTextEl) badgeTextEl.textContent = err.badgeText;
-      if (codeEl) {
-        codeEl.textContent = err.code;
-        codeEl.className = `error-big-code ${err.codeClass}`;
-      }
-      if (titleEl) titleEl.textContent = err.title;
-      if (descEl) descEl.textContent = err.desc;
-      if (rayIdEl) rayIdEl.textContent = `sidaya_${isOps ? 'ops' : 'req'}_${Math.random().toString(36).substring(2, 10)}`;
-      if (timeEl) timeEl.textContent = new Date().toISOString();
-      if (routeEl) routeEl.textContent = requestedRoute ? `/${requestedRoute}` : '/';
-    }
-
-    function triggerError(statusCode) {
-      history.pushState(null, '', '/' + statusCode);
-      store.dispatch('NAVIGATE', statusCode);
-    }
-
-    function copyRayId() {
-      const rayEl = document.getElementById('err-ray-id') || document.getElementById('op-err-ray-id');
-      const text = rayEl ? rayEl.textContent : 'sidaya_req_89f1a2bc0d';
-      navigator.clipboard?.writeText(text);
-      showToast(`📋 Ray ID disalin: ${text}`, 'success');
-    }
-
-    function handleBetaRegistration() {
-      showToast('🎉 Minat Early Access dicatat! Kami akan mengirimkan notifikasi saat versi Beta siap.', 'success');
-    }
-
-    /**
-     * ==========================================================================
-     * 🎮 EVENT HANDLERS & DISPATCH WRAPPERS
-     * ==========================================================================
-     */
-    function toggleTheme() { store.dispatch('TOGGLE_THEME'); }
-    function toggleSidebarDrawer() { store.dispatch('TOGGLE_SIDEBAR'); }
-    function closeSidebarDrawer() { store.dispatch('CLOSE_SIDEBAR'); }
-
-    function switchModule(mod) {
-      const slug = mod === 'owner' ? 'dashboard' : (mod === 'sj' ? 'surat-jalan' : mod);
-      history.pushState(null, '', '/' + slug);
-      store.dispatch('NAVIGATE', slug);
-    }
-
-    function switchOperatorTab(tab) {
-      history.pushState(null, '', '/' + tab);
-      store.dispatch('NAVIGATE', tab);
-    }
-
-    function quickLoginPreset(email) {
-      const preset = MERCHANT_PRESETS[email] || {
-        name: email.split('@')[0],
-        role: 'STAFF',
-        avatar: email.charAt(0).toUpperCase(),
-        tenant: 'Toko Grosir Beras Jaya Bersama'
-      };
-      history.pushState(null, '', '/dashboard');
-      store.dispatch('LOGIN_MERCHANT', { email, ...preset });
-    }
-
-    function handleMerchantLoginSubmit() {
-      const email = document.getElementById('merchant-login-identifier').value || 'budi@berasjaya.com';
-      quickLoginPreset(email);
-    }
-
-    function quickLoginOperator(email, role) {
-      const preset = OPERATOR_PRESETS[email] || {
-        name: email.split('@')[0],
-        role: role || 'SUPER_ADMIN',
-        badgeClass: role === 'DEV_ENGINEER' ? 'role-dev-engineer' : (role === 'OPS_SUPPORT' ? 'role-ops-support' : 'role-super-admin')
-      };
-      history.pushState(null, '', '/telemetry');
-      store.dispatch('LOGIN_OPERATOR', { email, ...preset });
-    }
-
-    function handleOperatorLoginSubmit() {
-      const email = document.getElementById('operator-login-email').value || 'gabriel@ashvinlabs.com';
-      quickLoginOperator(email, 'SUPER_ADMIN');
-    }
-
-    function handleLogout() {
-      history.pushState(null, '', '/login');
-      store.dispatch('LOGOUT');
-    }
-
-    function togglePdpMasking() {
-      store.dispatch('OPS_TOGGLE_PII_MASK');
-    }
-
-    function handlePosCheckout(method) {
-      store.dispatch('POS_CHECKOUT', method);
-    }
-
-    function handleBarcodeKeydown(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const val = e.target.value;
-        store.dispatch('POS_SCAN_BARCODE', val);
-        e.target.value = '';
-      }
-    }
-
-    function handleScanBarcodeManual() {
-      const input = document.getElementById('pos-barcode-input');
-      if (input && input.value) {
-        store.dispatch('POS_SCAN_BARCODE', input.value);
-        input.value = '';
-      } else {
-        // Quick demo: simulate scanning random catalog item
-        const rand = store.getState().catalog[Math.floor(Math.random() * store.getState().catalog.length)];
-        store.dispatch('POS_SCAN_BARCODE', rand.barcode);
-      }
-    }
-
-    function openModal(modalKey) { store.dispatch('OPEN_MODAL', modalKey); }
-    function closeModal() { store.dispatch('CLOSE_MODAL'); }
-    function openOwnerRegistrationModal() { store.dispatch('OPEN_MODAL', 'owner-reg'); }
-    function openForgotPasswordModal() { store.dispatch('OPEN_MODAL', 'forgot-pwd'); }
-
-    function handleInboundLotSubmit(e) {
-      e.preventDefault();
-      const sku = document.getElementById('inbound-sku').value;
-      const supplier = document.getElementById('inbound-supplier').value;
-      const qty = parseInt(document.getElementById('inbound-qty').value, 10);
-      const unitCost = parseInt(document.getElementById('inbound-cost').value, 10);
-
-      store.dispatch('FIFO_ADD_INBOUND_LOT', { sku, supplier, qty, unitCost });
-      store.dispatch('CLOSE_MODAL');
-    }
-
-    function handleAddProductSubmit(e) {
-      e.preventDefault();
-      const sku = document.getElementById('prod-sku').value;
-      const barcode = document.getElementById('prod-barcode').value;
-      const name = document.getElementById('prod-name').value;
-      const category = document.getElementById('prod-cat').value;
-      const unit = document.getElementById('prod-unit').value;
-      const costPrice = parseInt(document.getElementById('prod-cost').value, 10);
-      const price = parseInt(document.getElementById('prod-price').value, 10);
-
-      store.dispatch('KATALOG_ADD_PRODUCT', {
-        sku, barcode, name, category, unit, costPrice, price, icon: '📦'
-      });
-      store.dispatch('CLOSE_MODAL');
-    }
-
-    function handleInviteStaffSubmit(e) {
-      e.preventDefault();
-      const name = document.getElementById('staff-invite-name').value;
-      const email = document.getElementById('staff-invite-email').value;
-      const phone = document.getElementById('staff-invite-phone').value;
-      const role = document.getElementById('staff-invite-role').value;
-
-      store.dispatch('STAFF_INVITE', { name, email, phone, role });
-      store.dispatch('CLOSE_MODAL');
-    }
-
-    function handleAddCustomerSubmit(e) {
-      e.preventDefault();
-      const name = document.getElementById('cust-name').value;
-      const storeName = document.getElementById('cust-store').value;
-      const phone = document.getElementById('cust-phone').value;
-      const tier = document.getElementById('cust-tier').value;
-      const address = document.getElementById('cust-address').value;
-      const creditLimit = parseInt(document.getElementById('cust-credit-limit').value, 10) || 0;
-
-      store.dispatch('CUSTOMER_ADD', { name, storeName, phone, tier, address, creditLimit });
-      store.dispatch('CLOSE_MODAL');
-    }
-
-    function handleSaveRoleMatrix() {
-      const checks = document.querySelectorAll('.role-perm-check');
-      const newPerms = {
-        OWNER: ['all'],
-        KASIR: [],
-        GUDANG: [],
-        DRIVER: []
-      };
-
-      checks.forEach(c => {
-        if (c.checked) {
-          const role = c.getAttribute('data-role');
-          const key = c.getAttribute('data-key');
-          if (newPerms[role]) {
-            newPerms[role].push(key);
-          }
-        }
-      });
-
-      store.dispatch('ROLE_MATRIX_SAVE', newPerms);
-    }
-
-    function handleResetStaffPin(email) {
-      store.dispatch('STAFF_RESET_PIN', { email });
-    }
-
-    function handleInviteOperatorSubmit(e) {
-      e.preventDefault();
-      const email = document.getElementById('ops-invite-email').value;
-      const fullName = document.getElementById('ops-invite-name').value;
-      const phone = document.getElementById('ops-invite-phone').value;
-      const role = document.getElementById('ops-invite-role').value;
-
-      store.dispatch('OPS_INVITE_OPERATOR', { email, fullName, phone, role });
-      store.dispatch('CLOSE_MODAL');
-    }
-
-    async function handleOwnerRegistrationSubmit(e) {
-      e.preventDefault();
-      const payload = {
-        businessName: document.getElementById('reg-biz-name').value,
-        subdomain: document.getElementById('reg-biz-subdomain').value,
-        phoneNumber: document.getElementById('reg-biz-phone').value,
-        ownerName: document.getElementById('reg-owner-name').value,
-        email: document.getElementById('reg-owner-email').value,
-        password: document.getElementById('reg-owner-password').value,
-      };
-      try {
-        await fetch('http://localhost:4000/api/v1/auth/register-owner', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-      } catch (err) {}
-      store.dispatch('CLOSE_MODAL');
-      showToast(`🎉 Registrasi Berhasil! Verifikasi dikirim ke ${payload.email}`, 'success');
-    }
-
-    async function handleForgotPasswordSubmit(e) {
-      e.preventDefault();
-      const email = document.getElementById('forgot-email').value;
-      try {
-        await fetch('http://localhost:4000/api/v1/auth/forgot-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
-      } catch (err) {}
-      store.dispatch('CLOSE_MODAL');
-      showToast(`✉️ Tautan reset sandi dikirim ke ${email}`, 'success');
-    }
-
-    function togglePasswordVisibility(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (!input) return;
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.textContent = '🔒';
-      } else {
-        input.type = 'password';
-        btn.textContent = '👁️';
-      }
-    }
-
-    function checkPasswordStrength(inputId, fillId, labelId) {
-      const password = document.getElementById(inputId).value;
-      const fill = document.getElementById(fillId);
-      const label = document.getElementById(labelId);
-
-      let score = 0;
-      if (password.length >= 8) score++;
-      if (/[A-Z]/.test(password)) score++;
-      if (/[a-z]/.test(password)) score++;
-      if (/[0-9]/.test(password)) score++;
-      if (/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) score++;
-
-      if (score <= 1) {
-        fill.style.width = '20%';
-        fill.style.backgroundColor = 'var(--accent-rose)';
-        label.textContent = 'Sangat Lemah';
-        label.style.color = 'var(--accent-rose)';
-      } else if (score === 2) {
-        fill.style.width = '40%';
-        fill.style.backgroundColor = 'var(--accent-amber)';
-        label.textContent = 'Lemah';
-        label.style.color = 'var(--accent-amber)';
-      } else if (score === 3) {
-        fill.style.width = '60%';
-        fill.style.backgroundColor = '#EAB308';
-        label.textContent = 'Cukup';
-        label.style.color = '#EAB308';
-      } else if (score === 4) {
-        fill.style.width = '80%';
-        fill.style.backgroundColor = 'var(--primary)';
-        label.textContent = 'Kuat';
-        label.style.color = 'var(--primary)';
-      } else {
-        fill.style.width = '100%';
-        fill.style.backgroundColor = 'var(--accent-green)';
-        label.textContent = 'Sangat Kuat ✓';
-        label.style.color = 'var(--accent-green)';
-      }
-    }
-
-    // Subscribe UI renderer to store
-    store.subscribe(renderUI);
-
-    // Cross-Tab Synchronization
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'sidaya_store_v3' && e.newValue) {
-        try {
-          const remoteState = JSON.parse(e.newValue);
-          Object.assign(store.state, remoteState);
-          renderUI(store.getState());
-        } catch (err) {}
-      }
-    });
-
-    // Listen for browser Back/Forward navigation
-    window.addEventListener('popstate', () => {
-      const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-      store.dispatch('NAVIGATE', path);
-    });
-
-    // Initial render
-    renderUI(store.getState());
-  </script>
+  <!-- 1. Config -->
+  <script src="/js/config/constants.js"></script>
+  <script src="/js/config/roadmap.js"></script>
+  <script src="/js/config/errors.js"></script>
+
+  <!-- 2. Store & Utils -->
+  <script src="/js/store/state.js"></script>
+  <script src="/js/store/store.js"></script>
+  <script src="/js/utils/formatters.js"></script>
+
+  <!-- 3. Components -->
+  <script src="/js/components/toast.js"></script>
+  <script src="/js/components/modals.js"></script>
+
+  <!-- 4. Pilar Modules -->
+  <script src="/js/modules/dashboard.js"></script>
+  <script src="/js/modules/katalog.js"></script>
+  <script src="/js/modules/fifo.js"></script>
+  <script src="/js/modules/customers.js"></script>
+  <script src="/js/modules/pos.js"></script>
+  <script src="/js/modules/invoices.js"></script>
+  <script src="/js/modules/sj.js"></script>
+  <script src="/js/modules/piutang.js"></script>
+  <script src="/js/modules/users.js"></script>
+  <script src="/js/modules/roles.js"></script>
+  <script src="/js/modules/settings.js"></script>
+  <script src="/js/modules/operator.js"></script>
+  <script src="/js/modules/roadmap.js"></script>
+  <script src="/js/modules/error.js"></script>
+
+  <!-- 5. Router & App Bootstrap -->
+  <script src="/js/router.js"></script>
+  <script src="/js/app.js"></script>
 </body>
 </html>
