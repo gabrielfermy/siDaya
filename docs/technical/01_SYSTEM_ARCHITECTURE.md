@@ -509,4 +509,69 @@ flowchart LR
 3. **Sub-5ms Local Index Resolution**:
    - Products are pre-indexed into an in-memory hash map (`Map<string, Product>`), allowing instant O(1) item retrieval even on budget Android hardware with 50,000+ items.
 
+---
+
+## 11. Standard Error Access & Fault-Tolerant Status Pages (400, 401, 403, 404, 429, 500, 503)
+
+To ensure enterprise-grade resilience, transparent security boundaries, and graceful failure handling across both Tenant and Operator planes, SiDaya defines a unified HTTP & Access Error architecture:
+
+```mermaid
+flowchart TD
+    REQ["Incoming Client Request / Navigation"] --> ROUTE{"Route & Permission Guard"}
+    
+    ROUTE -->|"Invalid Param / Malformed"| E400["400 Bad Request\n(Payload Validation Error)"]
+    ROUTE -->|"No Valid Session Token"| E401["401 Unauthorized\n(Session Expired / Re-login)"]
+    ROUTE -->|"Missing Role Permission"| E403["403 Forbidden\n(Access Restricted / Escalation)"]
+    ROUTE -->|"Route Not Found"| E404["404 Not Found\n(Resource / Path Typo)"]
+    ROUTE -->|"Rate Limit Exceeded"| E429["429 Too Many Requests\n(Brute-Force & API Protection)"]
+    ROUTE -->|"Unhandler Server Crash"| E500["500 Internal Server Error\n(Logged with Incident Ray ID)"]
+    ROUTE -->|"Database / Maintenance"| E503["503 Service Unavailable\n(Scheduled Maintenance Mode)"]
+    ROUTE -->|"Valid & Permitted"| SUCCESS["200 OK / Active UI View"]
+```
+
+### Standard Error Taxonomy & UX Behavior:
+
+| Status Code | Error Title | Description & Context | Client Remediation & Primary Action |
+| :--- | :--- | :--- | :--- |
+| **400** | **Bad Request (Permintaan Tidak Valid)** | Parameter input, header, atau JSON body tidak sesuai schema / korup. | Perbaiki input form atau reset formulir ke nilai awal. |
+| **401** | **Unauthorized (Sesi Kedaluwarsa)** | JWT / session cookie telah habis masa berlakunya atau tidak valid. | Tombol *"Masuk Kembali"* yang mengarahkan ke gateway login dengan return URL. |
+| **403** | **Forbidden (Akses Terbatas)** | Staf (e.g. Kasir/Driver) mencoba mengakses modul finansial/COGS atau Operator mencoba break-glass tanpa justifikasi. | Tombol *"Kembali ke Dashboard Utama"* & banner *"Minta Izin ke Pemilik Toko"*. |
+| **404** | **Not Found (Halaman Tidak Ditemukan)** | URL slug atau ID transaksi tidak terdaftar dalam routing table. | Tombol navigasi *"Kembali ke Beranda"* & search box cepat. |
+| **429** | **Too Many Requests (Batas Permintaan Terlampaui)** | Proteksi rate limiting (maksimal 100 req/min untuk API publik, 10 login attempts/min). | Countdown timer otomatis (e.g. *"Tunggu 30 detik sebelum mencoba lagi"*). |
+| **500** | **Internal Server Error (Gangguan Sistem)** | Exception tak tertangani di level API atau backend microservice. | Menampilkan **Ray ID / Trace ID** unik (e.g. `sidaya_err_8f91a2`), tombol *"Salin Kode Error"*, dan tombol *"Muat Ulang Halaman"*. |
+| **503** | **Service Unavailable (Pemeliharaan Terjadwal)** | Database migration atau maintenance window infrastruktur sedang berlangsung. | Banner status pemeliharaan dengan estimasi waktu kembali online & tombol *"Cek Status Server"*. |
+
+---
+
+## 12. Modular Roadmap Feature-Gating & "Coming Soon" UX Paradigm
+
+To balance rapid market transparency with phased enterprise engineering, SiDaya surfaces future roadmap modules directly within the sidebar navigation, gated by dynamic **Roadmap Feature Placeholders**:
+
+```mermaid
+flowchart LR
+    SIDEBAR["Sidebar Navigation Item\n(e.g. Laporan Laba Rugi)"] --> CHECK{"Module Active in Current Tenant Tier / Phase?"}
+    CHECK -->|"Phase 1 (Live MVP)"| ACTIVE["Render Live Interactive Module\n(POS, FIFO, Surat Jalan, Piutang, Katalog)"]
+    CHECK -->|"Phase 2 / 3 / 4 (Roadmap)"| SOON["Render Coming Soon Glassmorphic Showcase\n- Feature Highlights\n- Target Delivery Quarter\n- Early Access Beta Opt-in CTA"]
+    SOON -->|"Merchant Clicks 'Minta Akses Beta'"| TOAST["Save Tenant Interest to Database & Display Toast Alert"]
+```
+
+### Navigation Module Matrix by Phase:
+
+1. **Active Core Modules (Phase 1 MVP)**:
+   - 🏢 **Dashboard & Hak Akses** (`/dashboard`): Realtime turnover, inventory overview, staff onboarding.
+   - 🛒 **Kasir Grosir & Barcode Fast-Scan** (`/pos`): 3-tap order creation, barcode scan, dynamic QRIS PayLink.
+   - 📦 **Inbound & Gudang FIFO** (`/fifo`): Batch receiving, lot expiration tracking, automated FIFO deduction.
+   - 🚚 **Surat Jalan Driver** (`/surat-jalan`): Logistics manifest with price-masked driver working permits.
+   - 📒 **Buku Piutang & Kasbon** (`/piutang`): Accounts receivable ledger, debt aging, and WhatsApp PayLink reminders.
+   - 🏷️ **Katalog Master & SKU** (`/katalog`): Commodity master catalog, EAN-13 barcodes, COGS privacy protection.
+   - ⚙️ **Pengaturan & Hardware** (`/pengaturan`): Business profile, custom subdomain, ESC/POS printer pairing.
+
+2. **Roadmap Coming Soon Modules (Phased Delivery)**:
+   - 📊 **Laporan Laba Rugi & Finansial** (`/laporan` - **Phase 2 / Q4 2026**): Comprehensive P&L calculation, daily gross margins, COGS analysis, and tax export.
+   - 🏬 **Multi-Gudang & Transfer Cabang** (`/multi-gudang` - **Phase 2 / Q4 2026**): Inter-branch stock transfers, multi-bin distribution, and in-transit tracking.
+   - 🔌 **Integrasi Marketplace & Omnichannel** (`/integrasi` - **Phase 3 / Q1 2027**): Realtime stock sync across Shopee, Tokopedia, and TikTok Shop.
+   - 🤖 **AI Demand Forecasting & Smart Reorder** (`/ai-forecasting` - **Phase 3 / Q1 2027**): Predictive commodity purchasing algorithms based on historical sales velocity.
+   - 🧾 **Pajak & e-Faktur Otomatis** (`/pajak` - **Phase 4 / Q2 2027**): Automated Indonesian tax compliance, PPN calculation, and DJP e-Faktur integration.
+
+
 
