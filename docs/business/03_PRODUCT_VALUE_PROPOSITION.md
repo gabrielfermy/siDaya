@@ -108,9 +108,13 @@ SiDaya matches and modernizes every core feature that makes Canggih Software's e
 * **Marketplace Connectors**: Synchronizes order queues and revenue from Tokopedia, Shopee, and TikTok Shop.
 * **Legacy e-Nota / TokoPro Data Importer**: 1-click CSV/Excel ingestion allowing merchants using Canggih Software or desktop software to migrate their full product catalog and customer database in seconds.
 
-> [!NOTE]
-> **Deferred Operational Modes (Low-Priority Backlog)**:
-> Features like *Kasir Minimarket Fast-Scan Mode* and *Cafe/Resto Table Management & Kitchen Display* have been moved to the Phase 4 backlog to focus 100% of engineering bandwidth on core B2B wholesale, multi-tier pricing, inbound inventory, and driver logistics.
+### 7. High-Speed Barcode & Massive Catalog Engine (Scale to 50,000+ Items)
+* **Instant SKU Barcode Scanning**: Scan retail (EAN-13/UPC) and wholesale case barcodes (Code 128/ITF-14) using device cameras or Bluetooth/USB laser scanners.
+* **Sub-5ms O(1) Index Lookup**: Effortlessly search and checkout across catalogs containing **thousands to tens of thousands of items** without lagging or typing.
+* **Multi-Purpose Scanner Workflows**:
+  - **POS Cashiering**: Continuous barcode scan-to-cart with automatic quantity increments and audio beeps.
+  - **Inbound Receiving**: Scan pallet/box barcodes to quickly assign batch lot numbers and warehouse storage bins.
+  - **Physical Stock Opname**: Rapid handheld shelf scanning for instant stock discrepancy audits.
 
 ---
 

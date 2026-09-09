@@ -464,3 +464,49 @@ flowchart TD
 5. **Clean HTML5 Path-Based Routing**:
    - Full RESTful URL paths (`/dashboard`, `/pos`, `/fifo`, `/surat-jalan`, `/telemetry`, `/fleet`, `/operators`, `/audit`, `/login`) synchronized via HTML5 `history.pushState` and `popstate` listeners.
 
+---
+
+## 10. High-Speed Barcode & SKU Scanning Engine (Scale to 50,000+ Items)
+
+To enable wholesale merchants and distributors to effortlessly manage and checkout catalogs containing **thousands to tens of thousands of SKUs**, SiDaya implements a multi-modal, zero-latency Barcode Scanning Subsystem:
+
+```mermaid
+flowchart LR
+    subgraph Inputs ["📷 Scan Inputs"]
+        CAM["Smartphone / Tablet Camera\n(Vision & BarcodeDetector API)"]
+        HID["Bluetooth / USB Laser Scanner\n(Keystroke Wedge Buffer)"]
+    end
+
+    subgraph ScannerEngine ["⚡ SiDaya Scanning Engine"]
+        BUFFER["Rapid Input Buffer & Debounce\n(Detects bursts < 50ms + CR/Enter)"]
+        INDEX["O(1) Local Memory Index\n(Hash Map by Barcode & SKU)"]
+        HAPTIC["Audio & Haptic Feedback\n(Instant Beep / Vibrate)"]
+    end
+
+    subgraph Actions ["🎯 Instant Workflows"]
+        POS["🛒 POS Cashier Fast Scan\n(Instant Add to Cart)"]
+        INBOUND["📦 Inbound Warehouse Receiving\n(Batch Lot Registration)"]
+        OPNAME["📋 Stock Opname Audit\n(Live Physical Stock Count)"]
+    end
+
+    CAM --> BUFFER
+    HID --> BUFFER
+    BUFFER --> INDEX
+    INDEX --> HAPTIC
+    INDEX --> POS
+    INDEX --> INBOUND
+    INDEX --> OPNAME
+```
+
+### Supported Formats & Capabilities:
+1. **Universal Barcode Symbologies**:
+   - **Retail & FMCG**: EAN-13, EAN-8, UPC-A, UPC-E.
+   - **Wholesale & Logistics**: Code 128, Code 39, ITF-14 (Case barcodes).
+   - **2D & QR Codes**: QR Code, GS1 DataMatrix (with batch & expiry metadata).
+2. **Dual-Mode Hardware Support**:
+   - **Smartphone / Tablet Camera Scanner**: Built-in visual viewfinder with auto-focus, torch toggle, and bounding box targeting.
+   - **Physical Laser / 2D Scanner Wedge**: Supports wireless Bluetooth handheld scanners and USB countertop gun scanners without extra drivers.
+3. **Sub-5ms Local Index Resolution**:
+   - Products are pre-indexed into an in-memory hash map (`Map<string, Product>`), allowing instant O(1) item retrieval even on budget Android hardware with 50,000+ items.
+
+
