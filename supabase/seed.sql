@@ -156,7 +156,7 @@ VALUES
         'b0000000-0000-0000-0000-000000000002',
         'Iwan Mitra',
         '081198765432',
-        'investor@mitraretail.com',
+        'investor+sembako@mitraretail.com',
         'STORE_MANAGER',
         '["catalog:view", "finance:reports"]'::JSONB,
         '7788'
