@@ -31,9 +31,27 @@ docs/
 
 ---
 
+## 🏛️ The 9 Strategic Pillars of SiDaya Enterprise OS
+
+SiDaya organizes wholesale, retail, and logistics workflows into **9 Unified Strategic Pillars**:
+
+| No | Pilar Strategis | Menu Utama | Rute Path | Cakupan Fungsional & Modul |
+| :--- | :--- | :--- | :--- | :--- |
+| **1** | **📊 Dashboard & Executive Center** | Dashboard | `/dashboard` | Omset realtime, Laba Kotor FIFO, Nilai Stok, Piutang & Hutang Jatuh Tempo, Saldo Kas & Bank. |
+| **2** | **📦 Manajemen Inventori & Multi-Gudang**| Inventori | `/inventory` | Master SKU/Barcode, Multi-satuan (*Pcs/Lusin/Dus*), FIFO/FEFO Lots, Multi-Gudang, Stock Opname, Label Print. |
+| **3** | **👥 Manajemen Kontak CRM & SRM** | Kontak | `/contacts` | Direktori Supplier (TOP terms, Rekening), Pelanggan (Credit Limit, Tier Grosir, Dynamic Credit Score). |
+| **4** | **🛍️ Pengadaan & Rantai Pasok (Procurement)**| Pengadaan | `/procurement` | Perencanaan Reorder Point, Surat Pesanan (PO), Penerimaan Barang Dock, Retur Beli (RTV) & Nota Debet. |
+| **5** | **🛒 Penjualan, Invoicing & Kasir POS** | Kasir & Penjualan| `/pos`, `/sales` | Offline POS, Scan Barcode Cepat, Diskon Bertingkat (*5%+2%*), Faktur Multi-Status, Retur Jual, Shift X/Z. |
+| **6** | **🚚 Logistik & Operasional Lapangan** | Logistik | `/surat-jalan` | Surat Jalan (*Price-Masked* tanpa HPP/Harga untuk Sopir), Pelacakan Pengiriman, Digital Proof of Delivery. |
+| **7** | **💰 Keuangan, Kas & Akuntansi Terpadu**| Keuangan | `/finance` | Buku Piutang (AR Aging & PayLink WA), Buku Hutang (AP), Multi-Akun Kas & Bank, Laba Rugi FIFO, Aset Tetap. |
+| **8** | **👥 Manajemen Pengguna & Hak Akses (RBAC)**| Tim & Akses | `/settings/users`| Undangan Staf, Fast PIN Switch 4-6 Digit, Matriks Izin Checkbox (*Owner Checkbox Matrix*), Proteksi HPP. |
+| **9** | **🔒 Tata Kelola, Audit Trail & Keamanan** | Tata Kelola | `/settings` | Immutable Activity Audit Log, Backup Otomatis, Export Excel/PDF, Kepatuhan UU PDP No. 27/2022. |
+
+---
+
 ## 🎯 At a Glance: What Makes SiDaya Different?
 
-| Feature Dimension | Traditional Paper / Bon Manual | Legacy POS (Moka, Majoo, Pawoon) | Canggih Software e-Nota | **SiDaya Mobile SaaS** |
+| Feature Dimension | Traditional Paper / Bon Manual | Legacy POS (Moka, Majoo, Pawoon) | Canggih Software e-Nota | **SiDaya Enterprise OS** |
 | :--- | :--- | :--- | :--- | :--- |
 | **Primary Platform** | Paper receipt pads | Bulky Android tablet / Desktop | Android utility app | **Offline-First Native Mobile (iOS & Android) + Responsive Web Backoffice** |
 | **Multi-Device Sync** | None (physical paper) | Local network or slow cloud | High latency; frequent sync delays | **Sub-second Supabase Realtime WebSocket engine** |

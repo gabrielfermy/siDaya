@@ -65,91 +65,114 @@ sequenceDiagram
 
 ---
 
-## 3. Comprehensive Feature Parity with Canggih Software's e-Nota
+## 3. The 9 Strategic Pillars of SiDaya Enterprise Platform
 
-SiDaya matches and modernizes every core feature that makes Canggih Software's e-Nota indispensable to Indonesian businesses, while eliminating its structural flaws:
+SiDaya elevates the traditional receipt generator into an integrated, modular **Enterprise Operating System for Wholesale, FMCG, and Retail Trade**:
 
-### 1. Wholesale & Retail Multi-Tier Pricing
-* **Price Classes**: Assign distinct prices for *Eceran* (Retail), *Grosir 1*, *Grosir 2*, *Tipe Pelanggan* (Regular, Member, VIP, Distributor), and *Salesman*.
-* **Multi-Unit Conversions**: Automatically converts between packaging tiers (e.g., `1 Karton = 12 Lusin = 144 PCS`). Pricing and stock deduction calculate automatically based on the selected sales unit.
-* **Compound Trade Discounts**: Native support for standard Indonesian wholesale discounting formats (e.g., `5% + 2% + Rp 1,000`).
+```mermaid
+graph TD
+    subgraph "SiDaya 9-Pilar Enterprise Blueprint"
+        P1["1. 📊 Executive Dashboard\nLive KPIs, FIFO Profit, Cash/Bank"]
+        P2["2. 📦 Inventory & Multi-Gudang\nMaster SKU, Batches, Stock Opname, Multi-Gudang"]
+        P3["3. 👥 Contacts CRM & SRM\nSuppliers, Customers, Credit Scoring, PayLink"]
+        P4["4. 🛍️ Procurement & Supply\nPO, Goods Receiving, RTV Returns, Min/Max"]
+        P5["5. 🛒 Sales, Invoicing & POS\nFast-Scan POS, Multi-Status, Retur, 5%+2%"]
+        P6["6. 🚚 Logistics & Operasional\nSurat Jalan (Masked HPP), Fleet POD Tracking"]
+        P7["7. 💰 Finance & Accounting\nPiutang, Hutang, Multi-Akun Bank, P&L FIFO, Aset"]
+        P8["8. 👥 User Management & RBAC\nOwner Matrix, Fast PIN, Role Hierarchies"]
+        P9["9. 🔒 Governance & Security\nImmutable Audit Log, Backup, UU PDP Compliance"]
+    end
+```
 
-### 2. Complete Merchant Inventory, Inbound Logistics & Batch Allocation
-* **Inbound Procurement & Arrival Tracking**: Record supplier purchase orders, expected vs actual delivery dates, carrier info, and received unit quantities.
-* **Granular Storage Location Hierarchy**: Multi-tier physical binning (Warehouse $\rightarrow$ Zone / Cold Room $\rightarrow$ Aisle $\rightarrow$ Rack / Bin / Pallet, e.g., `Gudang Utama -> Zona Beras -> Rak B-02`). Always know exactly where every sack or box is stored.
-* **Supplier Return Policies (RTV)**: Built-in tracking of supplier return terms, damage/pest claim inspection windows (e.g., 7 days), and debit note reconciliation.
-* **Automated Batch & Lot Allocation (FIFO / FEFO)**:
-  * Batches record harvest/milling dates, expiry dates, and lot numbers (e.g., `LOT-BERAS-20260901-01`).
-  * When a sales order is created, the system algorithmically allocates stock via **FIFO (First In, First Out)** to ensure older stock is sold and dispatched first, preventing aging or weevil infestation in commodities like rice.
-* **Driver Working Permit (*Surat Jalan* / Delivery Order)**:
-  * Instantly generated from the sales invoice as the driver's official authorization to withdraw allocated stock from the warehouse.
-  * **Price-Stripped for Security**: Explicitly **omits all financial values** (no unit prices, no subtotal, no discounts, no invoice total) so drivers and third parties cannot view merchant profit margins or invoice values.
-  * **Direct Invoice Linkage**: Embeds the master Sales Invoice Number and an encrypted QR code linking back to the verified order record.
-  * Multi-signature verification: *Petugas Gudang (Stock Release)*, *Sopir (Driver Custody)*, and *Penerima (Proof of Delivery)*.
-  * Supports Bluetooth thermal (80mm), standard A4, and Continuous Form Dot Matrix (Epson LX-310 2/3-ply).
+### Pilar 1: Dashboard & Executive Command Center (`/dashboard`)
+* **Real-time Turnover & Profitability**: Instant Gross Profit calculation based on actual FIFO cost of goods sold (COGS / *Harga Pokok Penjualan*).
+* **Consolidated Liquidity Widget**: Unified snapshot of total inventory asset value, uncollected Accounts Receivable (*Piutang*), upcoming Accounts Payable (*Hutang*), and active Cash & Bank balances.
+* **Smart Exception Alerts**: Proactive warnings for out-of-stock items, expiring batch lots, customer credit limit breaches, and pending approval requests.
 
-### 3. Multi-Hardware Printer Engine
-* **ESC/POS Bluetooth Thermal Printers**: Instant receipts for 58mm and 80mm mobile thermal printers.
-* **Network & Wi-Fi Printers**: Full A4 / Letter invoice printing for formal corporate buyers.
-* **Dot Matrix / Continuous Form (Epson ESC/P2)**: Native printing for 2-ply and 3-ply carbon paper dot matrix printers, essential for Indonesian B2B grosir logistics and Surat Jalan manifests.
+### Pilar 2: Manajemen Inventori & Multi-Gudang (`/inventory`)
+* **Master SKU & Multi-Satuan**: Hierarchical unit conversions (`1 Karton = 12 Lusin = 144 Pcs`) with independent barcode tags per unit.
+* **Automated FIFO / FEFO Batch Allocation**: Enforces strict stock rotation based on harvest, production, or receipt dates to eliminate spoilage and inventory obsolescence.
+* **Multi-Warehouse & Inter-Branch Transfers**: Centralized stock visibility across Head Warehouses (*Gudang Pusat*), Store Outlets (*Toko Cabang*), and In-Transit buffers.
+* **Stock Opname with Handheld Barcode Scanning**: Rapid physical shelf audits comparing system balance vs scanned physical count with automated adjustment approval flows.
+* **Batch Thermal Barcode Printing**: Print standardized EAN-13 / Code 128 / QR label stickers for mass labeling of inventory items.
 
-### 4. Accounts Receivable (*Piutang & Kasbon*) Ledger
-* **Debt Aging & Status**: Real-time tracking of unpaid and partially paid invoices.
-* **PayLink Debt Settlement**: Customers can settle overdue *kasbon* through their dynamic PayLink using partial or full digital payments.
-* **Automated WhatsApp Debt Reminders**: Polite, automated payment link reminders sent directly to customers before debt delinquency.
+### Pilar 3: Manajemen Kontak & CRM/SRM (`/contacts`)
+* **Supplier Directory (SRM)**: Vendor profile, payment terms (*Term of Payment / TOP* 7/14/30/60 days), bank routing details, and supplier ledger.
+* **Customer Directory & Wholesale Tiers (CRM)**: Customer segmentation (*Eceran, Grosir 1, Grosir 2, Distributor, VIP*), credit limit management, and dynamic credit scoring based on Days Beyond Terms (DBT).
+* **Automated WhatsApp Payment Link Loop**: Send professional invoices with embedded QRIS/VA PayLink directly to customer WhatsApp chats.
 
-### 5. Multi-User Tenant Management & Fast Cashier PIN Switch
-* **Role-Based Access Control (RBAC)**: Distinct permissions for *Owner*, *Store Manager*, *Cashier (Kasir)*, *Salesman*, and *Warehouse (Gudang)*.
-* **4–6 Digit Station Lock / Quick Switch**: Allows multiple cashiers on high-turnover shared counters to switch shifts in seconds without re-entering credentials.
-* **Cash Drawer & Shift Balancing**: Opening cash float, cash drop tracking, and automated X-Report / Z-Report end-of-day reconciliation.
-* **COGS / Margin Protection**: Protects store profitability by hiding cost-of-goods-sold (*harga modal*) from cashier views via PostgreSQL Row-Level Security.
+### Pilar 4: Pengadaan & Rantai Pasok / Procurement (`/procurement`)
+* **Smart Reorder Point Planning**: Predictive reordering recommendations calculated from historical sales velocity and supplier lead-time.
+* **Purchase Orders (PO)**: Digital PO generation with supplier email/WhatsApp dispatch and multi-tier approval rules.
+* **Goods Receiving Dock**: Physical check-in at warehouse dock, barcode lot registration, and instant conversion into active FIFO inventory lots.
+* **Purchase Returns (Return to Vendor / RTV)**: Defect / damage claims with automated AP Debit Notes deducting outstanding supplier liabilities.
 
-### 6. Marketplace Order & Legacy TokoPro Import
-* **Marketplace Connectors**: Synchronizes order queues and revenue from Tokopedia, Shopee, and TikTok Shop.
-* **Legacy e-Nota / TokoPro Data Importer**: 1-click CSV/Excel ingestion allowing merchants using Canggih Software or desktop software to migrate their full product catalog and customer database in seconds.
+### Pilar 5: Penjualan, Invoicing & Kasir POS (`/pos`, `/sales`)
+* **Offline-First POS Terminal**: 3-tap checkout, rapid barcode scanner gun integration, compound trade discounts (`5% + 2% + Rp`), and multi-unit switching.
+* **Advanced Multi-Status Invoicing**: Full invoice lifecycle tracking: *Draft $\rightarrow$ Belum Lunas (Piutang) $\rightarrow$ Jatuh Tempo $\rightarrow$ Lunas*.
+* **Sales Returns (Retur Penjualan)**: Returns seamlessly restore inventory back to corresponding FIFO lots and issue cash refunds or credit notes deducting customer piutang.
+* **Cashier Shift Balancing**: Opening cash float, midday cash drops, and automated X-Report / Z-Report shift reconciliation.
 
-### 7. High-Speed Barcode & Massive Catalog Engine (Scale to 50,000+ Items)
-* **Instant SKU Barcode Scanning**: Scan retail (EAN-13/UPC) and wholesale case barcodes (Code 128/ITF-14) using device cameras or Bluetooth/USB laser scanners.
-* **Sub-5ms O(1) Index Lookup**: Effortlessly search and checkout across catalogs containing **thousands to tens of thousands of items** without lagging or typing.
-* **Multi-Purpose Scanner Workflows**:
-  - **POS Cashiering**: Continuous barcode scan-to-cart with automatic quantity increments and audio beeps.
-  - **Inbound Receiving**: Scan pallet/box barcodes to quickly assign batch lot numbers and warehouse storage bins.
-  - **Physical Stock Opname**: Rapid handheld shelf scanning for instant stock discrepancy audits.
+### Pilar 6: Logistik & Operasional Lapangan (`/surat-jalan`, `/logistics`)
+* **Price-Masked Surat Jalan (Delivery Order)**: Official logistics manifest that explicitly **omits financial amounts and profit margins**, protecting merchant privacy from third-party drivers.
+* **Direct Invoice QR-Code Verification**: Encrypted QR code on physical printout linking to verified order records.
+* **Fleet Dispatch & Digital Proof of Delivery (POD)**: Driver mobile workflow with recipient signature capture, timestamped delivery photos, and real-time status sync.
+
+### Pilar 7: Keuangan, Kas & Akuntansi Terpadu (`/finance`)
+* **Accounts Receivable (Buku Piutang)**: Aging analysis (0–30, 31–60, 60+ days), partial digital installment collection via PayLink.
+* **Accounts Payable (Buku Hutang)**: Supplier maturity calendar, payment scheduling, and cash outflow planning.
+* **Multi-Account Cash & Bank Ledger**: Separate ledgers for Counter Cash Drawer, Petty Cash (*Kas Kecil*), BCA, Mandiri, and digital payment gateway settlement holding accounts.
+* **Realtime P&L (Laba Rugi Otomatis)**: Automatic gross and net margin reports without manual double-entry bookkeeping.
+* **Fixed Asset & Depreciation Management**: Track operational assets (vehicles, machinery, refrigeration) with monthly straight-line depreciation.
+
+### Pilar 8: Manajemen Pengguna & Hak Akses / RBAC (`/settings`)
+* **Granular Owner Checkbox Matrix**: Move beyond static roles to granular permission toggles (`pos:checkout`, `catalog:view_cogs`, `finance:reports`, `void:order`).
+* **Fast 4–6 Digit Station PIN Switch**: Effortless cashier handover on shared POS terminals in under 3 seconds.
+* **COGS Margin Privacy Protection**: Strict PostgreSQL RLS filters ensuring operational staff cannot view merchant purchase prices or profit margins.
+
+### Pilar 9: Tata Kelola, Audit Trail & Keamanan (`/settings`)
+* **Immutable Activity Audit Log**: Cryptographically logged trail of sensitive actions (price adjustments, void transactions, credit limit overrides, break-glass queries) with IP, user ID, and Ray ID.
+* **Automated Daily Backups & Clean Data Export**: 1-click export of financial reports, customer ledgers, and inventory balances to Excel/PDF.
+* **Indonesian Data Protection Compliance**: Full adherence to UU PDP No. 27/2022 with tenant isolation and PII masking.
 
 ---
 
 ## 4. Built for Radical Modularity: Pluggable Feature Registry
 
-To ensure the app remains blazing fast for a simple solo merchant while scaling seamlessly to a multi-store enterprise, SiDaya utilizes a **Pluggable Feature Registry Engine**. Features are decoupled into standalone domain modules that activate dynamically based on the tenant's subscription plan:
+To ensure the application remains lightning-fast for a single-store shopkeeper while scaling effortlessly to an enterprise distributor network, SiDaya utilizes a **Pluggable Feature Registry Engine**. Features are decoupled into standalone domain modules activated dynamically based on subscription plans:
 
 ```mermaid
 graph TD
     subgraph "SiDaya Pluggable Modular Architecture"
-        Core[Core Checkout & Fast 3-Tap Nota]
+        Core[Core POS Checkout & Master SKU]
         
-        subgraph "Free / Retail Starter Modules"
-            Mod1[Basic Stock Count & Alerts]
-            Mod2[Client PayLink & Gateway]
-            Mod3[Bluetooth Thermal Printer]
+        subgraph "Starter Modules (Free / Retail)"
+            Mod1[Basic Stock Count]
+            Mod2[Client PayLink & QRIS Gateway]
+            Mod3[Bluetooth Thermal Receipt Printer]
         end
         
         subgraph "Grosir Pro Modules"
             Mod4[Multi-Tier Pricing: Eceran & Grosir]
             Mod5[Compound Discounts: 5% + 2% + Rp]
-            Mod6[Unit Conversions: PCS / Lusin / Dus]
-            Mod7[Inbound POs & Bin Storage Locations]
-            Mod8[FIFO / FEFO Batch Allocation]
-            Mod9[Driver Working Permit: Surat Jalan]
-            Mod10[Dot Matrix Continuous Form Driver]
-            Mod11[Piutang & Kasbon Ledger]
-            Mod12[Multi-User RBAC & Shift Management]
+            Mod6[Unit Conversions: Pcs / Lusin / Karton]
+            Mod7[FIFO / FEFO Batch Allocation Engine]
+            Mod8[Price-Masked Surat Jalan]
+            Mod9[Dot Matrix Continuous Form Driver]
+            Mod10[Buku Piutang & Aging Ledger]
+            Mod11[Cashier Shifts & X/Z Reports]
+            Mod12[Barcode Scanner Gun Engine]
         end
         
-        subgraph "Enterprise / Omnichannel Modules"
-            Mod13[Supabase Realtime Multi-Device Sync Engine]
-            Mod14[Marketplace Order Sync: Shopee / Tokopedia / TikTok]
-            Mod15[Multi-Warehouse Stock Routing]
-            Mod16[Advanced Supplier Return & RTV Analytics]
+        subgraph "Enterprise & Multi-Outlet Modules"
+            Mod13[Multi-Warehouse & Inter-Branch Stock Transfers]
+            Mod14[Procurement PO & Goods Receiving Dock]
+            Mod15[Supplier RTV & Sales Returns Engine]
+            Mod16[Multi-Account Cash & Bank Ledgers]
+            Mod17[Realtime P&L FIFO Costing Reports]
+            Mod18[Salesman Force Automation SFA / Canvassing]
+            Mod19[Approval Workflow Engine]
+            Mod20[Consignment In & Out Ledgers]
         end
         
         Core --> Mod1
@@ -168,6 +191,10 @@ graph TD
         Core -.->|Activated via Enterprise Tier| Mod14
         Core -.->|Activated via Enterprise Tier| Mod15
         Core -.->|Activated via Enterprise Tier| Mod16
+        Core -.->|Activated via Enterprise Tier| Mod17
+        Core -.->|Activated via Enterprise Tier| Mod18
+        Core -.->|Activated via Enterprise Tier| Mod19
+        Core -.->|Activated via Enterprise Tier| Mod20
     end
 ```
 
