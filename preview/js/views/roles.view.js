@@ -27,7 +27,7 @@ const RolesView = {
       { key: 'settings:manage', label: 'Konfigurasi Toko & Hardware', desc: 'Mengubah identitas toko dan printer ESC/POS' },
     ];
 
-    const matrix = state.pilar8.rbacMatrix;
+    const matrix = state?.pilar8?.rbacMatrix || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar8.rbacMatrix : {});
 
     return `
       <div class="view-header">

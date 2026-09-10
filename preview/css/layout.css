@@ -321,6 +321,21 @@ html.state-auth-ops #app-shell {
   margin: 0 auto;
 }
 
+@keyframes viewEntrance {
+  0% {
+    opacity: 0.2;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.view-enter {
+  animation: viewEntrance 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* ==========================================================================
    FLOATING DEV & SIMULATION DOCKS
    ========================================================================== */

@@ -3,8 +3,9 @@
  */
 const OperatorView = {
   render(state) {
-    const op = state.operator;
-    const tenants = op.tenants;
+    const op = state?.operator || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.operator : {});
+    const tenants = op.tenants || [];
+    const telemetry = op.telemetry || { totalGmv: 428500000, activeTenants: 12, latencyP95: 38, dbPoolPercent: 42 };
     const isOpsSupport = op.currentRole === 'OPS_SUPPORT';
 
     return `
@@ -23,7 +24,7 @@ const OperatorView = {
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-header"><span class="kpi-title">Platform GMV (Monthly)</span><span class="kpi-icon">🌐</span></div>
-          <div class="kpi-value">${formatRupiah(op.telemetry.totalGmv)}</div>
+          <div class="kpi-value">${formatRupiah(telemetry.totalGmv)}</div>
           <div class="kpi-subtext positive">Across all active tenants</div>
         </div>
         <div class="kpi-card">
@@ -33,12 +34,12 @@ const OperatorView = {
         </div>
         <div class="kpi-card">
           <div class="kpi-header"><span class="kpi-title">API Latency p95</span><span class="kpi-icon">⚡</span></div>
-          <div class="kpi-value">${op.telemetry.latencyP95} ms</div>
+          <div class="kpi-value">${telemetry.latencyP95} ms</div>
           <div class="kpi-subtext positive">Target: &lt; 50ms</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-header"><span class="kpi-title">Database Pool Usage</span><span class="kpi-icon">🗄️</span></div>
-          <div class="kpi-value">${op.telemetry.dbPoolPercent}%</div>
+          <div class="kpi-value">${telemetry.dbPoolPercent}%</div>
           <div class="kpi-subtext">Optimal capacity</div>
         </div>
       </div>

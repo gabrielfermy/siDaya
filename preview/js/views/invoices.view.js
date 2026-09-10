@@ -3,7 +3,7 @@
  */
 const InvoicesView = {
   render(state) {
-    const invoices = state.pilar5.invoices;
+    const invoices = state?.pilar5?.invoices || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar5.invoices : []);
     return `
       <div class="view-header">
         <div>

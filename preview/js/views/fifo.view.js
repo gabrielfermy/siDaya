@@ -3,7 +3,7 @@
  */
 const FifoView = {
   render(state) {
-    const batches = state.pilar2.batches;
+    const batches = state?.pilar2?.batches || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar2.batches : []);
     return `
       <div class="view-header">
         <div>

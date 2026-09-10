@@ -3,7 +3,13 @@
  */
 const DashboardView = {
   render(state) {
-    const s = state.pilar1;
+    const s = state?.pilar1 || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar1 : {});
+    const omsetToday = s.omsetToday || 0;
+    const grossMarginPercent = s.grossMarginPercent || 0;
+    const grossMarginNominal = s.grossMarginNominal || 0;
+    const totalPiutangOutstanding = s.totalPiutangOutstanding || 0;
+    const cashMixPercent = s.cashMixPercent || 0;
+    const recentOrders = s.recentOrders || [];
     return `
       <div class="view-header">
         <div>
@@ -101,7 +107,7 @@ const DashboardView = {
             <span class="kpi-title">Omset Hari Ini (GMV)</span>
             <span class="kpi-icon">💰</span>
           </div>
-          <div class="kpi-value" id="dashboard-omset-today">${formatRupiah(s.omsetToday)}</div>
+          <div class="kpi-value" id="dashboard-omset-today">${formatRupiah(omsetToday)}</div>
           <div class="kpi-subtext positive">▲ +14.2% dibanding kemarin</div>
         </div>
 
@@ -110,8 +116,8 @@ const DashboardView = {
             <span class="kpi-title">Gross Margin Real-Time</span>
             <span class="kpi-icon">📈</span>
           </div>
-          <div class="kpi-value" id="dashboard-gross-margin">${s.grossMarginPercent}%</div>
-          <div class="kpi-subtext">Laba Kotor: <strong>${formatRupiah(s.grossMarginNominal)}</strong></div>
+          <div class="kpi-value" id="dashboard-gross-margin">${grossMarginPercent}%</div>
+          <div class="kpi-subtext">Laba Kotor: <strong>${formatRupiah(grossMarginNominal)}</strong></div>
         </div>
 
         <div class="kpi-card">
@@ -119,7 +125,7 @@ const DashboardView = {
             <span class="kpi-title">Total Piutang Berjalan</span>
             <span class="kpi-icon">⏳</span>
           </div>
-          <div class="kpi-value warning" id="dashboard-total-piutang">${formatRupiah(s.totalPiutangOutstanding)}</div>
+          <div class="kpi-value warning" id="dashboard-total-piutang">${formatRupiah(totalPiutangOutstanding)}</div>
           <div class="kpi-subtext">Dari 8 pelanggan kredit aktif</div>
         </div>
 
@@ -128,8 +134,8 @@ const DashboardView = {
             <span class="kpi-title">Komposisi Kas Masuk</span>
             <span class="kpi-icon">💳</span>
           </div>
-          <div class="kpi-value" id="dashboard-cash-mix">${s.cashMixPercent}% Tunai</div>
-          <div class="kpi-subtext">${100 - s.cashMixPercent}% PayLink QRIS & Transfer</div>
+          <div class="kpi-value" id="dashboard-cash-mix">${cashMixPercent}% Tunai</div>
+          <div class="kpi-subtext">${100 - cashMixPercent}% PayLink QRIS & Transfer</div>
         </div>
       </div>
 
@@ -138,12 +144,12 @@ const DashboardView = {
         <div class="card">
           <div class="card-title">💳 Bauran Arus Kas Masuk (Hari Ini)</div>
           <div style="display:flex; height:20px; border-radius:10px; overflow:hidden; margin:16px 0 12px 0;">
-            <div style="width:${s.cashMixPercent}%; background:var(--accent-green);" title="Tunai ${s.cashMixPercent}%"></div>
-            <div style="width:${100 - s.cashMixPercent}%; background:var(--primary);" title="Non-Tunai ${100 - s.cashMixPercent}%"></div>
+            <div style="width:${cashMixPercent}%; background:var(--accent-green);" title="Tunai ${cashMixPercent}%"></div>
+            <div style="width:${100 - cashMixPercent}%; background:var(--primary);" title="Non-Tunai ${100 - cashMixPercent}%"></div>
           </div>
           <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-secondary);">
-            <span>💵 Kas Tunai: <strong>${formatRupiah(s.omsetToday * (s.cashMixPercent / 100))}</strong> (${s.cashMixPercent}%)</span>
-            <span>📱 PayLink & Bank: <strong>${formatRupiah(s.omsetToday * ((100 - s.cashMixPercent) / 100))}</strong> (${100 - s.cashMixPercent}%)</span>
+            <span>💵 Kas Tunai: <strong>${formatRupiah(omsetToday * (cashMixPercent / 100))}</strong> (${cashMixPercent}%)</span>
+            <span>📱 PayLink & Bank: <strong>${formatRupiah(omsetToday * ((100 - cashMixPercent) / 100))}</strong> (${100 - cashMixPercent}%)</span>
           </div>
         </div>
 
@@ -176,7 +182,7 @@ const DashboardView = {
             </tr>
           </thead>
           <tbody id="dashboard-recent-orders">
-            ${s.recentOrders.map(o => `
+            ${recentOrders.map(o => `
               <tr>
                 <td><strong>${o.orderNumber}</strong></td>
                 <td>${o.time}</td>
