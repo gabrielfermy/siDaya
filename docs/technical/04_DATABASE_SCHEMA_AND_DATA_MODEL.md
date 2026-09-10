@@ -13,17 +13,24 @@ erDiagram
     TENANTS ||--o{ PRODUCTS : catalogs
     TENANTS ||--o{ SUPPLIERS : registers
     TENANTS ||--o{ CUSTOMERS : records
+    TENANTS ||--o{ CASH_BANK_ACCOUNTS : maintains
+    TENANTS ||--o{ FIXED_ASSETS : owns
+    TENANTS ||--o{ APPROVAL_RULES : configures
+    TENANTS ||--o{ TENANT_AUDIT_LOGS : records
     TENANTS ||--o{ PRINTER_CONFIGURATIONS : registers
     
     BRANCHES ||--o{ CASHIER_SHIFTS : operates
     BRANCHES ||--o{ STORAGE_LOCATIONS : contains
     BRANCHES ||--o{ ORDERS : processes
     BRANCHES ||--o{ STOCK_MOVEMENTS : logs
+    BRANCHES ||--o{ STOCK_ADJUSTMENTS : performs
+    BRANCHES ||--o{ WAREHOUSE_TRANSFERS : originates_or_receives
     
     SUPPLIERS ||--o{ SUPPLIER_PURCHASE_ORDERS : supplies
     SUPPLIER_PURCHASE_ORDERS ||--o{ INBOUND_SHIPMENTS : fulfills
     INBOUND_SHIPMENTS ||--o{ PRODUCT_BATCHES : receives
     STORAGE_LOCATIONS ||--o{ PRODUCT_BATCHES : stores
+    SUPPLIERS ||--o{ SUPPLIER_RETURNS : receives_rtv
     
     TENANT_USERS ||--o{ CASHIER_SHIFTS : manages
     CASHIER_SHIFTS ||--o{ SHIFT_CASH_MOVEMENTS : logs
@@ -38,12 +45,17 @@ erDiagram
     ORDERS ||--o| PAYLINKS : generates
     ORDERS ||--o| PIUTANG_RECORDS : generates_credit
     ORDERS ||--o| DELIVERY_ORDERS : dispatches_surat_jalan
+    ORDERS ||--o{ SALES_RETURNS : returns
+    
+    SALES_RETURNS ||--o{ SALES_RETURN_ITEMS : contains
     
     DELIVERY_ORDERS ||--o{ DELIVERY_ORDER_ITEMS : manifests
     PRODUCT_BATCHES ||--o{ DELIVERY_ORDER_ITEMS : allocates_fifo
     
     CUSTOMERS ||--o{ PIUTANG_RECORDS : owes
     PIUTANG_RECORDS ||--o{ PIUTANG_PAYMENTS : receives_installments
+    
+    CASH_BANK_ACCOUNTS ||--o{ CASH_BANK_TRANSACTIONS : logs_mutasi
     
     PAYLINKS ||--o{ PAYMENT_TRANSACTIONS : captures
 ```
@@ -469,6 +481,205 @@ CREATE TABLE supplier_returns (
     status VARCHAR(32) NOT NULL DEFAULT 'REQUESTED', -- 'REQUESTED', 'APPROVED_BY_SUPPLIER', 'REPLACED', 'REFUNDED_CREDIT_NOTE'
     credit_note_amount NUMERIC(14,2),
     created_by_user_id UUID REFERENCES tenant_users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 23. Sales Returns (Retur Penjualan)
+CREATE TABLE sales_returns (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    order_id UUID NOT NULL REFERENCES orders(id),
+    customer_id UUID REFERENCES customers(id),
+    return_number VARCHAR(64) UNIQUE NOT NULL, -- e.g. 'RET-20260909-001'
+    settlement_type VARCHAR(32) NOT NULL DEFAULT 'CREDIT_NOTE', -- 'CASH_REFUND', 'CREDIT_NOTE', 'REPLACEMENT_GOODS'
+    total_refund_amount NUMERIC(14,2) NOT NULL DEFAULT 0,
+    status VARCHAR(32) NOT NULL DEFAULT 'COMPLETED', -- 'DRAFT', 'APPROVED', 'COMPLETED', 'CANCELED'
+    notes TEXT,
+    processed_by_user_id UUID REFERENCES tenant_users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE sales_return_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sales_return_id UUID NOT NULL REFERENCES sales_returns(id) ON DELETE CASCADE,
+    order_item_id UUID NOT NULL REFERENCES order_items(id),
+    product_id UUID NOT NULL REFERENCES products(id),
+    batch_id UUID REFERENCES product_batches(id), -- Restored back to FIFO batch lot if in sellable condition
+    quantity_returned INTEGER NOT NULL,
+    unit_price NUMERIC(14,2) NOT NULL,
+    subtotal NUMERIC(14,2) NOT NULL,
+    restock_condition VARCHAR(32) NOT NULL DEFAULT 'RESTOCK_GOOD', -- 'RESTOCK_GOOD', 'DAMAGED_DISPOSAL'
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 24. Inter-Warehouse Stock Transfers (Transfer Antar Gudang / Cabang)
+CREATE TABLE warehouse_transfers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    transfer_number VARCHAR(64) UNIQUE NOT NULL, -- e.g. 'TRF-20260909-001'
+    source_branch_id UUID NOT NULL REFERENCES branches(id),
+    destination_branch_id UUID NOT NULL REFERENCES branches(id),
+    status VARCHAR(32) NOT NULL DEFAULT 'IN_TRANSIT', -- 'DRAFT', 'PENDING_APPROVAL', 'IN_TRANSIT', 'RECEIVED', 'CANCELED'
+    driver_name VARCHAR(128),
+    vehicle_plate VARCHAR(32),
+    dispatched_at TIMESTAMPTZ,
+    received_at TIMESTAMPTZ,
+    dispatched_by UUID REFERENCES tenant_users(id),
+    received_by UUID REFERENCES tenant_users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE warehouse_transfer_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    transfer_id UUID NOT NULL REFERENCES warehouse_transfers(id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(id),
+    batch_id UUID REFERENCES product_batches(id),
+    quantity_sent INTEGER NOT NULL,
+    quantity_received INTEGER,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 25. Multi-Account Cash & Bank Accounts (Kas & Bank)
+CREATE TABLE cash_bank_accounts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    branch_id UUID REFERENCES branches(id),
+    account_code VARCHAR(32) NOT NULL, -- e.g. '1101-01', '1102-01'
+    account_name VARCHAR(128) NOT NULL, -- e.g. 'Kasir Utama', 'Kas Kecil Toko', 'BCA Operasional 123-456'
+    account_type VARCHAR(32) NOT NULL DEFAULT 'BANK', -- 'CASH', 'BANK', 'PAYMENT_GATEWAY_ESCROW'
+    bank_name VARCHAR(64), -- 'BCA', 'Mandiri', 'BRI', 'Cash Drawer'
+    account_number VARCHAR(64),
+    current_balance NUMERIC(16,2) NOT NULL DEFAULT 0,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE cash_bank_transactions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    account_id UUID NOT NULL REFERENCES cash_bank_accounts(id),
+    transaction_type VARCHAR(32) NOT NULL, -- 'DEPOSIT', 'WITHDRAWAL', 'TRANSFER_IN', 'TRANSFER_OUT', 'ORDER_PAYMENT', 'EXPENSE'
+    amount NUMERIC(16,2) NOT NULL,
+    balance_after NUMERIC(16,2) NOT NULL,
+    reference_type VARCHAR(64), -- 'ORDER', 'SUPPLIER_PAYMENT', 'SHIFT_DROP', 'EXPENSE'
+    reference_id UUID,
+    description TEXT,
+    created_by_user_id UUID REFERENCES tenant_users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 26. Stock Opname & Inventory Adjustments (Audit Fisik Stok)
+CREATE TABLE stock_adjustments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    branch_id UUID NOT NULL REFERENCES branches(id),
+    adjustment_number VARCHAR(64) UNIQUE NOT NULL, -- e.g. 'OPN-20260909-001'
+    status VARCHAR(32) NOT NULL DEFAULT 'DRAFT', -- 'DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'REJECTED'
+    total_variance_qty INTEGER NOT NULL DEFAULT 0,
+    total_variance_value NUMERIC(14,2) NOT NULL DEFAULT 0,
+    notes TEXT,
+    audited_by UUID REFERENCES tenant_users(id),
+    approved_by UUID REFERENCES tenant_users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE stock_adjustment_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    stock_adjustment_id UUID NOT NULL REFERENCES stock_adjustments(id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(id),
+    batch_id UUID REFERENCES product_batches(id),
+    system_qty INTEGER NOT NULL,
+    physical_qty INTEGER NOT NULL,
+    variance_qty INTEGER GENERATED ALWAYS AS (physical_qty - system_qty) STORED,
+    unit_cost NUMERIC(14,2) NOT NULL,
+    variance_value NUMERIC(14,2) GENERATED ALWAYS AS ((physical_qty - system_qty) * unit_cost) STORED,
+    reason VARCHAR(128), -- 'DAMAGED', 'EXPIRED', 'THEFT_SHRINKAGE', 'COUNT_MISMATCH'
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 27. Fixed Assets & Depreciation (Aset Tetap & Depresiasi)
+CREATE TABLE fixed_assets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    asset_code VARCHAR(32) NOT NULL, -- e.g. 'AST-VEH-001'
+    asset_name VARCHAR(128) NOT NULL, -- e.g. 'Mobil Box Grand Max B 1234 CD'
+    category VARCHAR(64) NOT NULL, -- 'VEHICLE', 'MACHINERY', 'ELECTRONICS', 'BUILDING_IMPROVEMENT'
+    acquisition_date DATE NOT NULL,
+    acquisition_cost NUMERIC(16,2) NOT NULL,
+    salvage_value NUMERIC(16,2) NOT NULL DEFAULT 0,
+    useful_life_months INTEGER NOT NULL, -- e.g. 48 months (4 years)
+    depreciation_method VARCHAR(32) NOT NULL DEFAULT 'STRAIGHT_LINE',
+    accumulated_depreciation NUMERIC(16,2) NOT NULL DEFAULT 0,
+    book_value NUMERIC(16,2) NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'ACTIVE', -- 'ACTIVE', 'DISPOSED', 'SOLD'
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE asset_depreciations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    fixed_asset_id UUID NOT NULL REFERENCES fixed_assets(id) ON DELETE CASCADE,
+    period_year_month VARCHAR(7) NOT NULL, -- e.g. '2026-09'
+    depreciation_amount NUMERIC(14,2) NOT NULL,
+    book_value_after NUMERIC(16,2) NOT NULL,
+    posted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 28. Approval Rules & Workflows
+CREATE TABLE approval_rules (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    workflow_type VARCHAR(64) NOT NULL, -- 'PURCHASE_ORDER', 'DISCRETIONARY_DISCOUNT', 'ORDER_VOID', 'CREDIT_LIMIT_OVERRIDE'
+    threshold_value NUMERIC(14,2) NOT NULL, -- e.g. 50000000 for PO > 50M
+    required_role VARCHAR(32) NOT NULL DEFAULT 'OWNER',
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE approval_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    rule_id UUID REFERENCES approval_rules(id),
+    workflow_type VARCHAR(64) NOT NULL,
+    reference_id UUID NOT NULL, -- e.g. purchase_order_id or order_id
+    requested_by UUID NOT NULL REFERENCES tenant_users(id),
+    approver_id UUID REFERENCES tenant_users(id),
+    status VARCHAR(32) NOT NULL DEFAULT 'PENDING', -- 'PENDING', 'APPROVED', 'REJECTED'
+    rejection_reason TEXT,
+    actioned_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 29. Tenant Activity Audit Log (Immutable Event Log)
+CREATE TABLE tenant_audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    actor_user_id UUID REFERENCES tenant_users(id),
+    actor_name VARCHAR(128) NOT NULL,
+    actor_role VARCHAR(32) NOT NULL,
+    action_type VARCHAR(64) NOT NULL, -- 'PRICE_OVERRIDE', 'VOID_ORDER', 'STAFF_INVITE', 'RBAC_UPDATE', 'STOCK_ADJUST'
+    entity_name VARCHAR(64) NOT NULL, -- 'orders', 'products', 'tenant_users'
+    entity_id UUID,
+    old_state JSONB,
+    new_state JSONB,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    ray_id VARCHAR(64),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_tenant_audit_logs ON tenant_audit_logs(tenant_id, created_at DESC);
+
+-- 30. Consignment Management (Konsinyasi Masuk & Keluar)
+CREATE TABLE consignment_contracts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    consignment_type VARCHAR(32) NOT NULL DEFAULT 'INBOUND', -- 'INBOUND' (dari Supplier), 'OUTBOUND' (ke Toko Mitra)
+    partner_id UUID NOT NULL, -- supplier_id or customer_id
+    contract_number VARCHAR(64) UNIQUE NOT NULL,
+    commission_rate_pct NUMERIC(5,2) NOT NULL DEFAULT 0,
+    settlement_period VARCHAR(32) NOT NULL DEFAULT 'MONTHLY', -- 'WEEKLY', 'BI_WEEKLY', 'MONTHLY'
+    status VARCHAR(32) NOT NULL DEFAULT 'ACTIVE',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 ```

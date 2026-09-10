@@ -10,6 +10,49 @@ To satisfy the core requirements of **extreme modularity** (where features can b
 2. **Offline-First Client Architecture** (React Native Expo + Local SQLite/WatermelonDB) with deterministic conflict resolution.
 3. **Pluggable Domain Modules with Dynamic Tenant Feature Entitlements**.
 4. **Tenant User, Role & Shift Governance** (Fast cashier PIN switching, shift cash balancing, and COGS privacy protection).
+5. **Discreet Dual-Plane Multi-Tenancy** (Two independent, purpose-built UIs reading the same unified multi-tenant dataset).
+
+### 1.1 Dual-Plane Architecture: Tenant Workspace OS vs. Operator Control Plane
+
+The platform is strictly partitioned into two discreet, end-to-end system planes that read and operate on the same unified PostgreSQL multi-tenant data layer:
+
+```
++---------------------------------------------------------------------------------------------------------------+
+|                                      UNIFIED MULTI-TENANT POSTGRESQL 17 DATA SET                              |
+|           (Row-Level Security, Tenant Schema Shards, Immutable Audit Logs, Dynamic PDP Masking)              |
++---------------------------------------+-----------------------------------------------------------------------+
+                                        |
+                 +----------------------+----------------------+
+                 |                                             |
+                 v                                             v
++-----------------------------------------------+ +-------------------------------------------------------------+
+|        SYSTEM 1: TENANT WORKSPACE OS          | |          SYSTEM 2: OPERATOR CONTROL PLANE                   |
+|     (Merchant Plane • [tenant].sidaya.id)     | |         (Ashvin Labs Plane • ops.sidaya.id)                 |
++-----------------------------------------------+ +-------------------------------------------------------------+
+| Target: Toko Owner, Kasir, Gudang, Driver     | | Target: Ashvin Labs CEO, Devs, Ops Support, Compliance      |
+| End-to-End Merchant Lifecycle:                | | End-to-End Platform Lifecycle:                              |
+|  1. Inbound Dock & Batch Lot FIFO Receiving   | |  1. Tenant Fleet Provisioning & Subdomain Routing           |
+|  2. Master Barcode Catalog (EAN-13 / SKU)     | |  2. Dynamic Tier Entitlement & Feature Flag Engine          |
+|  3. High-Speed POS Kasir & Barcode Fast-Scan  | |  3. Automated SaaS Subscription Billing & Dunning Engine    |
+|  4. Surat Jalan Dispatch & Driver POD         | |  4. Cluster Telemetry, P99 Latency & Connection Pool Health |
+|  5. Piutang Ledger & WhatsApp PayLink QRIS    | |  5. UU PDP No. 27/2022 PII Dynamic Data Masking Guard       |
+|  6. Role Matrix RBAC & Fast PIN Switch        | |  6. Immutable Cross-Tenant Operator Forensic Audit Trail    |
+|  7. Store Settings & Printer Hardware Pairing | |  7. Threat Detection, WAF Rate Limiting & Shard Migration   |
++-----------------------------------------------+ +-------------------------------------------------------------+
+```
+
+1. **System 1: Tenant Workspace OS (Merchant Plane)**:
+   - **Audience**: Business Owners, Store Managers, Counter Cashiers, Warehouse Pickers, and Logistics Delivery Drivers.
+   - **Domain**: `[subdomain].sidaya.id` or `app.sidaya.id`.
+   - **Isolation**: Strictly isolated at the database layer via PostgreSQL Row Level Security (`tenant_id = current_setting('app.current_tenant_id')`). Each tenant only sees their own transactions, stock lots, customers, and staff.
+   - **Modularity**: Structured into the **9 Pillars of Enterprise ERP Architecture** with interactive "Coming Soon" showcase placeholders for roadmap features.
+
+2. **System 2: Operator Control Plane (Ashvin Labs Management Plane)**:
+   - **Audience**: Ashvin Labs internal team (`SUPER_ADMIN`, `DEV_ENGINEER`, `OPS_SUPPORT`, `AUDIT_COMPLIANCE`).
+   - **Domain**: `ops.sidaya.id` or `ops.localhost:3333`.
+   - **Cross-Tenant Fleet Governance**: Provides aggregate platform telemetri (GMV, active tenant count, p95/p99 API latency, DB connection pool utilization), tenant lifecycle provisioning (create, upgrade/downgrade tier, suspend/reactivate), and immutable operator audit logs.
+   - **Privacy Guard (UU PDP No. 27/2022)**: Enforces dynamic masking of tenant Personally Identifiable Information (PII) for customer support agents with an explicit "break-glass" emergency unmasking mechanism that creates an immutable forensic audit trail.
+
 
 ```
 +---------------------------------------------------------------------------------------------------------------+
@@ -161,131 +204,188 @@ graph TB
 
 ---
 
-## 3. The Modular Monolith & Domain Boundaries
+## 3. The 9 Pillars of Enterprise ERP Architecture & Domain Boundaries
 
-To guarantee that any domain module can be added, updated, or removed independently without regressions, all modules adhere to strict **Hexagonal / Clean Architecture boundaries**. Direct cross-module database querying is prohibited; all cross-domain operations must pass through explicit **Domain Interfaces** or the **Asynchronous Domain Event Bus**.
-
-### Core Bounded Contexts
+To guarantee that any enterprise domain module can be added, updated, or toggled independently without regressions, all modules adhere to strict **Hexagonal / Clean Architecture boundaries**. Direct cross-module database querying is prohibited; all cross-domain operations must pass through explicit **Domain Interfaces** or the **Asynchronous Domain Event Bus**.
 
 ```mermaid
 classDiagram
-    class IdentityModule {
-        +TenantService
-        +AuthService
-        +StaffRoleService
-        +QuickPinAuthService
+    class Pilar1_Dashboard {
+        +ExecutiveMetricsService
+        +GrossProfitFifoCalculator
+        +CashBankSummaryService
+        +SmartAlertEngine
     }
-    class EntitlementModule {
-        +TenantEntitlementService
-        +FeatureRegistry
-        +PlanLimitGuard
-    }
-    class ShiftModule {
-        +ShiftLifecycleService
-        +CashDrawerTracker
-        +ReconciliationReportService
-    }
-    class CatalogModule {
-        +ProductService
-        +WholesalePriceTierService
+    class Pilar2_Inventory {
+        +MasterSkuService
+        +MultiWarehouseService
+        +BatchAllocationEngine (FIFO/FEFO)
+        +StockOpnameAdjustmentService
         +UnitConversionService
     }
-    class OrderModule {
-        +OrderCreationService
-        +CompoundDiscountEngine
-        +POSTransactionService
+    class Pilar3_ContactsCRM {
+        +SupplierDirectoryService
+        +CustomerDirectoryService
+        +WholesaleTierResolver
+        +DynamicCreditScoringService
     }
-    class InventoryModule {
-        +StockLedgerService
-        +StorageBinService
-        +BatchAllocationEngine (FIFO/FEFO)
-        +MultiWarehouseService
-        +AtomicDecrementService
-    }
-    class InboundProcurementModule {
-        +SupplierService
-        +SupplierPOService
+    class Pilar4_Procurement {
+        +StockPlanningReorderEngine
+        +PurchaseOrderService
         +GoodsReceivingService
         +SupplierReturnService (RTV)
     }
-    class LogisticsModule {
-        +SuratJalanService
-        +DriverManifestGenerator
-        +ProofOfDeliveryService
+    class Pilar5_SalesInvoicingPOS {
+        +OfflinePOSCheckoutService
+        +InvoiceMultiStatusEngine
+        +SalesReturnSettlementService
+        +CashierShiftX_Z_ReportService
+        +BarcodeScanningService
     }
-    class PayLinkModule {
-        +PayLinkGenerator
-        +WebhookHandler
-        +GatewayAdapterRegistry
+    class Pilar6_Logistics {
+        +SuratJalanService (Price-Masked)
+        +FleetDriverAssignmentService
+        +DigitalProofOfDeliveryService
     }
-    class PiutangModule {
-        +PiutangLedgerService
-        +DebtAgingService
-        +PartialSettlementEngine
+    class Pilar7_FinanceAccounting {
+        +AccountsReceivableLedger (Piutang)
+        +AccountsPayableLedger (Hutang)
+        +MultiAccountCashBankLedger
+        +RealtimeProfitLossService (FIFO HPP)
+        +CashFlowForecastService
+        +FixedAssetDepreciationService
     }
-    class HardwareModule {
-        +EscPosThermalDriver
-        +DotMatrixEscP2Driver
-        +PrinterProfileRegistry
+    class Pilar8_UserRBAC {
+        +TenantAuthService
+        +StaffRoleMatrixService
+        +QuickPinSwitchService
+    }
+    class Pilar9_GovernanceAudit {
+        +ImmutableAuditLogService
+        +DatabaseBackupSnapshotService
+        +DataExportService (Excel/PDF)
+        +PdpComplianceMaskingEngine
     }
 
-    OrderModule ..> EntitlementModule : Verifies Active Tiers
-    OrderModule ..> IdentityModule : Authenticates Staff PIN
-    OrderModule ..> CatalogModule : Resolves Wholesale & Units
-    OrderModule ..> InventoryModule : Requests FIFO Batch Reservation
-    OrderModule ..> LogisticsModule : Dispatches Driver Surat Jalan (Price-Stripped)
-    OrderModule ..> HardwareModule : Dispatches Print Jobs
-    OrderModule ..> PayLinkModule : Requests Payment Link
-    InboundProcurementModule ..> InventoryModule : Ingests Inbound Batches & Bins
-    PayLinkModule --> EventBus : Publishes 'OrderPaidEvent'
-    EventBus --> InventoryModule : Confirms Batch Decrement
-    EventBus --> PiutangModule : Clears Customer Kasbon
+    Pilar5_SalesInvoicingPOS ..> Pilar2_Inventory : Requests FIFO Batch Reservation
+    Pilar5_SalesInvoicingPOS ..> Pilar3_ContactsCRM : Resolves Customer Credit & Tiers
+    Pilar5_SalesInvoicingPOS ..> Pilar6_Logistics : Triggers Surat Jalan Generation
+    Pilar5_SalesInvoicingPOS ..> Pilar7_FinanceAccounting : Posts AR / Cash Ledger Entries
+    Pilar4_Procurement ..> Pilar2_Inventory : Ingests Goods Receiving Batches
+    Pilar4_Procurement ..> Pilar7_FinanceAccounting : Posts AP / Vendor Invoices
+    Pilar7_FinanceAccounting ..> Pilar2_Inventory : Reads FIFO COGS (HPP)
+    Pilar8_UserRBAC ..> Pilar9_GovernanceAudit : Logs Role Changes & Breakglass Access
 ```
 
-### Domain Module Responsibilities
+---
 
-| Module | Core Responsibility | Public API / Interfaces |
-| :--- | :--- | :--- |
-| **`IdentityModule`** | Tenant accounts, multi-staff credentials, JWT claims, fast 4–6 digit cashier PIN switching, outlet assignment. | `verifyStaffPin()`, `switchStationCashier()`, `getTenantStaff()` |
-| **`EntitlementModule`** | Plan definitions (Free, Retail, Grosir Pro, Enterprise), dynamic feature toggling, entitlement checks. | `isFeatureEnabled(tenantId, featureKey)`, `assertLimit()` |
-| **`ShiftModule`** | Register shift lifecycle (`shifts`), opening cash float, cash in/out drops, X-Report & Z-Report reconciliation. | `openShift()`, `recordCashDrop()`, `closeShift()` |
-| **`CatalogModule`** | Products, variants, barcodes, wholesale price tiers (*Eceran/Grosir*), unit conversions (*PCS/Lusin/Dus*). | `getProduct()`, `resolveTierPrice()`, `convertStockUnits()` |
-| **`InboundProcurementModule`** | Suppliers, inbound POs, goods receiving, carrier logs, and supplier return policies (RTV terms). | `createSupplierPO()`, `receiveInboundShipment()`, `recordSupplierReturn()` |
-| **`InventoryModule`** | Multi-bin storage locations (Warehouse $\rightarrow$ Zone $\rightarrow$ Rack $\rightarrow$ Bin), FIFO/FEFO batch allocation, atomic decrements. | `allocateBatchesFIFO()`, `recordStockMovement()`, `assignStorageBin()` |
-| **`LogisticsModule`** | Driver Working Permits (*Surat Jalan* / Delivery Orders) with price-stripped manifests linked to invoices, proof of delivery. | `generateSuratJalan()`, `recordProofOfDelivery()`, `getDriverManifest()` |
-| **`OrderModule`** | Order orchestration, shopping cart calculations, compound discounts (`5%+2%+Rp`), invoice numbering. | `createOrder()`, `calculateCompoundDiscount()`, `voidOrder()` |
-| **`PayLinkModule`** | Hosted checkout tokens, QRIS/VA gateway adapters, idempotent webhook processing and auto-reconciliation. | `generatePayLink()`, `handleGatewayWebhook()` |
-| **`PiutangModule`** | Accounts receivable ledger (`piutang_records`), customer debt aging, partial installment settlements via PayLink. | `recordPiutang()`, `settleInstallment()`, `getDebtSummary()` |
-| **`HardwareModule`** | ESC/POS thermal printer byte formatting (58/80mm), Dot Matrix Continuous Form (ESC/P2) layout renderer. | `formatThermalReceipt()`, `formatDotMatrixInvoice()`, `formatSuratJalan()` |
-| **`MarketplaceModule`**| Synchronizes orders, inventory, and settlement status with Tokopedia, Shopee, and TikTok Shop APIs. | `ingestMarketplaceOrder()`, `syncCatalogStock()` |
-| **`NotificationModule`**| WhatsApp Cloud API messages, mobile push alerts (FCM/APNS), customer receipt delivery. | `sendWhatsAppPayLink()`, `sendPushNotification()` |
+## 3.1. Canonical Tenant Dashboard Menu & Sub-Menu Navigation Map
+
+The Tenant Dashboard provides a structured, role-adaptive navigation hierarchy categorized cleanly across the **9 Strategic Pillars**:
+
+| Pilar | Menu Utama | Sub-Menu | Route Path | Deskripsi & Fungsi Bisnis | Role & Permission RBAC | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Pilar 1: Dashboard** | **📊 Dashboard** | Overview Eksekutif | `/dashboard` | Ringkasan omset realtime, laba kotor FIFO, nilai total inventory, posisi piutang & hutang jatuh tempo, saldo kas & bank, serta quick launchpad. | `OWNER`, `MANAGER`, `FINANCE_ADMIN` | **Live (MVP)** |
+| **Pilar 2: Inventori & Multi-Gudang** | **📦 Inventori** | Katalog & Master SKU | `/inventory/catalog` | Manajemen data master barang, barcode EAN-13/UPC, kategori, varian, dan multi-satuan (*Pcs/Lusin/Karton*). | `OWNER`, `MANAGER`, `WAREHOUSE` | **Live (MVP)** |
+| | | Batch & Lot FIFO | `/inventory/fifo-batches` | Pelacakan lot masuk, tanggal expired, lokasi rak/bin, dan simulasi antrean pengeluaran FIFO/FEFO otomatis. | `OWNER`, `WAREHOUSE` | **Live (MVP)** |
+| | | Multi-Gudang & Cabang | `/inventory/warehouses` | Daftar gudang (Pusat, Toko, Transit), alokasi stok per lokasi, dan transfer barang antar cabang (*Inter-Warehouse Transfer*). | `OWNER`, `MANAGER`, `WAREHOUSE` | **Roadmap (Phase 2)** |
+| | | Stock Opname | `/inventory/stock-opname` | Audit fisik berkala menggunakan barcode scanner genggam, perbandingan sistem vs fisik, dan approval penyesuaian (*Adjustment*). | `OWNER`, `MANAGER`, `WAREHOUSE` | **Roadmap (Phase 2)** |
+| | | Cetak Label Barcode | `/inventory/barcode-print` | Generator cetak batch stiker barcode/QR thermal (ukuran 33x15mm, 40x30mm) untuk ribuan SKU. | `OWNER`, `WAREHOUSE`, `CASHIER` | **Roadmap (Phase 2)** |
+| **Pilar 3: Kontak CRM & SRM** | **👥 Kontak** | Direktori Pemasok (*Supplier*) | `/contacts/suppliers` | Database vendor, syarat pembayaran (*Term of Payment / TOP*), rekening bank, dan buku pembantu hutang. | `OWNER`, `PURCHASING`, `FINANCE_ADMIN` | **Roadmap (Phase 2)** |
+| | | Direktori Pelanggan (*Customer*) | `/contacts/customers` | Database pembeli, tier harga grosir, batas plafon kredit (*Credit Limit*), riwayat transaksi, dan dynamic credit score. | `OWNER`, `MANAGER`, `SALESMAN`, `CASHIER` | **Live (MVP)** |
+| **Pilar 4: Pengadaan (Procurement)** | **🛍️ Pengadaan** | Perencanaan Stok & Min/Max | `/procurement/planning` | Kalkulasi reorder point otomatis berdasarkan velocity penjualan dan estimasi lead-time supplier. | `OWNER`, `PURCHASING` | **Roadmap (Phase 3)** |
+| | | Surat Pesanan (*Purchase Order / PO*) | `/procurement/po` | Pembuatan PO supplier, approval berjenjang, tracking status (Draft, Sent, Partial, Received, Canceled). | `OWNER`, `PURCHASING` | **Roadmap (Phase 2)** |
+| | | Penerimaan Barang (*Goods Receipt*) | `/procurement/receiving` | Pencatatan barang tiba di dermaga gudang, inspeksi kuantitas/kondisi, dan pembuatan lot batch FIFO otomatis. | `OWNER`, `WAREHOUSE`, `PURCHASING` | **Live (MVP)** |
+| | | Retur Pembelian (*RTV / Return to Vendor*) | `/procurement/returns` | Pengembalian barang rusak/kadaluarsa ke supplier, klaim garansi, dan pembuatan Nota Debet pengurang hutang. | `OWNER`, `PURCHASING`, `WAREHOUSE` | **Roadmap (Phase 2)** |
+| **Pilar 5: Penjualan & POS** | **🛒 Kasir & Penjualan** | Kasir POS (Fast Scan) | `/pos` | Terminal kasir offline-first, scan barcode cepat, diskon bertingkat (*5%+2%*), multi-satuan, cetak struk thermal & PayLink QRIS. | `OWNER`, `CASHIER`, `SALESMAN` | **Live (MVP)** |
+| | | Faktur Penjualan (*Sales Invoices*) | `/sales/invoices` | Manajemen nota dan faktur: Multi-status (Draft, Belum Lunas / Piutang, Jatuh Tempo, Lunas), filter tanggal, cetak Dot Matrix. | `OWNER`, `FINANCE_ADMIN`, `CASHIER` | **Live (MVP)** |
+| | | Retur Penjualan (*Sales Returns*) | `/sales/returns` | Alur pengembalian nota penjualan: kembalikan barang ke batch FIFO, pengembalian dana tunai, atau potong saldo piutang. | `OWNER`, `MANAGER`, `CASHIER` | **Roadmap (Phase 2)** |
+| | | Shift & Kas Kasir (*X/Z Reports*) | `/sales/shifts` | Modal kas awal (*Opening Float*), cash drops, penutupan kasir, selisih fisik vs sistem, dan cetak Laporan Z. | `OWNER`, `MANAGER`, `CASHIER` | **Roadmap (Phase 2)** |
+| | | Skema Harga & Promo (*Dynamic Pricing*) | `/sales/pricing` | Konfigurasi tier grosir, diskon kuantitas minimum, aturan promo waktu terbatas, dan komisi salesman. | `OWNER`, `MANAGER` | **Roadmap (Phase 3)** |
+| **Pilar 6: Logistik & Operasional** | **🚚 Logistik** | Surat Jalan (*Delivery Order*) | `/surat-jalan` | Penerbitan dokumen pengiriman bertanda-tangan digital, *Price-Masked* (tanpa harga/HPP untuk privasi sopir & pihak ketiga). | `OWNER`, `WAREHOUSE`, `DRIVER` | **Live (MVP)** |
+| | | Pelacakan Pengiriman (*Tracking & POD*) | `/logistics/tracking` | Status armada driver (*In Transit, Delivered, Failed*), upload foto serah terima barang (*Proof of Delivery*) & tanda tangan digital penerima. | `OWNER`, `WAREHOUSE`, `DRIVER` | **Roadmap (Phase 2)** |
+| **Pilar 7: Keuangan & Akuntansi** | **💰 Keuangan** | Buku Piutang (*Accounts Receivable*) | `/finance/piutang` | Ledger piutang pelanggan, debt aging (0-30, 31-60, 60+ hari), notifikasi tagihan WhatsApp PayLink, dan riwayat cicilan. | `OWNER`, `FINANCE_ADMIN` | **Live (MVP)** |
+| | | Buku Hutang (*Accounts Payable*) | `/finance/hutang` | Jadwal jatuh tempo hutang supplier, rencana pelunasan kas, dan rekonsiliasi faktur pembelian. | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 2)** |
+| | | Kas & Rekening Bank | `/finance/cash-bank` | Rekening multi-akun (Kas Kasir, Kas Kecil, BCA, Mandiri), mutasi transfer antar rekening, dan pencatatan biaya operasional. | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 2)** |
+| | | Laporan Laba Rugi & Neraca | `/finance/reports` | Laporan P&L otomatis berbasis HPP FIFO, laporan arus kas, neraca keuangan, dan export format akuntan (Excel/PDF). | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 2)** |
+| | | Peramalan Arus Kas (*Cash Forecast*) | `/finance/forecast` | Proyeksi likuiditas 30–90 hari ke depan berdasarkan jadwal jatuh tempo piutang vs hutang dagang. | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 3)** |
+| | | Aset Tetap & Depresiasi | `/finance/assets` | Pencatatan aset toko/gudang (kendaraan, komputer, rak) dan perhitungan penyusutan otomatis garis lurus bulanan. | `OWNER`, `FINANCE_ADMIN` | **Roadmap (Phase 3)** |
+| **Pilar 8: Pengguna & RBAC** | **👥 Manajemen Tim** | Daftar Pengguna & Karyawan | `/settings/users` | Undangan staf baru (Kasir, Gudang, Sopir, Purchasing), reset PIN cepat 4-6 digit, dan assignment outlet/gudang. | `OWNER`, `MANAGER` | **Live (MVP)** |
+| | | Matriks Hak Akses (*Role Matrix*) | `/settings/roles` | Matriks checkbox izin detail (*Owner Checkbox Matrix*) untuk mengontrol akses modul, privasi HPP, hak void nota, dan diskon manual. | `OWNER` | **Live (MVP)** |
+| **Pilar 9: Tata Kelola & Audit** | **🔒 Tata Kelola** | Audit Trail Aktivitas (*Audit Logs*) | `/settings/audit-logs` | Rekam jejak aktivitas tidak dapat diubah (*immutable*): siapa mengubah apa, kapan, alamat IP, dan Ray ID transaksi. | `OWNER` | **Live (MVP)** |
+| | | Backup & Export Data | `/settings/backup` | Snapshot backup database harian, download arsip master data (CSV/Excel/JSON), dan kepatuhan UU PDP No. 27/2022. | `OWNER` | **Live (MVP)** |
+| | | Pengaturan Profil & Hardware | `/pengaturan` | Konfigurasi identitas toko, logo struk, pairing printer thermal Bluetooth & Dot Matrix, dan pengaturan pajak PPN. | `OWNER`, `MANAGER` | **Live (MVP)** |
 
 ---
 
 ## 4. Pluggable Feature Registry & Dynamic Tenant Entitlements
 
-To satisfy the user requirement of **extreme modularity**—where features can be enabled, disabled, or removed at runtime when a tenant changes their subscription plan:
+To satisfy the core requirement of **extreme modularity**—where features can be enabled, disabled, or gated at runtime according to tenant subscription plans:
 
-### 1. Feature Registry & Keys
-Every feature is governed by a canonical `FeatureKey` enum:
+### 1. Unified Feature Registry & Keys
+Every capability across the 9 Pillars is governed by a canonical `FeatureKey` enum:
+
 ```typescript
 export enum FeatureKey {
-  CORE_POS = 'core:pos',
-  CLIENT_PAYLINK = 'fintech:paylink',
-  GROSIR_MULTI_TIER = 'wholesale:multi_tier',
-  COMPOUND_DISCOUNTS = 'wholesale:compound_discounts',
-  UNIT_CONVERSIONS = 'wholesale:unit_conversions',
-  INBOUND_PROCUREMENT = 'inventory:inbound_procurement',
+  // Pilar 1: Dashboard & Analytics
+  EXECUTIVE_DASHBOARD = 'dashboard:executive_kpis',
+  LIVE_PROFIT_FIFO = 'dashboard:live_profit_fifo',
+
+  // Pilar 2: Inventori & Multi-Gudang
+  CORE_CATALOG = 'inventory:core_catalog',
   STORAGE_BINS = 'inventory:storage_bins',
   FIFO_BATCH_ALLOCATION = 'inventory:fifo_batch_allocation',
+  MULTI_WAREHOUSE = 'inventory:multi_warehouse',
+  STOCK_OPNAME_AUDIT = 'inventory:stock_opname_audit',
+  BARCODE_BATCH_PRINTING = 'inventory:barcode_batch_printing',
+
+  // Pilar 3: Kontak CRM & SRM
+  SUPPLIER_DIRECTORY = 'contacts:suppliers',
+  CUSTOMER_CREDIT_SCORING = 'contacts:customer_credit_scoring',
+
+  // Pilar 4: Pengadaan (Procurement)
+  INBOUND_PROCUREMENT = 'procurement:inbound_po',
+  SUPPLIER_RETURNS_RTV = 'procurement:supplier_returns_rtv',
+  SMART_REORDER_PLANNING = 'procurement:smart_reorder_planning',
+
+  // Pilar 5: Penjualan & POS
+  CORE_POS = 'pos:core_checkout',
+  BARCODE_SCANNER_FAST_SCAN = 'pos:barcode_fast_scan',
+  GROSIR_MULTI_TIER = 'sales:wholesale_multi_tier',
+  COMPOUND_DISCOUNTS = 'sales:compound_discounts',
+  UNIT_CONVERSIONS = 'sales:unit_conversions',
+  INVOICE_MULTI_STATUS = 'sales:invoice_multi_status',
+  SALES_RETURNS_MANAGEMENT = 'sales:returns_management',
+  CASHIER_SHIFT_RECONCILIATION = 'sales:shift_reconciliation',
+
+  // Pilar 6: Logistik & Operasional
   DRIVER_SURAT_JALAN = 'logistics:driver_surat_jalan',
-  SUPPLIER_RETURNS = 'inventory:supplier_returns',
-  DOT_MATRIX_PRINTING = 'hardware:dot_matrix',
-  PIUTANG_LEDGER = 'finance:piutang',
-  STAFF_RBAC_SHIFTS = 'staff:rbac_shifts',
-  REALTIME_MULTI_DEVICE = 'sync:supabase_realtime',
+  DIGITAL_PROOF_OF_DELIVERY = 'logistics:digital_pod',
+
+  // Pilar 7: Keuangan & Akuntansi
+  PIUTANG_LEDGER = 'finance:piutang_ledger',
+  HUTANG_LEDGER = 'finance:hutang_ledger',
+  CASH_BANK_MULTI_ACCOUNT = 'finance:cash_bank_accounts',
+  PROFIT_LOSS_REPORTING = 'finance:profit_loss_reporting',
+  CASH_FLOW_FORECASTING = 'finance:cash_flow_forecasting',
+  FIXED_ASSETS_DEPRECIATION = 'finance:fixed_assets_depreciation',
+  CLIENT_PAYLINK = 'fintech:paylink_qris_va',
+
+  // Pilar 8: Pengguna & RBAC
+  STAFF_RBAC_MATRIX = 'staff:rbac_matrix',
+  FAST_PIN_SWITCHING = 'staff:fast_pin_switch',
+
+  // Pilar 9: Tata Kelola & Keamanan
+  IMMUTABLE_AUDIT_TRAIL = 'governance:immutable_audit_trail',
+  AUTO_BACKUP_DATA_EXPORT = 'governance:auto_backup_export',
+  APPROVAL_WORKFLOW_ENGINE = 'governance:approval_workflows',
+
+  // Hardware & Omnichannel
+  THERMAL_PRINTING = 'hardware:thermal_escpos',
+  DOT_MATRIX_PRINTING = 'hardware:dot_matrix_escp2',
   MARKETPLACE_SYNC = 'omnichannel:marketplace_sync',
-  RESTAURANT_MODE = 'hospitality:restaurant_mode', // Deferred backlog
+  SALESMAN_CANVASSING_SFA = 'sales:salesman_canvassing_sfa',
+  CONSIGNMENT_MANAGEMENT = 'inventory:consignment_management',
 }
 ```
 
@@ -463,4 +563,268 @@ flowchart TD
    - Declarative CSS classes (`html.state-auth-*` vs `html.state-unauth-*`) ensure authenticated routes (`/dashboard`, `/pos`, `/fleet`) render without flickering the login screen on reload.
 5. **Clean HTML5 Path-Based Routing**:
    - Full RESTful URL paths (`/dashboard`, `/pos`, `/fifo`, `/surat-jalan`, `/telemetry`, `/fleet`, `/operators`, `/audit`, `/login`) synchronized via HTML5 `history.pushState` and `popstate` listeners.
+
+---
+
+## 10. High-Speed Barcode & SKU Scanning Engine (Scale to 50,000+ Items)
+
+To enable wholesale merchants and distributors to effortlessly manage and checkout catalogs containing **thousands to tens of thousands of SKUs**, SiDaya implements a multi-modal, zero-latency Barcode Scanning Subsystem:
+
+```mermaid
+flowchart LR
+    subgraph Inputs ["📷 Scan Inputs"]
+        CAM["Smartphone / Tablet Camera\n(Vision & BarcodeDetector API)"]
+        HID["Bluetooth / USB Laser Scanner\n(Keystroke Wedge Buffer)"]
+    end
+
+    subgraph ScannerEngine ["⚡ SiDaya Scanning Engine"]
+        BUFFER["Rapid Input Buffer & Debounce\n(Detects bursts < 50ms + CR/Enter)"]
+        INDEX["O(1) Local Memory Index\n(Hash Map by Barcode & SKU)"]
+        HAPTIC["Audio & Haptic Feedback\n(Instant Beep / Vibrate)"]
+    end
+
+    subgraph Actions ["🎯 Instant Workflows"]
+        POS["🛒 POS Cashier Fast Scan\n(Instant Add to Cart)"]
+        INBOUND["📦 Inbound Warehouse Receiving\n(Batch Lot Registration)"]
+        OPNAME["📋 Stock Opname Audit\n(Live Physical Stock Count)"]
+    end
+
+    CAM --> BUFFER
+    HID --> BUFFER
+    BUFFER --> INDEX
+    INDEX --> HAPTIC
+    INDEX --> POS
+    INDEX --> INBOUND
+    INDEX --> OPNAME
+```
+
+### Supported Formats & Capabilities:
+1. **Universal Barcode Symbologies**:
+   - **Retail & FMCG**: EAN-13, EAN-8, UPC-A, UPC-E.
+   - **Wholesale & Logistics**: Code 128, Code 39, ITF-14 (Case barcodes).
+   - **2D & QR Codes**: QR Code, GS1 DataMatrix (with batch & expiry metadata).
+2. **Dual-Mode Hardware Support**:
+   - **Smartphone / Tablet Camera Scanner**: Built-in visual viewfinder with auto-focus, torch toggle, and bounding box targeting.
+   - **Physical Laser / 2D Scanner Wedge**: Supports wireless Bluetooth handheld scanners and USB countertop gun scanners without extra drivers.
+3. **Sub-5ms Local Index Resolution**:
+   - Products are pre-indexed into an in-memory hash map (`Map<string, Product>`), allowing instant O(1) item retrieval even on budget Android hardware with 50,000+ items.
+
+---
+
+## 11. Standard Error Access & Fault-Tolerant Status Pages (400, 401, 403, 404, 429, 500, 503)
+
+To ensure enterprise-grade resilience, transparent security boundaries, and graceful failure handling across both Tenant and Operator planes, SiDaya defines a unified HTTP & Access Error architecture:
+
+```mermaid
+flowchart TD
+    REQ["Incoming Client Request / Navigation"] --> ROUTE{"Route & Permission Guard"}
+    
+    ROUTE -->|"Invalid Param / Malformed"| E400["400 Bad Request\n(Payload Validation Error)"]
+    ROUTE -->|"No Valid Session Token"| E401["401 Unauthorized\n(Session Expired / Re-login)"]
+    ROUTE -->|"Missing Role Permission"| E403["403 Forbidden\n(Access Restricted / Escalation)"]
+    ROUTE -->|"Route Not Found"| E404["404 Not Found\n(Resource / Path Typo)"]
+    ROUTE -->|"Rate Limit Exceeded"| E429["429 Too Many Requests\n(Brute-Force & API Protection)"]
+    ROUTE -->|"Unhandler Server Crash"| E500["500 Internal Server Error\n(Logged with Incident Ray ID)"]
+    ROUTE -->|"Database / Maintenance"| E503["503 Service Unavailable\n(Scheduled Maintenance Mode)"]
+    ROUTE -->|"Valid & Permitted"| SUCCESS["200 OK / Active UI View"]
+```
+
+### Standard Error Taxonomy & UX Behavior:
+
+| Status Code | Error Title | Description & Context | Client Remediation & Primary Action |
+| :--- | :--- | :--- | :--- |
+| **400** | **Bad Request (Permintaan Tidak Valid)** | Parameter input, header, atau JSON body tidak sesuai schema / korup. | Perbaiki input form atau reset formulir ke nilai awal. |
+| **401** | **Unauthorized (Sesi Kedaluwarsa)** | JWT / session cookie telah habis masa berlakunya atau tidak valid. | Tombol *"Masuk Kembali"* yang mengarahkan ke gateway login dengan return URL. |
+| **403** | **Forbidden (Akses Terbatas)** | Staf (e.g. Kasir/Driver) mencoba mengakses modul finansial/COGS atau Operator mencoba break-glass tanpa justifikasi. | Tombol *"Kembali ke Dashboard Utama"* & banner *"Minta Izin ke Pemilik Toko"*. |
+| **404** | **Not Found (Halaman Tidak Ditemukan)** | URL slug atau ID transaksi tidak terdaftar dalam routing table. | Tombol navigasi *"Kembali ke Beranda"* & search box cepat. |
+| **429** | **Too Many Requests (Batas Permintaan Terlampaui)** | Proteksi rate limiting (maksimal 100 req/min untuk API publik, 10 login attempts/min). | Countdown timer otomatis (e.g. *"Tunggu 30 detik sebelum mencoba lagi"*). |
+| **500** | **Internal Server Error (Gangguan Sistem)** | Exception tak tertangani di level API atau backend microservice. | Menampilkan **Ray ID / Trace ID** unik (e.g. `sidaya_err_8f91a2`), tombol *"Salin Kode Error"*, dan tombol *"Muat Ulang Halaman"*. |
+| **503** | **Service Unavailable (Pemeliharaan Terjadwal)** | Database migration atau maintenance window infrastruktur sedang berlangsung. | Banner status pemeliharaan dengan estimasi waktu kembali online & tombol *"Cek Status Server"*. |
+
+---
+
+## 12. Modular Roadmap Feature-Gating & "Coming Soon" UX Paradigm
+
+To balance rapid market transparency with phased enterprise engineering, SiDaya surfaces future roadmap modules directly within the sidebar navigation, gated by dynamic **Roadmap Feature Placeholders**:
+
+```mermaid
+flowchart LR
+    SIDEBAR["Sidebar Navigation Item\n(e.g. Laporan Laba Rugi)"] --> CHECK{"Module Active in Current Tenant Tier / Phase?"}
+    CHECK -->|"Phase 1 (Live MVP)"| ACTIVE["Render Live Interactive Module\n(POS, FIFO, Surat Jalan, Piutang, Katalog)"]
+    CHECK -->|"Phase 2 / 3 / 4 (Roadmap)"| SOON["Render Coming Soon Glassmorphic Showcase\n- Feature Highlights\n- Target Delivery Quarter\n- Early Access Beta Opt-in CTA"]
+    SOON -->|"Merchant Clicks 'Minta Akses Beta'"| TOAST["Save Tenant Interest to Database & Display Toast Alert"]
+```
+
+### Navigation Module Matrix by Phase:
+
+1. **Active Core Modules (Phase 1 MVP)**:
+   - 🏢 **Dashboard & Hak Akses** (`/dashboard`): Realtime turnover, inventory overview, staff onboarding.
+   - 🛒 **Kasir Grosir & Barcode Fast-Scan** (`/pos`): 3-tap order creation, barcode scan, dynamic QRIS PayLink.
+   - 📦 **Inbound & Gudang FIFO** (`/fifo`): Batch receiving, lot expiration tracking, automated FIFO deduction.
+   - 🚚 **Surat Jalan Driver** (`/surat-jalan`): Logistics manifest with price-masked driver working permits.
+   - 📒 **Buku Piutang & Kasbon** (`/piutang`): Accounts receivable ledger, debt aging, and WhatsApp PayLink reminders.
+   - 🏷️ **Katalog Master & SKU** (`/katalog`): Commodity master catalog, EAN-13 barcodes, COGS privacy protection.
+   - ⚙️ **Pengaturan & Hardware** (`/pengaturan`): Business profile, custom subdomain, ESC/POS printer pairing.
+
+2. **Roadmap Coming Soon Modules (Phased Delivery)**:
+   - 📊 **Laporan Laba Rugi & Finansial** (`/finance/reports` - **Phase 2 / Q4 2026**): Comprehensive P&L calculation, daily gross margins, FIFO COGS analysis, and accountant export.
+   - 🏬 **Multi-Gudang & Transfer Cabang** (`/inventory/warehouses` - **Phase 2 / Q4 2026**): Inter-branch stock transfers, multi-bin distribution, and in-transit tracking.
+   - 🔌 **Integrasi Marketplace & Omnichannel** (`/integrasi` - **Phase 3 / Q1 2027**): Realtime stock sync across Shopee, Tokopedia, and TikTok Shop.
+   - 🤖 **AI Demand Forecasting & Smart Reorder** (`/procurement/planning` - **Phase 3 / Q1 2027**): Predictive commodity purchasing algorithms based on historical sales velocity.
+   - 🧾 **Pajak & e-Faktur Otomatis** (`/pajak` - **Phase 4 / Q2 2027**): Automated Indonesian tax compliance, PPN calculation, and DJP e-Faktur integration.
+
+---
+
+## 13. High-Value Extended Modules & Specialized Capabilities
+
+To cater to mid-sized wholesalers, FMCG distributors, and multi-outlet trade networks, SiDaya specifies 5 specialized enterprise capabilities:
+
+### 1. Approval Workflow Engine
+* **Configurable Financial Thresholds**: Store Owners can configure automatic approval rules for sensitive operations:
+  - *Purchase Order (PO)* exceeding a threshold (e.g. `> Rp 50.000.000` requires Owner/Director PIN).
+  - *Discretionary Cashier Discount* exceeding maximum allowance (e.g. `> 10%` or `> Rp 250.000`).
+  - *Transaction Void or Credit Limit Override*.
+* **Real-time Mobile Push Approvals**: Push notifications with 1-tap Approve/Reject delivered to the Owner's smartphone.
+
+### 2. Salesman Force Automation (SFA) & Field Canvassing
+* **Mobile Canvasser Order Taking**: Field salesmen can record customer orders, take payments, or register new toko outlets directly on Android smartphones.
+* **Geolocation & Route Optimization**: GPS-stamped check-in at customer shops (*Toko Retail*) to verify physical sales visits.
+* **Commission Tracking**: Automated calculation of sales commissions per salesman based on target achievement and cash collections.
+
+### 3. Consignment Management (Konsinyasi Masuk & Keluar)
+* **Konsinyasi Masuk (Supplier Titip Jual)**: Goods received from vendor without upfront payment; stock is tracked in a dedicated consignment ledger and vendor billing is triggered only when goods are sold.
+* **Konsinyasi Keluar (Titip Jual ke Toko Mitra)**: Stock dispatched to partner outlets; automated periodic stock settlement and margin calculation.
+
+### 4. Barcode Batch Label Generator & Thermal Printing
+* **Batch Print Engine**: Generate and print formatted barcode labels (EAN-13, Code 128, QR) on standard thermal label rolls (33x15mm, 40x30mm, 50x20mm).
+* **Mass SKU Printing**: 1-click printing for newly received PO lots or re-tagging physical shelves.
+
+### 5. Dynamic Credit Scoring & Automated Credit Limits
+* **Customer Payment Behavior Index**: Tracks historical Days Beyond Terms (DBT) and on-time payment percentages.
+* **Automated Credit Limit Scaling**: Automatically recommends or increases credit limits (e.g. from Rp 10M to Rp 25M) for verified reliable wholesale customers.
+
+---
+
+## 14. Subdomain Routing, Wildcard DNS & Centralized Gateway Architecture
+
+SiDaya utilizes a multi-environment wildcard DNS routing topology to deliver isolated subdomains per merchant while providing a centralized login gateway:
+
+```
++---------------------------------------------------------------------------------------------------------------+
+|                                    WILDCARD DNS & EDGE INGRESS LAYER                                          |
+|                 Production: *.sidaya.biz.id  |  Staging: *.sidaya.my.id  |  Local: localhost:3333             |
++-------------------------------------------------------+-------------------------------------------------------+
+                                                        |
+                            +---------------------------+---------------------------+
+                            |                                                       |
+                            v                                                       v
++-------------------------------------------------------+ +-----------------------------------------------------+
+|      CENTRALIZED GATEWAY (sidaya.biz.id / .my.id)      | |         STORE SUBDOMAINS ([subdomain].sidaya.*)      |
++-------------------------------------------------------+ +-----------------------------------------------------+
+| 1. Universal Login Form for all merchant staff        | | 1. Direct Store-Branded Workspace & POS Cashier     |
+| 2. Resolves User Credentials -> Tenant Subdomain      | | 2. Client-Side Pre-Paint Session Validator (30m TTL)|
+| 3. Direct HTTP 302 Redirect to Store Dashboard        | | 3. 30-Day Subdomain Alias (HTTP 301 Permanent Redir)|
+| 4. Zero Operator Links / Zero Administrative Exposure | | 4. Pro Tier Custom Domain (CNAME -> Cloudflare SaaS)|
++-------------------------------------------------------+ +-----------------------------------------------------+
+                                                        |
+                                                        v
+                                +-----------------------------------------------------+
+                                |      OPERATOR CONTROL PLANE (ops.sidaya.biz.id)     |
+                                +-----------------------------------------------------+
+                                | 1. Dedicated Super Admin & Dev Telemetry Dashboard  |
+                                | 2. Ticket-Bound Impersonation ("Act as Tenant User")|
+                                | 3. Top Impersonation Alert Banner & Return Hook     |
+                                +-----------------------------------------------------+
+```
+
+### Subdomain Redirection Sequence:
+1. **User accesses `https://sidaya.biz.id`**: Gateway prompts Universal Login.
+2. **User authenticates**: Server validates credentials against `users`, queries `tenant_memberships` for `tenant_id`, and resolves `subdomain` (e.g. `berasjaya`).
+3. **Immediate Redirection**: HTTP 302 redirect sent to `https://berasjaya.sidaya.biz.id/dashboard`.
+4. **Subdomain Direct Visit**: When cashier tablet loads `https://berasjaya.sidaya.biz.id`, client-side pre-paint verifies session age (`< 30 minutes`). If valid, POS renders instantly without flashing login screen.
+
+---
+
+## 15. Client-Side Modulith MVC Architecture & Zero God Files Standard
+
+To ensure maximum codebase maintainability, rapid page loads, and eliminate monolithic "God Files", the web and prototype architectures enforce strict modular MVC boundaries:
+
+```
+preview/js/
+├── config/             # Immutable constants, session TTL, reserved words, theme tokens
+├── services/           # Network drivers, barcode scanner listeners, printer bridges
+├── store/              # Reactive central state (state.js, store.js, deep migration versioning)
+├── views/              # Pure rendering templates (layout, pos, fifo, sj, piutang, settings, operator)
+├── controllers/        # Business logic & event dispatchers (pos, fifo, auth, operator controllers)
+├── components/         # Reusable glassmorphic UI widgets (toast, modals, quick PIN pad)
+└── router.js           # Client-side hash/path router with synchronous pre-paint route guards
+```
+
+### Architectural Guardrails:
+1. **Strict File Size Cap (< 450 Lines)**: Every single JavaScript, CSS, or HTML file must remain strictly under 450 lines. Files approaching 400 lines must be refactored by splitting view templates from event controllers.
+2. **Single Responsibility Principle (SRP)**: View files (`*.view.js`) only construct HTML strings and templates. Controller files (`*.controller.js`) only attach event listeners and dispatch actions to the Store.
+3. **Internal Dependency Manager**: Dynamic module initialization is orchestrated via an asynchronous Dependency Manager that verifies prerequisite DOM elements, state stores, and controllers before mounting routes.
+4. **Standardized TSDoc / JSDoc Headers**: Every class, controller method, and view component must declare formal JSDoc metadata specifying `@module`, `@author`, `@param`, `@returns`, and `@description`.
+
+---
+
+## 16. Future Architectural Roadmap: Decoupled Multi-Store Organization Engine
+
+*(Roadmap Baseline - ADR-16)*
+
+In future expansion phases, large distributors operating multiple physical outlets will require multi-store management under a single master organization:
+
+```mermaid
+erDiagram
+    ORGANIZATIONS ||--o{ TENANTS : "owns multiple stores"
+    USERS ||--o{ TENANT_MEMBERSHIPS : "holds roles across stores"
+    TENANTS ||--o{ TENANT_MEMBERSHIPS : "has staff members"
+    TENANTS ||--o{ INVENTORY_BATCHES : "isolated warehouse stock"
+    TENANTS ||--o{ SALES_INVOICES : "isolated POS sales"
+    TENANTS ||--o{ PIUTANG_LEDGERS : "isolated customer debt"
+
+    ORGANIZATIONS {
+        uuid id PK
+        string corporate_name "PT Beras Jaya Nusantara"
+        uuid primary_owner_id FK
+        string billing_plan "ENTERPRISE_MULTI_STORE"
+        timestamp created_at
+    }
+
+    USERS {
+        uuid id PK
+        string email UK "joni@berasjaya.com / siti@berasjaya.com"
+        string password_hash
+        string full_name
+        string phone
+    }
+
+    TENANTS {
+        uuid id PK
+        uuid organization_id FK
+        string subdomain UK "berasjaya1 / berasjaya2"
+        string store_name "Toko Beras Jaya Cabang 1"
+        string address
+    }
+
+    TENANT_MEMBERSHIPS {
+        uuid id PK
+        uuid user_id FK
+        uuid tenant_id FK
+        enum role "OWNER, ADMIN, KASIR, GUDANG, SALES, DRIVER"
+        enum status "ACTIVE, SUSPENDED"
+        jsonb permissions_override
+    }
+```
+
+### Multi-Store Governance Characteristics:
+1. **Isolated Physical Domains**: Each physical store (`berasjaya1`, `berasjaya2`) maintains completely independent inventory stock lots, FIFO cost queues, cashier cash drawers, and customer credit ledgers.
+2. **Flexible Cross-Store User Assignment**:
+   * Management staff (`siti@berasjaya.com`) can be granted `ADMIN` access across all branch subdomains.
+   * Operational field staff (`agus@berasjaya.com`) are granted access strictly to their assigned branch warehouse.
+3. **Zero Destructive Migration**: Because the base data model isolates store-level tables by `tenant_id` and decouples user identities via `tenant_memberships`, transitioning from Phase 1 (1-Email-1-Store) to Multi-Store requires zero database schema rewrites.
+
+
+
+
 

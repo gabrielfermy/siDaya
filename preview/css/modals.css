@@ -1,0 +1,221 @@
+/**
+ * @file modals.css
+ * @description Modals, Auth Overlays, Preset Pills & Dialog Windows
+ */
+
+/* ==========================================================================
+   MODAL WINDOWS & OVERLAYS
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+.modal-overlay.hidden { display: none; }
+
+.modal-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  max-width: 540px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4);
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+.modal-close-btn:hover {
+  background: var(--accent-rose-soft);
+  color: var(--accent-rose);
+  border-color: var(--accent-rose);
+}
+
+/* ==========================================================================
+   LOGIN CARDS & AUTH OVERLAYS
+   ========================================================================== */
+.login-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.login-brand { text-align: center; margin-bottom: 20px; }
+
+.login-logo {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--primary) 0%, #3B82F6 100%);
+  color: #FFFFFF;
+  font-size: 1.5rem;
+  font-weight: 800;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px var(--primary-glow);
+  margin-bottom: 10px;
+}
+
+.login-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.login-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.login-security-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent-green-soft);
+  border: 1px solid var(--accent-green-border);
+  color: var(--accent-green);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   SIMULATION PRESET BUTTONS
+   ========================================================================== */
+.preset-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.preset-pill-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.preset-pill-btn {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.preset-pill-btn:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  transform: translateY(-2px);
+}
+.preset-pill-btn span:first-child {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.preset-role-badge {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.login-action-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  font-size: 0.76rem;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.login-action-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 700;
+  cursor: pointer;
+}
+.login-action-link:hover { text-decoration: underline; }
+
+.login-footer-meta {
+  margin-top: 14px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   THERMAL RECEIPT PAPER SIMULATOR (58mm / 80mm ESC/POS)
+   ========================================================================== */
+.thermal-paper {
+  background: #ffffff;
+  color: #0f172a;
+  font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+  font-size: 11px;
+  line-height: 1.35;
+  padding: 18px 16px;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  margin: 0 auto;
+  max-width: 320px;
+}
+
+.thermal-header { text-align: center; margin-bottom: 8px; }
+.thermal-brand { font-size: 13px; font-weight: 800; letter-spacing: -0.3px; }
+.thermal-sub { font-size: 9.5px; color: #475569; margin-top: 2px; }
+.thermal-divider { color: #94a3b8; font-size: 10px; margin: 4px 0; overflow: hidden; white-space: nowrap; }
+.thermal-meta { font-size: 10px; margin-bottom: 6px; }
+.thermal-items { margin: 6px 0; font-size: 10.5px; }
+.thermal-item-row { margin-bottom: 4px; }
+.thermal-item-name { font-weight: 700; }
+.thermal-item-calc { display: flex; justify-content: space-between; font-size: 10px; color: #334155; }
+.thermal-totals { font-size: 10.5px; }
+.rec-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+.thermal-bold { font-weight: 800; font-size: 11.5px; color: #000000; }
+.thermal-footer { text-align: center; margin-top: 8px; }
+

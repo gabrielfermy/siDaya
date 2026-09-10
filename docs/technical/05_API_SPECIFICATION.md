@@ -1,24 +1,45 @@
 # API Specification & Contracts
-> **RESTful OpenAPI Standards, Multi-Tenant Headers, Request/Response Payloads & Webhook Contracts**
+> **Canonical RESTful OpenAPI 3.1.0 Standards, Multi-Tenant Headers, Request/Response Payloads & Webhook Contracts**
+
+* **Canonical OpenAPI 3.1 Specification**: [openapi.yaml](file:///k:/Personal/bikin%20duit/ashvin-book/docs/technical/openapi.yaml) | [openapi.json](file:///k:/Personal/bikin%20duit/ashvin-book/docs/technical/openapi.json)
+* **Interactive Swagger UI**: `GET /api/v1/docs` (Hosted on Fastify API Core)
+* **Machine-Readable Spec**: `GET /api/v1/openapi.json`
 
 ---
 
 ## 1. Global API Standards & Conventions
 
-* **Base URL**: `https://api.sidaya.id/api/v1`
+* **Specification Version**: OpenAPI 3.1.0
+* **Base URLs**:
+  * **Production Tenant Plane**: `https://{subdomain}.sidaya.biz.id/api/v1`
+  * **Production Operator Control Plane**: `https://ops.sidaya.biz.id/api/v1`
+  * **Staging Tenant Plane**: `https://{subdomain}.sidaya.my.id/api/v1`
+  * **Local Core API**: `http://localhost:4000/api/v1`
 * **Protocol**: HTTPS / TLS 1.3
 * **Content Negotiation**: `Content-Type: application/json; charset=utf-8`
-* **Standard Error Representation**:
+* **Standard Error Representation Envelope**:
   ```json
   {
     "success": false,
     "error": {
       "code": "INSUFFICIENT_STOCK",
       "message": "Product 'Beras Rojolele' has only 2 units available.",
+      "status": 400,
+      "trace_id": "req_88f91a2bc0d",
+      "timestamp": "2026-09-09T13:30:00Z",
       "details": { "product_id": "prod_01JA98Z", "requested": 5, "available": 2 }
     }
   }
   ```
+* **Global HTTP Status Code & Error Code Taxonomy**:
+  * `400 Bad Request` (`BAD_REQUEST`, `VALIDATION_FAILED`, `MALFORMED_JSON`)
+  * `401 Unauthorized` (`UNAUTHORIZED`, `SESSION_EXPIRED`, `INVALID_TOKEN`)
+  * `403 Forbidden` (`FORBIDDEN`, `INSUFFICIENT_PERMISSIONS`, `TENANT_RESTRICTED`)
+  * `404 Not Found` (`RESOURCE_NOT_FOUND`, `TENANT_NOT_FOUND`, `ORDER_NOT_FOUND`)
+  * `429 Too Many Requests` (`RATE_LIMIT_EXCEEDED`, `BRUTE_FORCE_LOCKOUT`)
+  * `500 Internal Server Error` (`INTERNAL_SERVER_ERROR`, `DATABASE_UNREACHABLE`)
+  * `503 Service Unavailable` (`MAINTENANCE_MODE`, `SERVICE_DEGRADED`)
+
 
 ---
 
@@ -559,7 +580,179 @@ Generates an official Driver Working Permit (*Surat Jalan* / Delivery Order) lin
 
 ---
 
-### K. Control Plane Endpoints: Ashvin Labs Platform Operator & Fleet Telemetry
+### I. Sales Returns & Invoicing Lifecycle (Pilar 5)
+
+#### `POST /sales/returns`
+Processes a customer sales return, restores stock to corresponding FIFO batches, and issues a credit note or cash refund.
+
+```http
+POST /api/v1/sales/returns HTTP/1.1
+Authorization: Bearer <JWT_ACCESS_TOKEN>
+X-Tenant-ID: a0000001-0000-0000-0000-000000000001
+Content-Type: application/json
+
+{
+  "order_id": "ord_991823ab",
+  "customer_id": "cust_001",
+  "settlement_type": "CREDIT_NOTE",
+  "notes": "2 karung beras sobek saat pengiriman",
+  "items": [
+    {
+      "order_item_id": "item_001",
+      "product_id": "prod_01JA98Z",
+      "batch_id": "lot_20260901_01",
+      "quantity_returned": 2,
+      "unit_price": 625000,
+      "restock_condition": "RESTOCK_GOOD"
+    }
+  ]
+}
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "return_id": "ret_77182a",
+    "return_number": "RET-20260909-001",
+    "total_refund_amount": 1250000,
+    "settlement_type": "CREDIT_NOTE",
+    "customer_piutang_deducted": 1250000,
+    "status": "COMPLETED",
+    "created_at": "2026-09-09T14:00:00Z"
+  }
+}
+```
+
+---
+
+### J. Procurement, Multi-Warehouse Transfers & Stock Opname (Pilar 2 & 4)
+
+#### `POST /procurement/orders`
+Creates a Purchase Order (PO) to a supplier with optional automatic approval evaluation.
+
+```json
+{
+  "supplier_id": "sup_001",
+  "expected_delivery_date": "2026-09-15",
+  "payment_terms": "TOP_30_DAYS",
+  "items": [
+    {
+      "product_id": "prod_01JA98Z",
+      "quantity": 100,
+      "unit_cost": 590000
+    }
+  ],
+  "notes": "Pesanan beras musim panen September"
+}
+```
+
+#### `POST /inventory/transfers`
+Dispatches an inter-warehouse stock transfer between branches.
+
+```json
+{
+  "source_branch_id": "br_pusat",
+  "destination_branch_id": "br_mangga_dua",
+  "driver_name": "Sopir Hendra",
+  "vehicle_plate": "B 9912 CD",
+  "items": [
+    {
+      "product_id": "prod_01JA98Z",
+      "batch_id": "lot_20260901_01",
+      "quantity_sent": 50
+    }
+  ]
+}
+```
+
+#### `POST /inventory/stock-opname`
+Submits a physical stock opname audit with scanned quantities vs system balance.
+
+```json
+{
+  "branch_id": "br_pusat",
+  "items": [
+    {
+      "product_id": "prod_01JA98Z",
+      "batch_id": "lot_20260901_01",
+      "system_qty": 50,
+      "physical_qty": 48,
+      "reason": "DAMAGED"
+    }
+  ]
+}
+```
+
+---
+
+### K. Integrated Finance, Multi-Account Cash & Bank (Pilar 7)
+
+#### `GET /finance/cash-bank`
+Retrieves all cash drawer, petty cash, and bank accounts with live balances.
+
+```json
+{
+  "success": true,
+  "data": [
+    { "id": "acc_01", "account_name": "Kasir Utama (Cash Drawer)", "account_type": "CASH", "current_balance": 1850000 },
+    { "id": "acc_02", "account_name": "BCA Operasional", "account_type": "BANK", "bank_name": "BCA", "account_number": "8891234567", "current_balance": 142500000 },
+    { "id": "acc_03", "account_name": "Mandiri Grosir", "account_type": "BANK", "bank_name": "Mandiri", "account_number": "12300998877", "current_balance": 87300000 }
+  ]
+}
+```
+
+#### `GET /finance/reports/profit-loss`
+Generates a real-time Profit & Loss statement based on actual FIFO cost of goods sold.
+
+```json
+{
+  "success": true,
+  "data": {
+    "period": { "from": "2026-09-01", "to": "2026-09-09" },
+    "gross_revenue": 185000000,
+    "sales_discounts": 3500000,
+    "net_revenue": 181500000,
+    "cogs_fifo": 152000000,
+    "gross_profit": 29500000,
+    "gross_profit_margin_pct": 16.25,
+    "operating_expenses": 6500000,
+    "net_profit": 23000000
+  }
+}
+```
+
+---
+
+### L. Approval Workflows & Immutable Activity Audit Logs (Pilar 8 & 9)
+
+#### `GET /governance/audit-logs`
+Retrieves cryptographically logged immutable audit events.
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "log_001",
+      "actor_name": "Budi Santoso",
+      "actor_role": "OWNER",
+      "action_type": "PRICE_OVERRIDE",
+      "entity_name": "products",
+      "entity_id": "prod_01JA98Z",
+      "old_state": { "price": 640000 },
+      "new_state": { "price": 625000 },
+      "ip_address": "180.252.11.45",
+      "ray_id": "ray_991823ab",
+      "created_at": "2026-09-09T14:15:00Z"
+    }
+  ]
+}
+```
+
+---
+
+### M. Control Plane Endpoints: Ashvin Labs Platform Operator & Fleet Telemetry
 
 #### `POST /api/v1/admin/auth/login`
 Authenticates an Ashvin Labs staff member (`@ashvinlabs.com`) and returns an operator session with granted administrative capabilities.
@@ -625,4 +818,107 @@ Returns aggregated platform-wide telemetry: total GMV across all tenants, active
 
 #### `POST /api/v1/admin/tenants/:id/breakglass`
 Requests a temporary, time-bounded technical debug session on a specific tenant. Requires a valid support ticket reference and writes an un-deletable audit log under UU PDP compliance.
+
+#### `POST /api/v1/admin/tenants/:id/impersonate`
+Authorizes an operator (`SUPER_ADMIN`, `DEV_ENGINEER`, or authorized `OPS_SUPPORT`) to assume a tenant staff identity for diagnostic reproduction. Bound to a mandatory support ticket ID.
+
+```http
+POST /api/v1/admin/tenants/c4b8e219-9831-482a-bc91-23a9cf8e12d4/impersonate HTTP/1.1
+Host: ops.sidaya.biz.id
+Authorization: Bearer <OPERATOR_JWT>
+Content-Type: application/json
+
+{
+  "target_user_id": "u0000001-0000-0000-0000-000000000001",
+  "ticket_reference": "#TICKET-8492",
+  "reason": "Investigasi laporan selisih stok FIFO pada batch Mei"
+}
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "impersonation_token": "eyJhbGciOiJSUzI1NiIs...",
+    "target_subdomain": "berasjaya",
+    "redirect_url": "https://berasjaya.sidaya.biz.id/dashboard?impersonate_ref=TICKET-8492",
+    "audit_log_id": "aud_018892"
+  }
+}
+```
+
+#### `POST /api/v1/admin/tenants/:id/impersonate/exit`
+Terminates the active tenant impersonation session, records `OPERATOR_IMPERSONATION_ENDED` in immutable audit logs, and restores operator context.
+
+---
+
+### M. Subdomain Management & Centralized Authentication Endpoints
+
+#### `GET /api/v1/auth/resolve-tenant?email=joni@berasjaya.com`
+Resolves tenant information and subdomain destination for Universal Gateway login on root domain (`sidaya.biz.id` / `sidaya.my.id`).
+
+```json
+{
+  "success": true,
+  "data": {
+    "user_id": "u0000001-0000-0000-0000-000000000001",
+    "tenant_id": "c4b8e219-9831-482a-bc91-23a9cf8e12d4",
+    "subdomain": "berasjaya",
+    "target_url": "https://berasjaya.sidaya.biz.id/dashboard"
+  }
+}
+```
+
+#### `GET /api/v1/tenants/check-subdomain?slug=berasjayagrosir`
+Checks whether a proposed subdomain slug is available and not matching reserved keywords.
+
+```json
+{
+  "success": true,
+  "data": {
+    "slug": "berasjayagrosir",
+    "is_available": true,
+    "is_reserved": false
+  }
+}
+```
+
+#### `PUT /api/v1/tenants/subdomain`
+Modifies the tenant's primary subdomain, registering the old subdomain as a 30-day alias with HTTP 301 redirection (Owner only).
+
+```http
+PUT /api/v1/tenants/subdomain HTTP/1.1
+Authorization: Bearer <OWNER_JWT>
+X-Tenant-ID: c4b8e219-9831-482a-bc91-23a9cf8e12d4
+Content-Type: application/json
+
+{
+  "new_subdomain": "berasjayagrosir"
+}
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "active_subdomain": "berasjayagrosir",
+    "alias_subdomain": "berasjaya",
+    "alias_expires_at": "2026-10-10T09:30:00Z",
+    "new_primary_url": "https://berasjayagrosir.sidaya.biz.id"
+  }
+}
+```
+
+---
+
+### N. Future Architectural Backlog: Multi-Store Organization Endpoints
+
+*(Roadmap Baseline - ADR-16)*
+
+#### `GET /api/v1/user/workspaces`
+Lists all store branches where the authenticated user holds an active membership.
+
+#### `POST /api/v1/auth/switch-store`
+Switches active store context for multi-store users (e.g., `siti@berasjaya.com` switching between `berasjaya1` and `berasjaya2`), issuing a store-scoped JWT.
+
 
