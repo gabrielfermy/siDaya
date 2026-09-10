@@ -143,6 +143,38 @@ const OperatorView = {
           </table>
         </div>
       </div>
+
+      <!-- HTTP ERROR SIMULATOR (OPERATOR EXCLUSIVE) -->
+      <div class="card" style="margin-top:20px; border-left: 4px solid #7c3aed;">
+        <div class="card-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span>🌐 HTTP Response Status Simulator (Platform Resilience & Fallbacks)</span>
+          <span class="badge" style="background:rgba(124, 58, 237, 0.15); color:#7c3aed; font-size:11px; font-weight:700;">OPERATOR EXCLUSIVE</span>
+        </div>
+        <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:14px; line-height:1.5;">
+          Uji simulasi respon status kode HTTP standar RFC 9110 dan fallback UI error recovery platform secara real-time:
+        </p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <button class="btn btn-outline btn-sm" onclick="navigate('/400')" style="font-weight:700;">400 Bad Request</button>
+          <button class="btn btn-outline btn-sm" onclick="navigate('/401')" style="font-weight:700;">401 Unauthorized</button>
+          <button class="btn btn-outline btn-sm" onclick="navigate('/403')" style="font-weight:700;">403 Forbidden</button>
+          <button class="btn btn-outline btn-sm" onclick="navigate('/404')" style="font-weight:700;">404 Not Found</button>
+          <button class="btn btn-outline btn-sm" onclick="navigate('/429')" style="font-weight:700;">429 Rate Limit</button>
+          <button class="btn btn-outline btn-sm" onclick="navigate('/500')" style="font-weight:700;">500 Server Error</button>
+          <button class="btn btn-outline btn-sm" onclick="navigate('/503')" style="font-weight:700;">503 Service Unavailable</button>
+        </div>
+      </div>
+
+      <!-- OPERATOR FLOATING DOCK -->
+      <div class="error-tester-dock">
+        <span style="font-size:0.75rem; font-weight:800; color:#7c3aed;">⚡ Ops Simulator:</span>
+        <button class="error-pill-btn" onclick="navigate('/400')">400</button>
+        <button class="error-pill-btn" onclick="navigate('/401')">401</button>
+        <button class="error-pill-btn" onclick="navigate('/403')">403</button>
+        <button class="error-pill-btn" onclick="navigate('/404')">404</button>
+        <button class="error-pill-btn" onclick="navigate('/429')">429</button>
+        <button class="error-pill-btn" onclick="navigate('/500')">500</button>
+        <button class="error-pill-btn" onclick="navigate('/503')">503</button>
+      </div>
     `;
   },
 };
