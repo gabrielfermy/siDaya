@@ -13,16 +13,12 @@ class SiDayaStateStore {
   }
 
   /**
-   * Resolves initial portal mode from hostname or URL path
+   * Resolves initial portal mode strictly from hostname subdomain
    * @returns {'MERCHANT'|'OPS'}
    */
   getInitialPortalMode() {
-    const hostname = window.location.hostname.toLowerCase();
-    const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-    if (hostname.startsWith('ops.') || path === 'telemetry' || path === 'fleet' || path === 'operators' || path === 'audit') {
-      return 'OPS';
-    }
-    return 'MERCHANT';
+    const h = window.location.hostname.toLowerCase();
+    return (h.startsWith('ops.') || h === 'ops.localhost') ? 'OPS' : 'MERCHANT';
   }
 
   /**
@@ -32,8 +28,14 @@ class SiDayaStateStore {
    */
   getInitialPath(portalMode) {
     const path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-    if (path && path !== '') return '/' + path;
-    return portalMode === 'OPS' ? '/telemetry' : '/dashboard';
+    if (portalMode === 'OPS') {
+      return path === 'fleet' ? '/fleet' : '/telemetry';
+    }
+    // On MERCHANT plane, operator routes do not exist
+    if (path === 'telemetry' || path === 'fleet' || path === 'operators' || path === 'audit') {
+      return '/dashboard';
+    }
+    return (path && path !== '') ? '/' + path : '/dashboard';
   }
 
   /**
@@ -73,6 +75,23 @@ class SiDayaStateStore {
     stored.ui.theme = localStorage.getItem('sidaya_theme') || stored.ui.theme || 'light';
     stored.ui.sidebarOpen = false;
     stored.ui.activeModal = null;
+
+    // Strict Plane Isolation: Ensure operator credentials only exist on OPS subdomain
+    if (portalMode !== 'OPS') {
+      stored.auth.operatorUser = null;
+      if (stored.operator) stored.operator.currentRole = null;
+    } else {
+      const rawOps = localStorage.getItem('sidaya_operator_session');
+      let opsSession = null;
+      if (rawOps) {
+        try {
+          const parsed = JSON.parse(rawOps);
+          if (parsed && parsed.expiresAt > Date.now()) opsSession = parsed;
+        } catch (e) {}
+      }
+      stored.auth.operatorUser = opsSession;
+      if (stored.operator) stored.operator.currentRole = opsSession ? (opsSession.role || 'SUPER_ADMIN') : null;
+    }
 
     return stored;
   }

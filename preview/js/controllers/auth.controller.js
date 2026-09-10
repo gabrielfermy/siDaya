@@ -132,7 +132,8 @@ const AuthController = {
       sessionStorage.setItem(SESSION_CONFIG.KEY_INTENDED_PATH, dest);
     }
 
-    const isOps = type === 'operator' || window.location.pathname.includes('telemetry') || window.location.pathname.includes('fleet');
+    const host = (typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '');
+    const isOps = host.startsWith('ops.') || host === 'ops.localhost';
     document.documentElement.className = isOps ? 'state-unauth-ops' : 'state-unauth-merchant';
 
     showToast('🔒 Sesi Anda telah berakhir demi keamanan data. Silakan masuk kembali.');
@@ -159,7 +160,8 @@ const AuthController = {
     // 3. Periodic idle timeout checker
     const checkInterval = SESSION_CONFIG.IDLE_CHECK_INTERVAL_MS || 15000;
     setInterval(() => {
-      const isOps = document.documentElement.className.includes('ops');
+      const host = (typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '');
+      const isOps = host.startsWith('ops.') || host === 'ops.localhost';
       const type = isOps ? 'operator' : 'merchant';
       const raw = localStorage.getItem(type === 'operator' ? SESSION_CONFIG.KEY_OPERATOR_SESSION : SESSION_CONFIG.KEY_MERCHANT_SESSION);
       if (raw) {
@@ -175,7 +177,8 @@ const AuthController = {
     // 4. Handle tab visibility change (e.g., returning to tab after laptop sleep)
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
-        const isOps = document.documentElement.className.includes('ops');
+        const host = (typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '');
+        const isOps = host.startsWith('ops.') || host === 'ops.localhost';
         const type = isOps ? 'operator' : 'merchant';
         const raw = localStorage.getItem(type === 'operator' ? SESSION_CONFIG.KEY_OPERATOR_SESSION : SESSION_CONFIG.KEY_MERCHANT_SESSION);
         if (raw) {
@@ -272,11 +275,21 @@ const AuthController = {
     localStorage.removeItem(SESSION_CONFIG.KEY_OPERATOR_SESSION);
     sessionStorage.removeItem(SESSION_CONFIG.KEY_INTENDED_PATH);
     
-    const isOps = window.location.pathname.includes('telemetry') || window.location.pathname.includes('fleet');
+    const host = (typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '');
+    const isOps = host.startsWith('ops.') || host === 'ops.localhost';
     document.documentElement.className = isOps ? 'state-unauth-ops' : 'state-unauth-merchant';
     
+    const state = store.getState();
+    if (state && state.auth) {
+      if (isOps) {
+        state.auth.operatorUser = null;
+        if (state.operator) state.operator.currentRole = null;
+      }
+      store.saveState();
+    }
+
     showToast('Anda telah berhasil keluar dari sesi.');
-    navigate('/dashboard');
+    navigate(isOps ? '/telemetry' : '/dashboard');
   },
 
   handleOwnerRegistrationSubmit(e) {

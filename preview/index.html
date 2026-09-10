@@ -22,8 +22,7 @@
     (function() {
       try {
         var hostname = window.location.hostname.toLowerCase();
-        var rawPath = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-        var isOps = hostname.startsWith('ops.') || rawPath === 'telemetry' || rawPath === 'fleet' || rawPath === 'operators' || rawPath === 'audit';
+        var isOps = hostname.startsWith('ops.') || hostname === 'ops.localhost';
         
         var theme = localStorage.getItem('sidaya_theme') || 'light';
         document.documentElement.setAttribute('data-theme', theme);

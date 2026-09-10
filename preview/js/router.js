@@ -8,9 +8,19 @@
  * @author Ashvin Labs Engineering Team
  * @license Proprietary - SiDaya
  */
-
 const Router = {
-  routes: {
+  /**
+   * Checks if current runtime is hosted on operator subdomain
+   * @returns {boolean}
+   */
+  isOpsHost() {
+    if (typeof window === 'undefined') return false;
+    const h = window.location.hostname.toLowerCase();
+    return h.startsWith('ops.') || h === 'ops.localhost';
+  },
+
+  // Routes accessible on the Merchant / Tenant Plane
+  merchantRoutes: {
     '/': { title: 'Dashboard', render: (s) => DashboardView.render(s) },
     '/dashboard': { title: 'Dashboard', render: (s) => DashboardView.render(s) },
     '/katalog': { title: 'Master SKU & Harga', render: (s) => KatalogView.render(s) },
@@ -23,6 +33,11 @@ const Router = {
     '/users': { title: 'Direktori Staf (PIN)', render: (s) => UsersView.render(s) },
     '/roles': { title: 'Matriks RBAC', render: (s) => RolesView.render(s) },
     '/settings': { title: 'Pengaturan & Domain', render: (s) => SettingsView.render(s) },
+  },
+
+  // Routes accessible exclusively on the Operator Plane (ops. subdomain)
+  operatorRoutes: {
+    '/': { title: 'Operator Control Plane', render: (s) => OperatorView.render(s) },
     '/telemetry': { title: 'Operator Control Plane', render: (s) => OperatorView.render(s) },
     '/fleet': { title: 'Operator Fleet Directory', render: (s) => OperatorView.render(s) },
   },
@@ -42,33 +57,46 @@ const Router = {
     }
 
     const state = store.getState();
-    const isOpsRoute = cleanPath === '/telemetry' || cleanPath === '/fleet';
+    const isOps = this.isOpsHost();
     const isError = typeof ERROR_PAGES !== 'undefined' && !!ERROR_PAGES[cleanPath];
 
-    // Strict Tenant Isolation: Block operator routes from regular tenant sessions
-    if (isOpsRoute && !state?.auth?.impersonation?.active) {
-      const isOpsUser = !!localStorage.getItem('sidaya_operator_session');
-      const isMerchUser = !!localStorage.getItem('sidaya_merchant_session');
-      if (!isOpsUser && isMerchUser) {
-        Toast.show('⛔ Akses Ditolak: Rute ini khusus Operator Platform.', 'error');
-        Router.navigate('/dashboard', false);
-        return;
-      }
+    // STRICT SUBDOMAIN BARRIER:
+    // Operator endpoints are completely non-existent on the Tenant Plane.
+    const isOperatorEndpoint = ['/telemetry', '/fleet', '/operators', '/audit'].includes(cleanPath);
+    if (!isOps && isOperatorEndpoint) {
+      const errSpec = typeof ERROR_PAGES !== 'undefined' && ERROR_PAGES['/404']
+        ? ERROR_PAGES['/404']
+        : { statusCode: '404', title: 'Halaman Tidak Ditemukan', desc: 'Rute tidak terdaftar.' };
+      container.innerHTML = ErrorView.render(errSpec, cleanPath);
+      document.title = 'SiDaya - 404 Halaman Tidak Ditemukan';
+      this.updateActiveNav('');
+      this.updateBreadcrumb('404 Not Found');
+      this.syncPlaneShell(false, state);
+      return;
+    }
+
+    // On OPS subdomain, root and /dashboard redirect to /telemetry
+    if (isOps && (cleanPath === '/' || cleanPath === '/dashboard')) {
+      this.navigate('/telemetry', pushState);
+      return;
     }
 
     // Session Security & Inactivity Validation Guard
     if (!isError && typeof AuthController !== 'undefined') {
-      const isValid = AuthController.validateSession(isOpsRoute ? 'operator' : 'merchant', cleanPath);
+      const sessionType = isOps ? 'operator' : 'merchant';
+      const isValid = AuthController.validateSession(sessionType, cleanPath);
       if (!isValid) return;
     }
 
     // Synchronize Plane Isolation (Sidebar, Branding, Breadcrumbs)
-    this.syncPlaneShell(isOpsRoute, state);
+    this.syncPlaneShell(isOps, state);
 
     // Floating Top Impersonation Banner Docking
     this.updateImpersonationBanner(state?.auth?.impersonation);
 
-    const route = this.routes[cleanPath];
+    // Resolve route strictly according to current plane
+    const routeTable = isOps ? this.operatorRoutes : this.merchantRoutes;
+    const route = routeTable[cleanPath] || (state?.auth?.impersonation?.active ? this.merchantRoutes[cleanPath] : null);
 
     try {
       if (route) {
@@ -192,7 +220,7 @@ const Router = {
 
     const subEl = document.getElementById('topbar-subdomain-code');
     if (subEl) {
-      const isOps = window.location.pathname.includes('telemetry') || window.location.pathname.includes('fleet');
+      const isOps = this.isOpsHost();
       const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
       if (isOps) {
         subEl.textContent = `ops.${baseDomain}`;
@@ -228,7 +256,8 @@ const Router = {
       this.navigate(window.location.pathname, false);
     });
 
-    const initialPath = window.location.pathname || '/dashboard';
+    const isOps = this.isOpsHost();
+    const initialPath = window.location.pathname || (isOps ? '/telemetry' : '/dashboard');
     this.navigate(initialPath, false);
   },
 };
