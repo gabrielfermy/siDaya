@@ -49,39 +49,58 @@ SET LOCAL app.current_user_permissions = 'pos:checkout,shifts:operate,catalog:vi
 
 ---
 
-## 1.1 Web & Mobile Universal Login and Tenant Routing Flow
+---
 
-When a user opens `sidaya.id/login` (or the mobile app) and signs in:
+## 1.1 Subdomain-Aware Centralized Authentication & Routing Architecture
+
+SiDaya operates across defined environment base domains:
+* **Production**: `sidaya.biz.id` (Tenants: `https://[subdomain].sidaya.biz.id`, Operator: `https://ops.sidaya.biz.id`)
+* **Staging**: `sidaya.my.id` (Tenants: `https://[subdomain].sidaya.my.id`, Operator: `https://ops.sidaya.my.id`)
+* **Local Development / Preview**: `localhost:3333` (Operator: `ops.localhost:3333`)
+
+### 1. Centralized Gateway Authentication (Base Domain)
+When a user accesses the root domain (`https://sidaya.biz.id` / `https://sidaya.my.id`), they are presented with the Centralized Universal Login:
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor User as Store Owner / Cashier / Driver
-    participant Client as Web / Mobile App
-    participant Auth as Supabase Auth (auth.users)
-    participant API as SiDaya Tenant Resolver
-    participant DB as PostgreSQL (tenants + tenant_users)
+    actor User as Store Owner / Kasir / Gudang
+    participant Gateway as Centralized Gateway (sidaya.biz.id)
+    participant Auth as Identity & Tenant Resolver
+    participant DB as PostgreSQL (users + tenant_memberships + tenants)
+    participant Subdomain as Store Subdomain (berasjaya.sidaya.biz.id)
 
-    User->>Client: Enters Email / Phone & Password
-    Client->>Auth: signInWithPassword({ email, password })
-    Auth-->>Client: Returns Supabase Auth Token
-    Client->>API: GET /api/v1/auth/my-tenants (Bearer Token)
-    API->>DB: Query tenant_users JOIN tenants WHERE email = auth.email
-    DB-->>API: Returns list of tenant memberships & permissions
-    
-    alt Single Tenant Associated (Default Case)
-        API-->>Client: Exactly 1 tenant found
-        Client->>Client: Inject active tenant context into session
-        Client->>User: Route to /dashboard (Role-Adaptive View)
-    else Multi-Store Owner / Multi-Tenant
-        API-->>Client: Multiple tenants found
-        Client->>User: Renders "Pilih Usaha Anda" (Workspace Switcher)
-        User->>Client: Selects desired store
-        Client->>API: POST /api/v1/auth/select-tenant
-        API-->>Client: Issues tenant-scoped token
-        Client->>User: Route to /dashboard (Role-Adaptive View)
-    end
+    User->>Gateway: Opens https://sidaya.biz.id & Enters Email / Password
+    Gateway->>Auth: POST /api/v1/auth/login { email, password }
+    Auth->>DB: Verify credentials & find tenant for email
+    DB-->>Auth: Returns user_id, tenant_id, subdomain ("berasjaya")
+    Auth-->>Gateway: Returns 302 Redirect URI + Session Token
+    Gateway->>User: HTTP 302 Redirect to https://berasjaya.sidaya.biz.id/dashboard
+    User->>Subdomain: Loads https://berasjaya.sidaya.biz.id/dashboard
+    Subdomain->>Subdomain: Pre-paint session validator verifies 30m TTL
+    Subdomain-->>User: Renders Store Dashboard / POS
 ```
+
+### 2. Direct Subdomain Access
+When a user navigates directly to their bookmarked store URL (`https://berasjaya.sidaya.biz.id`):
+1. **Active Session Check**: Client-side synchronous pre-paint script checks `localStorage` session token and verifies that `(currentTime - lastActivityTimestamp) < 30 minutes`.
+2. **If Valid**: Enters Dashboard or POS instantly without flashing a login screen.
+3. **If Expired or Missing**: Displays the store-branded login form for `berasjaya` or redirects with an intended path parameter (`/login?returnUrl=/pos`).
+
+---
+
+## 1.2 Subdomain Self-Service, 30-Day Alias Protection & Reserved Keywords
+
+To protect merchants during store rebranding without breaking existing links:
+1. **Solution A (30-Day Subdomain Alias)**:
+   * When an Owner updates their subdomain in `/settings` (e.g. from `berasjaya` to `berasjayagrosir`), the database records `berasjaya` in `tenant_subdomain_aliases` with an `expires_at = NOW() + INTERVAL '30 days'`.
+   * Edge reverse proxy issues an **HTTP 301 (Permanent Redirect)** for all traffic hitting `berasjaya.sidaya.biz.id`, preserving paths and query strings (e.g. `https://berasjaya.sidaya.biz.id/p/INV-9021` $\rightarrow$ `https://berasjayagrosir.sidaya.biz.id/p/INV-9021`).
+   * This guarantees that existing WhatsApp PayLinks, printed paper receipts, and bookmarked cashier tablets never fail.
+2. **Solution B (Custom Domain Support - PRO Tier)**:
+   * Pro/Enterprise merchants can bind custom hostnames (e.g., `pos.berasjaya.com`) via Cloudflare for SaaS CNAME routing.
+3. **Reserved Subdomain Keywords Blacklist**:
+   * The system strictly blocks tenant registration or renaming for reserved operational keywords:
+     `ops`, `admin`, `api`, `auth`, `app`, `www`, `billing`, `support`, `status`, `mail`, `gateway`, `portal`, `staging`, `prod`, `dev`, `static`, `assets`.
 
 ---
 
@@ -169,37 +188,93 @@ In Indonesian B2B wholesale trade (e.g. bulk rice and FMCG distribution), mercha
 
 ---
 
-## 7. Control Plane Security: Operator RBAC & Privacy-Preserving Break-Glass Protocol
+## 7. Control Plane Security: Operator RBAC, Subdomain Isolation & Impersonation Protocol
 
-To provide Ashvin Labs management (CEO, developers, support staff) with system oversight without compromising tenant trust or violating UU PDP:
+To ensure absolute separation between tenant operations and platform administration:
+
+### 7.1 Subdomain-Strict Control Plane Isolation (`ops.*`)
+* The Operator Control Plane is hosted strictly on dedicated administrative subdomains:
+  * **Production**: `https://ops.sidaya.biz.id`
+  * **Staging**: `https://ops.sidaya.my.id`
+  * **Local Dev**: `http://ops.localhost:3333`
+* **Zero Merchant Footprint**: Regular merchant tenant domains (`[tenant].sidaya.biz.id`) contain **zero operator routes, zero operator login links, and zero operator UI widgets**. Navigation attempts to `/telemetry` or `/fleet` from a merchant domain are blocked at the edge router and return a `404 Not Found`.
+
+### 7.2 Role-Governed Operator Impersonation ("Act as Tenant User")
+When an authorized operator must reproduce a reported tenant issue (e.g., investigating inventory variance or invoice formatting in an active support ticket):
 
 ```mermaid
-graph TD
-    Operator[Ashvin Labs Operator] --> Auth[Operator Auth Gateway]
-    Auth --> RoleCheck{Operator Role}
+sequenceDiagram
+    autonumber
+    actor Operator as Operator (SUPER_ADMIN / DEV_ENGINEER)
+    participant OpsPlane as Operator Control Plane (ops.sidaya.biz.id)
+    participant API as Impersonation Gateway
+    participant AuditDB as platform_operator_audit_logs
+    participant TenantApp as Tenant Workspace ([subdomain].sidaya.biz.id)
+
+    Operator->>OpsPlane: Clicks "Masuk sebagai Pengguna" for Toko Beras Jaya
+    OpsPlane->>Operator: Prompts Impersonation Modal (Select Target Staff, Enter Ticket #, Enter Reason)
+    Operator->>OpsPlane: Submits { staff_id, ticket_ref: "#TICKET-8492", reason: "Investigasi selisih FIFO" }
+    OpsPlane->>API: POST /api/v1/admin/tenants/:id/impersonate
+    API->>AuditDB: INSERT INTO platform_operator_audit_logs (action="OPERATOR_IMPERSONATION_STARTED")
+    API-->>OpsPlane: Returns scoped Impersonation JWT & Target Subdomain URL
+    OpsPlane->>TenantApp: Navigates to https://berasjaya.sidaya.biz.id?impersonate_token=...
+    TenantApp->>TenantApp: Activates Impersonation Mode
+    TenantApp-->>Operator: Renders Persistent Floating Top Alert Banner ([🛡️ Impersonasi Aktif: #TICKET-8492] [🚪 Keluar])
     
-    RoleCheck -->|OPS_SUPPORT| RedactedView[Privacy-Redacted View\nMasked Contacts, Zero COGS]
-    RoleCheck -->|DEV_ENGINEER| TechView[Technical Telemetry View\nLatency, Pools, Health Score]
-    RoleCheck -->|SUPER_ADMIN| ExecutiveView[Global Control View\nGMV, Tier Overrides, Fleet Life]
+    Note over Operator,TenantApp: Operator performs diagnostic inspection in tenant view
     
-    ExecutiveView -.->|Break-Glass Request\nRequires Ticket #| AuditLog[(Immutable Operator Audit Log\nUUID, Timestamp, IP, Reason)]
-    TechView -.->|Break-Glass Diagnostic\nRequires Ticket #| AuditLog
-    AuditLog --> TargetTenant[Tenant Debug Session]
+    Operator->>TenantApp: Clicks [🚪 Keluar Impersonasi]
+    TenantApp->>API: POST /api/v1/admin/tenants/:id/impersonate/exit
+    API->>AuditDB: INSERT INTO platform_operator_audit_logs (action="OPERATOR_IMPERSONATION_ENDED")
+    TenantApp-->>Operator: Restores Operator Persona & Redirects back to https://ops.sidaya.biz.id/telemetry
 ```
 
-1. **Dual-Plane Separation**:
-   * **Merchant Data Plane**: Strictly partitioned by `tenant_id` via PostgreSQL RLS.
-   * **Control Plane**: Governed by `platform_operators` with four specialized roles:
-     - `SUPER_ADMIN`: CEO / Founders / CTO (Global GMV/MRR, tenant lifecycle, plan overrides).
-     - `DEV_ENGINEER`: Developers / Tech Leads (Telemetry, latency, error rates, read-only diagnostic).
-     - `OPS_SUPPORT`: Support Officers (Tenant directory, reset PINs/passwords, quota monitoring). **Proprietary commercial secrets (COGS, customer phone numbers, sales margins) are strictly masked.**
-     - `AUDIT_COMPLIANCE`: Compliance officers (Auditing operator actions under UU PDP).
-2. **Privacy-Preserving Masking**:
-   * Support agents querying tenant customer lists receive hashed or redacted representations: `Pak H*** R*** (0812-****-5432)`.
-   * Raw supplier purchase invoices and margin calculations are physically withheld from operational support roles.
-3. **Mandatory Break-Glass Diagnostic Protocol**:
-   * If a developer or super-admin must inspect a specific tenant's data to resolve an active system defect:
-     - They must provide an active **Ticket Reference** (e.g., `INC-9482`) and a justified **Reason**.
-     - The system issues a short-lived diagnostic session and appends an immutable entry to `platform_operator_audit_logs`.
-     - Deleting or tampering with operator audit logs is physically prevented by database row-level triggers.
+1. **Mandatory Ticket Binding**: Impersonation requires a valid Ticket ID (e.g. `#TICKET-8492`) and a mandatory justification string (min 10 characters).
+2. **Immutable Audit Trail**: An un-deletable record is written to `platform_operator_audit_logs` capturing the operator ID, target tenant ID, target user ID, ticket reference, client IP, user agent, and timestamp.
+3. **High-Visibility Persistent Top Banner**: While in impersonation mode, a persistent warning banner is docked at the top of the viewport:
+   `[🛡️ Mode Impersonasi Operator Aktif: #TICKET-8492 - Target: joni@berasjaya.com] [🚪 Keluar Impersonasi]`
+4. **1-Click Return Hook**: Clicking `[Keluar Impersonasi]` instantly purges the impersonated token, restores the original operator token, and redirects back to the Operator Command Center.
+
+---
+
+## 8. Session Security, Rolling Inactivity TTL & Pre-Paint Guard
+
+To prevent unauthorized access on shared POS cash registers and warehouse tablets:
+1. **Rolling Session Inactivity Expiry (30 Minutes)**:
+   * Constant: `SESSION_TTL_MS = 30 * 60 * 1000` (1,800,000 ms).
+   * Any client-side interaction (page route change, barcode scan, clicking buttons, submitting forms) updates `lastActivityTimestamp` in local storage.
+   * If `(Date.now() - lastActivityTimestamp) > SESSION_TTL_MS`, the session is expired.
+2. **Synchronous Zero-FOUC Pre-Paint Validation**:
+   * Before the browser renders HTML components, a synchronous JavaScript guard executes in `<head>`:
+     ```javascript
+     const session = getSession();
+     if (session && (Date.now() - session.lastActivityTimestamp > SESSION_TTL_MS)) {
+       sessionStorage.setItem('intendedRoute', window.location.pathname);
+       clearSession();
+       window.location.replace('/login?reason=session_expired');
+     }
+     ```
+3. **Intended Target Route Redirection**:
+   * When session expiration forces a logout, the current URL pathname (e.g., `/pos` or `/fifo`) is persisted to `sessionStorage.getItem('intendedRoute')`.
+   * Upon successful re-authentication, the user is immediately restored to their intended route rather than dropped at the default dashboard.
+
+---
+
+## 9. Future Architectural Backlog: Multi-Store Cross-Tenant Access Controls
+
+*(Roadmap Baseline - ADR-16)*
+
+In future expansion phases when a single business entity operates multiple physical stores (e.g. `berasjaya1.sidaya.biz.id` and `berasjaya2.sidaya.biz.id`):
+1. **Decoupled User Identity (`users`) & Store Memberships (`tenant_memberships`)**:
+   * Global identity (`users`: `id`, `email`, `password_hash`) represents physical persons.
+   * Store memberships (`tenant_memberships`: `user_id`, `tenant_id`, `role`, `status`, `permissions`) govern per-store authority.
+2. **Cross-Store Role Scoping**:
+   * A single user (`siti@berasjaya.com`) can hold `role: ADMIN` on Store 1 and `role: ADMIN` on Store 2.
+   * Warehouse staff (`agus@berasjaya.com`) hold `role: GUDANG` exclusively on Store 1.
+3. **Subdomain-Scoped Token Authorization Middleware**:
+   * Every API request to `https://[subdomain].sidaya.biz.id/api/*` verifies that the caller has an active `tenant_memberships` record for the `tenant_id` corresponding to that specific subdomain.
+   * If `agus@berasjaya.com` attempts an API request against `berasjaya2.sidaya.biz.id`, the middleware rejects the request with `403 Forbidden: You do not have membership in this store branch`.
+4. **Complete Store Data Isolation**:
+   * All operational entities (`products`, `inventory_batches`, `invoices`, `piutang_ledgers`) enforce strict `tenant_id` foreign keys, guaranteeing 100% data, stock, and financial separation between physical branch stores.
+
 

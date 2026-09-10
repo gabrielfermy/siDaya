@@ -183,3 +183,84 @@
   * Gives Ashvin Labs leadership real-time commercial telemetry (total GMV, active stores, MRR, churn risk).
   * Gives developers deep diagnostic tools (API latency p95, database connection pools, webhook delivery metrics) without exposing sensitive tenant data.
   * Protects merchant trust by preventing internal data scraping or leakages.
+
+---
+
+### ADR-12: Subdomain-Strict Multi-Tenancy, Wildcard DNS, and Centralized Authentication Engine
+
+* **Status**: Approved
+* **Context**:
+  Merchants need distinct web branding and easy cashier tablet access (e.g. `berasjaya.sidaya.biz.id` in production or `berasjaya.sidaya.my.id` in staging). Furthermore, merchants and staff frequently arrive at the root domain (`sidaya.biz.id`) without knowing their exact subdomain URL.
+* **Decision**:
+  1. Configure **Wildcard DNS (`*.sidaya.biz.id` / `*.sidaya.my.id`)** with automated SSL edge termination on Cloudflare/Traefik.
+  2. Implement **Centralized Authentication with Automatic Redirection**:
+     * Visiting the main gateway (`sidaya.biz.id`) presents a universal login.
+     * The system verifies user credentials, resolves the single corresponding `tenant_id` and `subdomain`, and immediately issues an HTTP 302 redirect to `https://[subdomain].sidaya.biz.id/dashboard`.
+     * Direct visits to `https://[subdomain].sidaya.biz.id` check client session validity (30m TTL). If active, dashboard loads directly; if expired, prompts store-branded login.
+* **Consequences**:
+  * Clean merchant branding and isolated cookies/local storage per subdomain.
+  * Frictionless login for staff regardless of whether they navigate to the root domain or their specific store URL.
+
+---
+
+### ADR-13: 30-Day Subdomain Alias Grace Period (HTTP 301 Redirect) & Custom Domain CNAME Architecture
+
+* **Status**: Approved
+* **Context**:
+  Store owners can modify their store name and subdomain in `/settings` (e.g., changing from `berasjaya` to `berasjayagrosir`). Abruptly disabling the old subdomain would break existing WhatsApp PayLinks sent to customers, print receipts with old QR codes, and bookmarked cashier tablets. Furthermore, enterprise/pro merchants demand custom domains (e.g. `pos.berasjaya.com`).
+* **Decision**:
+  1. **Solution A (30-Day Subdomain Alias)**: When an owner modifies their subdomain, the previous subdomain is retained in `tenant_subdomain_aliases` for a 30-day grace period. Edge routing issues an HTTP 301 (Permanent Redirect) preserving path and query strings (e.g. `/p/paylink-token`).
+  2. **Solution B (Custom Domain Support - PRO Tier)**: Allow Pro/Enterprise tier tenants to configure custom hostnames via Cloudflare for SaaS CNAME proxying with automatic SSL certificate issuance.
+* **Consequences**:
+  * Guarantees zero payment failures or broken customer paylinks during business rebranding.
+  * Reserved platform keywords (`ops`, `admin`, `api`, `auth`, `app`, `www`, `billing`, `support`, `status`, `mail`) are strictly prohibited from being claimed as tenant subdomains.
+
+---
+
+### ADR-14: Ticket-Bound Operator Impersonation (Tenant Shadowing) Protocol
+
+* **Status**: Approved
+* **Context**:
+  When a merchant opens a support ticket regarding a bug in their inventory FIFO calculations or invoice formatting, Ashvin Labs customer support or developer engineers need to inspect the issue within the merchant's exact view without asking for merchant passwords or exposing operator controls to the merchant.
+* **Decision**:
+  1. Implement **Role-Governed Impersonation ("Act as Tenant User")** accessible only by authorized operator roles (`SUPER_ADMIN`, `DEV_ENGINEER`, `OPS_SUPPORT`).
+  2. Require a **Mandatory Ticket Reference** (e.g. `#TICKET-8492`) and justified reason before session elevation.
+  3. Emit an immutable record to `platform_operator_audit_logs` (`OPERATOR_IMPERSONATION_STARTED`).
+  4. Render a **High-Visibility Persistent Floating Top Banner** in the shadowed tenant workspace (`[🛡️ Operator Impersonation Active: #TICKET-8492] [🚪 Exit Impersonation]`).
+  5. Provide a 1-click safe return hook that terminates the impersonation session, emits `OPERATOR_IMPERSONATION_ENDED`, and returns the operator directly to the Operator Control Plane (`/telemetry`).
+* **Consequences**:
+  * Zero operator UI elements or login paths exist in standard merchant views.
+  * Strict compliance with UU PDP and enterprise auditability standards.
+
+---
+
+### ADR-15: Client-Side Session TTL, Inactivity Expiry, and Intended Return Path Redirection
+
+* **Status**: Approved
+* **Context**:
+  SiDaya handles sensitive financial, stock, and credit data. Leaving open browser tabs logged in indefinitely on shared desktop computers or tablet cashiers poses severe security risks.
+* **Decision**:
+  1. Implement a **Rolling Session TTL of 30 Minutes** (`SESSION_TTL_MS = 30 * 60 * 1000`).
+  2. Every meaningful user action (navigation, barcode scan, order creation) refreshes `lastActivityTimestamp`.
+  3. Pre-paint synchronous route guards validate session expiry before rendering UI (preventing FOUC - Flash of Unauthenticated Content).
+  4. Upon session expiration, store the user's intended target route in `sessionStorage` (`intendedRoute`) and redirect to the login view. Upon re-authentication, immediately restore navigation to the intended target route.
+* **Consequences**:
+  * Prevents unauthorized access on abandoned shared registers.
+  * Preserves frictionless user workflow after quick re-login.
+
+---
+
+### ADR-16: Decoupled Multi-Store Tenant Membership Architecture (Future Roadmap Baseline)
+
+* **Status**: Approved (Backlog & Infrastructure Baseline)
+* **Context**:
+  In future roadmap phases, enterprise merchants operating multiple branch stores (e.g., `berasjaya1.sidaya.biz.id` and `berasjaya2.sidaya.biz.id`) will require individual users (e.g., `siti@berasjaya.com`) to have access across multiple stores with varying or identical roles (e.g., Admin on Store 1 & 2, while warehouse staff are restricted to a single store), while keeping inventory, FIFO COGS, POS registers, and piutang ledgers 100% isolated per store.
+* **Decision**:
+  1. Decouple global user identity (`users` table) from store-level permissions via an associative `tenant_memberships` table (`user_id`, `tenant_id`, `role`, `status`, `permissions_override`).
+  2. In Phase 1 (current), enforce 1-Email-to-1-Tenant mapping in business logic.
+  3. In Phase 2+ (backlog execution), enable multi-membership queries at the Universal Gateway to support the Multi-Store Switcher modal.
+  4. Authorize every API request by matching `(user_id, target_subdomain_tenant_id)` against `tenant_memberships`.
+* **Consequences**:
+  * Zero destructive database schema migration required when activating multi-store capabilities in future roadmap phases.
+  * Clean, multi-entity RBAC isolation supporting complex corporate hierarchies.
+

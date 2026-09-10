@@ -1,9 +1,12 @@
 /**
- * @file router.js
- * @description Client-side SPA Router: Coordinates routing, URL pushState, and dynamic MVC View mounting
+ * @fileoverview Client-side SPA Router: Coordinates routing, URL pushState, and dynamic MVC View mounting
  * @module Core:Router
- * @implements {RouterInterface}
- * @dependencies Store, LayoutView, DashboardView, KatalogView, FifoView, CustomersView, PosView, InvoicesView, SjView, PiutangView, UsersView, RolesView, SettingsView, OperatorView, RoadmapView, ErrorView
+ * @description
+ * Manages client route transitions, pre-paint session validation, strict operator route guarding,
+ * breadcrumb updating, and floating impersonation banner docking.
+ *
+ * @author Ashvin Labs Engineering Team
+ * @license Proprietary - SiDaya
  */
 
 const Router = {
@@ -19,7 +22,7 @@ const Router = {
     '/piutang': { title: 'Buku Piutang & WA PayLink', render: (s) => PiutangView.render(s) },
     '/users': { title: 'Direktori Staf (PIN)', render: (s) => UsersView.render(s) },
     '/roles': { title: 'Matriks RBAC', render: (s) => RolesView.render(s) },
-    '/settings': { title: 'Konfigurasi Toko & Hardware', render: (s) => SettingsView.render(s) },
+    '/settings': { title: 'Pengaturan & Domain', render: (s) => SettingsView.render(s) },
     '/telemetry': { title: 'Operator Control Plane', render: (s) => OperatorView.render(s) },
     '/fleet': { title: 'Operator Fleet Directory', render: (s) => OperatorView.render(s) },
   },
@@ -38,17 +41,29 @@ const Router = {
       window.history.pushState({}, '', cleanPath);
     }
 
-    // 1. Session Security & Access Authorization Guard
-    const isOps = cleanPath === '/telemetry' || cleanPath === '/fleet';
+    const state = store.getState();
+    const isOpsRoute = cleanPath === '/telemetry' || cleanPath === '/fleet';
     const isError = typeof ERROR_PAGES !== 'undefined' && !!ERROR_PAGES[cleanPath];
-    if (!isError && typeof AuthController !== 'undefined') {
-      const isValid = AuthController.validateSession(isOps ? 'operator' : 'merchant', cleanPath);
-      if (!isValid) {
+
+    // Strict Tenant Isolation: Block operator routes from regular tenant sessions
+    if (isOpsRoute && !state?.auth?.impersonation?.active) {
+      const isOpsUser = !!localStorage.getItem('sidaya_operator_session');
+      if (!isOpsUser) {
+        Toast.show('⛔ Akses Ditolak: Rute ini khusus Operator Platform.', 'error');
+        Router.navigate('/dashboard', false);
         return;
       }
     }
 
-    const state = store.getState();
+    // Session Security & Inactivity Validation Guard
+    if (!isError && typeof AuthController !== 'undefined') {
+      const isValid = AuthController.validateSession(isOpsRoute ? 'operator' : 'merchant', cleanPath);
+      if (!isValid) return;
+    }
+
+    // Floating Top Impersonation Banner Docking
+    this.updateImpersonationBanner(state?.auth?.impersonation);
+
     const route = this.routes[cleanPath];
 
     try {
@@ -98,7 +113,7 @@ const Router = {
 
     // Trigger smooth view transition animation
     container.classList.remove('view-enter');
-    void container.offsetWidth; // trigger reflow
+    void container.offsetWidth; // reflow
     container.classList.add('view-enter');
 
     window.scrollTo(0, 0);
@@ -120,12 +135,35 @@ const Router = {
   },
 
   /**
-   * Updates topbar breadcrumb title
+   * Updates topbar breadcrumb title and dynamic subdomain
    * @param {string} title - Breadcrumb title text
    */
   updateBreadcrumb(title) {
     const el = document.getElementById('breadcrumb-current-page');
     if (el) el.textContent = title;
+
+    const subEl = document.getElementById('topbar-subdomain-code');
+    if (subEl) {
+      const currentSub = store.getState()?.pilar9?.settings?.subdomain || 'berasjaya';
+      subEl.textContent = `${currentSub}.sidaya.biz.id`;
+    }
+  },
+
+  /**
+   * Updates top floating impersonation warning banner
+   * @param {Object} impersonation
+   */
+  updateImpersonationBanner(impersonation) {
+    const bannerRoot = document.getElementById('impersonation-banner-root');
+    if (!bannerRoot) return;
+
+    if (impersonation && impersonation.active) {
+      bannerRoot.innerHTML = LayoutView.renderImpersonationBanner(impersonation);
+      document.body.classList.add('impersonation-active');
+    } else {
+      bannerRoot.innerHTML = '';
+      document.body.classList.remove('impersonation-active');
+    }
   },
 
   /**

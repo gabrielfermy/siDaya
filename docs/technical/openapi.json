@@ -1,0 +1,935 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SiDaya Enterprise OS API",
+    "version": "1.0.0",
+    "description": "Canonical RESTful OpenAPI 3.1.0 Specification for SiDaya Enterprise Wholesale ERP, Multi-Tenant Subdomain Gateway, POS Fast-Scan, Inbound FIFO Allocation, Field Driver POD, and Ashvin Labs Operator Control Plane.",
+    "contact": {
+      "name": "Ashvin Labs API Engineering",
+      "email": "api@ashvinlabs.com",
+      "url": "https://ashvinlabs.com"
+    },
+    "license": {
+      "name": "Proprietary - SiDaya",
+      "url": "https://sidaya.biz.id/terms"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://{subdomain}.sidaya.biz.id/api/v1",
+      "description": "Production Multi-Tenant Workspace Gateway",
+      "variables": {
+        "subdomain": {
+          "default": "berasjaya",
+          "description": "Unique tenant workspace subdomain"
+        }
+      }
+    },
+    {
+      "url": "https://ops.sidaya.biz.id/api/v1",
+      "description": "Production Platform Operator Control Plane"
+    },
+    {
+      "url": "https://{subdomain}.sidaya.my.id/api/v1",
+      "description": "Staging Multi-Tenant Workspace Gateway",
+      "variables": {
+        "subdomain": {
+          "default": "berasjaya",
+          "description": "Staging tenant subdomain"
+        }
+      }
+    },
+    {
+      "url": "http://localhost:4000/api/v1",
+      "description": "Local Development API Server"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "User Login",
+        "description": "Authenticates merchant owner or staff credentials and returns session token with tenant context.",
+        "operationId": "loginUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/auth/resolve-tenant": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Centralized Gateway Tenant Resolution",
+        "description": "Resolves tenant ID and target subdomain URL from user email for root domain redirect.",
+        "operationId": "resolveTenantByEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "description": "Registered user email address",
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "example": "budi@berasjaya.com"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant resolved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolveTenantResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          }
+        }
+      }
+    },
+    "/auth/register-owner": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Owner Self-Service Registration",
+        "description": "Registers a new business tenant, allocates primary subdomain, and creates owner credentials.",
+        "operationId": "registerOwner",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterOwnerRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tenant registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterOwnerResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          }
+        }
+      }
+    },
+    "/tenants/check-subdomain": {
+      "get": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Validate Subdomain Availability",
+        "description": "Checks if a subdomain slug is available, valid, and not blacklisted by system reserved keywords.",
+        "operationId": "checkSubdomain",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "berasjayagrosir"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subdomain availability status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckSubdomainResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/subdomain": {
+      "put": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Update Tenant Primary Subdomain",
+        "description": "Migrates primary subdomain and registers old subdomain as a 30-day alias with HTTP 301 redirect.",
+        "operationId": "updateTenantSubdomain",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubdomainRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Subdomain updated with 30-day alias",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateSubdomainResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          }
+        }
+      }
+    },
+    "/admin/auth/login": {
+      "post": {
+        "tags": [
+          "Operator Control Plane"
+        ],
+        "summary": "Operator Portal Login",
+        "description": "Authenticates Ashvin Labs platform operator on ops.sidaya.biz.id.",
+        "operationId": "loginOperator",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperatorLoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Operator session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorLoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
+      }
+    },
+    "/admin/tenants/{tenantId}/impersonate": {
+      "post": {
+        "tags": [
+          "Operator Control Plane"
+        ],
+        "summary": "Start Ticket-Bound Tenant Impersonation",
+        "description": "Issues a scoped token to impersonate a tenant user for customer support diagnostics.",
+        "operationId": "startImpersonation",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartImpersonationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Impersonation session established",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StartImpersonationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          }
+        }
+      }
+    },
+    "/admin/tenants/{tenantId}/impersonate/exit": {
+      "post": {
+        "tags": [
+          "Operator Control Plane"
+        ],
+        "summary": "Exit Tenant Impersonation Session",
+        "description": "Safely terminates impersonation session, records audit trail, and returns operator portal URL.",
+        "operationId": "exitImpersonation",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session terminated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExitImpersonationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/delivery/manifest/{doNumber}/masked": {
+      "get": {
+        "tags": [
+          "Delivery & Logistics"
+        ],
+        "summary": "Get Price-Masked Driver Manifest",
+        "description": "Retrieves sanitized delivery manifest with zero financial leaks for field drivers (UU PDP).",
+        "operationId": "getMaskedDriverManifest",
+        "parameters": [
+          {
+            "name": "doNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "DO-20260910-001"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Price-masked manifest",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaskedDriverManifestResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/delivery/pod/submit": {
+      "post": {
+        "tags": [
+          "Delivery & Logistics"
+        ],
+        "summary": "Submit Signed Proof of Delivery (POD)",
+        "description": "Submits digital recipient signature, GPS geotags, and delivery completion status.",
+        "operationId": "submitProofOfDelivery",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitPodRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "POD verified and registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmitPodResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "TenantHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Tenant-ID"
+      },
+      "OperatorRoleHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Operator-Role"
+      }
+    },
+    "responses": {
+      "BadRequestError": {
+        "description": "Invalid request payload",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/StandardErrorResponse"
+            }
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "description": "Authentication required",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/StandardErrorResponse"
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/StandardErrorResponse"
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/StandardErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "StandardErrorResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "error"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "object",
+            "required": [
+              "message"
+            ],
+            "properties": {
+              "message": {
+                "type": "string",
+                "example": "Subdomain is reserved"
+              },
+              "code": {
+                "type": "string",
+                "example": "RESERVED_KEYWORD"
+              },
+              "status": {
+                "type": "integer",
+                "example": 400
+              }
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "budi@berasjaya.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "Password123!"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "sessionToken": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ResolveTenantResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "string"
+              },
+              "tenantId": {
+                "type": "string"
+              },
+              "subdomain": {
+                "type": "string",
+                "example": "berasjaya"
+              },
+              "businessName": {
+                "type": "string",
+                "example": "Toko Grosir Beras Jaya Bersama"
+              },
+              "targetUrl": {
+                "type": "string",
+                "example": "https://berasjaya.sidaya.biz.id/dashboard"
+              }
+            }
+          }
+        }
+      },
+      "RegisterOwnerRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "businessName",
+          "ownerName",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "hendro@berasmakmur.com"
+          },
+          "businessName": {
+            "type": "string",
+            "example": "CV Beras Makmur Abadi"
+          },
+          "ownerName": {
+            "type": "string",
+            "example": "H. Hendro Wijaya"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      },
+      "RegisterOwnerResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenantId": {
+                "type": "string"
+              },
+              "subdomain": {
+                "type": "string"
+              },
+              "loginUrl": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "CheckSubdomainResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "slug": {
+                "type": "string"
+              },
+              "isAvailable": {
+                "type": "boolean"
+              },
+              "isReserved": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "UpdateSubdomainRequest": {
+        "type": "object",
+        "required": [
+          "newSubdomain"
+        ],
+        "properties": {
+          "newSubdomain": {
+            "type": "string",
+            "example": "berasjayagrosir"
+          }
+        }
+      },
+      "UpdateSubdomainResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "tenantId": {
+                "type": "string"
+              },
+              "activeSubdomain": {
+                "type": "string"
+              },
+              "aliasSubdomain": {
+                "type": "string"
+              },
+              "aliasExpiresAt": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "OperatorLoginRequest": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "gabriel@ashvinlabs.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          }
+        }
+      },
+      "OperatorLoginResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "operatorId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sessionToken": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "StartImpersonationRequest": {
+        "type": "object",
+        "required": [
+          "ticketReference",
+          "reason"
+        ],
+        "properties": {
+          "targetUserId": {
+            "type": "string"
+          },
+          "ticketReference": {
+            "type": "string",
+            "example": "#TICKET-8492"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Diagnosa selisih perhitungan alokasi FIFO"
+          }
+        }
+      },
+      "StartImpersonationResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "impersonationToken": {
+                "type": "string"
+              },
+              "targetTenantId": {
+                "type": "string"
+              },
+              "targetSubdomain": {
+                "type": "string"
+              },
+              "redirectUrl": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ExitImpersonationResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "terminated": {
+                "type": "boolean",
+                "example": true
+              },
+              "returnUrl": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "MaskedDriverManifestResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "deliveryOrderNumber": {
+                "type": "string"
+              },
+              "recipientName": {
+                "type": "string"
+              },
+              "verificationToken": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "SubmitPodRequest": {
+        "type": "object",
+        "required": [
+          "deliveryOrderId",
+          "signature",
+          "location"
+        ],
+        "properties": {
+          "deliveryOrderId": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "object",
+            "properties": {
+              "signerName": {
+                "type": "string"
+              },
+              "signatureVectorData": {
+                "type": "string"
+              }
+            }
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "latitude": {
+                "type": "number"
+              },
+              "longitude": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "SubmitPodResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "data"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "deliveryOrderId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "example": "DELIVERED"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

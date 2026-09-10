@@ -156,3 +156,36 @@ graph TD
 * [ ] Are offline mutations recorded as event deltas rather than absolute overwrites?
 * [ ] Are wholesale unit conversions mapped accurately to base quantities?
 * [ ] Is Supabase Realtime WebSocket subscription filtered by `tenant_id`?
+* [ ] **Strict Line Count Constraint**: Is every single source file strictly `< 450 lines` of code?
+* [ ] **Zero God Files**: Are rendering views (`*.view.js`) decoupled from event handlers (`*.controller.js`)?
+* [ ] **Standardized Headers**: Does every module declare a formal TSDoc/JSDoc block (`@module`, `@description`, `@author`)?
+* [ ] **Tenant Isolation**: Are operator routes, links, and banners strictly hidden from standard merchant views?
+
+---
+
+## 6. Codebase Modulith Architecture & Quality Standards
+
+### A. Strict File Size Limit (< 450 Lines)
+To maintain extreme codebase health, zero cognitive bloat, and ensure lightning-fast AI context ingestion:
+* **Hard Rule**: No single source file (JavaScript, TypeScript, CSS, HTML, SQL) shall exceed **450 lines of code**.
+* Any file approaching 400 lines MUST be refactored into smaller, focused modules (e.g. separating UI views from controllers, extracting modal dialogs into reusable components, or isolating business calculations).
+
+### B. Standardized TSDoc / JSDoc Header Standard
+Every code file in the repository must begin with a standardized header comment:
+```javascript
+/**
+ * @fileoverview [Brief single-line summary of file responsibility]
+ * @module [module_path_name]
+ * @description
+ * Detailed description of what this module does, its state dependencies,
+ * architectural role, and integration points with the rest of the system.
+ *
+ * @author Ashvin Labs Engineering Team
+ * @license Proprietary - SiDaya
+ */
+```
+
+### C. Subdomain Isolation & Zero Operator Footprint
+* Never import or render Operator Control Plane (`ops.*`) widgets inside merchant tenant workspaces.
+* Operator elements only appear in merchant views when an authorized operator is actively shadowing a tenant in **Impersonation Mode** (with a floating top warning banner and 1-click exit hook).
+

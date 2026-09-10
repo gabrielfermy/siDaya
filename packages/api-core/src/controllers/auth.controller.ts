@@ -10,6 +10,7 @@ import {
   AcceptStaffInvitePayload,
   ResetPasswordPayload,
 } from '@sidaya/shared-types';
+import { SubdomainDomainService } from '../services/tenant/subdomain.service.js';
 
 export class AuthController {
   constructor(
@@ -173,6 +174,32 @@ export class AuthController {
       sendJson(res, 200, { success: true, data: result });
     } catch (err: any) {
       sendJson(res, 400, { success: false, error: { message: err.message || 'Gagal mengatur PIN.' } });
+    }
+  }
+
+  public async resolveTenant(
+    _req: http.IncomingMessage,
+    res: http.ServerResponse,
+    _params: Record<string, string>,
+    query: Record<string, string>,
+  ): Promise<void> {
+    const email = query['email'] || '';
+    if (!email) {
+      sendJson(res, 400, {
+        success: false,
+        error: { message: 'Query parameter "email" is required.', code: 'MISSING_EMAIL' },
+      });
+      return;
+    }
+
+    try {
+      const result = SubdomainDomainService.getInstance().resolveTenantByEmail(email);
+      sendJson(res, 200, { success: true, data: result });
+    } catch (err: any) {
+      sendJson(res, 404, {
+        success: false,
+        error: { message: err.message || 'Tenant resolution failed.', code: 'RESOLVE_FAILED' },
+      });
     }
   }
 }

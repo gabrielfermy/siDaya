@@ -1,5 +1,5 @@
 /**
- * Invoices, Surat Jalan, and Katalog Controllers
+ * Invoices and Surat Jalan Controllers
  */
 const InvoicesController = {
   viewReceipt(invoiceNumber) {
@@ -30,18 +30,8 @@ const SjController = {
   },
 };
 
-const KatalogController = {
-  editProduct(id) {
-    const state = store.getState();
-    const product = state.pilar2.products.find(p => p.id === id);
-    if (!product) return;
-    showToast(`Membuka editor SKU: ${product.name}`);
-  },
-};
-
 function viewReceipt(num) { InvoicesController.viewReceipt(num); }
 function viewInvoiceReceipt(num) { InvoicesController.viewReceipt(num); }
 function exportInvoicesCsv() { InvoicesController.exportCsv(); }
 function openPodSignModal(id) { SjController.openPodModal(id); }
 function viewPodSignature(num) { SjController.viewPodSignature(num); }
-function editProduct(id) { KatalogController.editProduct(id); }

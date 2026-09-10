@@ -14,13 +14,19 @@ const SESSION_CONFIG = {
   KEY_OPERATOR_SESSION: 'sidaya_operator_session',
   KEY_INTENDED_PATH: 'sidaya_intended_path',
   KEY_SESSION_EXPIRED_FLAG: 'sidaya_session_expired_flag',
+  KEY_IMPERSONATION_SESSION: 'sidaya_impersonation_session',
 };
 
+const RESERVED_SUBDOMAINS = [
+  'ops', 'admin', 'api', 'auth', 'app', 'www', 'billing', 'support',
+  'status', 'mail', 'gateway', 'portal', 'staging', 'prod', 'dev', 'static', 'assets'
+];
+
 const MERCHANT_ACCOUNTS = {
-  'budi@berasjaya.com': { email: 'budi@berasjaya.com', password: 'Password123!', name: 'Budi Santoso', role: '👑 OWNER', roleLabel: 'Owner / Billing POC', avatar: 'B', tenantName: 'Toko Grosir Beras Jaya Bersama' },
-  'siti@berasjaya.com': { email: 'siti@berasjaya.com', password: 'Password123!', name: 'Siti Rahma', role: '💳 KASIR (POS)', roleLabel: 'Kasir Grosir (POS)', avatar: 'S', tenantName: 'Toko Grosir Beras Jaya Bersama' },
-  'agus@berasjaya.com': { email: 'agus@berasjaya.com', password: 'Password123!', name: 'Agus Santoso', role: '📦 GUDANG (FIFO)', roleLabel: 'Gudang & Batch FIFO', avatar: 'A', tenantName: 'Toko Grosir Beras Jaya Bersama' },
-  'joko@berasjaya.com': { email: 'joko@berasjaya.com', password: 'Password123!', name: 'Joko Supir', role: '🚚 DRIVER', roleLabel: 'Driver Logistik (POD)', avatar: 'J', tenantName: 'Toko Grosir Beras Jaya Bersama' },
+  'budi@berasjaya.com': { email: 'budi@berasjaya.com', password: 'Password123!', name: 'Budi Santoso', role: '👑 OWNER', roleLabel: 'Owner / Billing POC', avatar: 'B', tenantName: 'Toko Grosir Beras Jaya Bersama', subdomain: 'berasjaya' },
+  'siti@berasjaya.com': { email: 'siti@berasjaya.com', password: 'Password123!', name: 'Siti Rahma', role: '💳 KASIR (POS)', roleLabel: 'Kasir Grosir (POS)', avatar: 'S', tenantName: 'Toko Grosir Beras Jaya Bersama', subdomain: 'berasjaya' },
+  'agus@berasjaya.com': { email: 'agus@berasjaya.com', password: 'Password123!', name: 'Agus Santoso', role: '📦 GUDANG (FIFO)', roleLabel: 'Gudang & Batch FIFO', avatar: 'A', tenantName: 'Toko Grosir Beras Jaya Bersama', subdomain: 'berasjaya' },
+  'joko@berasjaya.com': { email: 'joko@berasjaya.com', password: 'Password123!', name: 'Joko Supir', role: '🚚 DRIVER', roleLabel: 'Driver Logistik (POD)', avatar: 'J', tenantName: 'Toko Grosir Beras Jaya Bersama', subdomain: 'berasjaya' },
 };
 
 const OPERATOR_ACCOUNTS = {

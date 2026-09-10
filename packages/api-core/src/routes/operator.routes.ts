@@ -19,4 +19,10 @@ export function registerOperatorRoutes(router: AppRouter, operatorController: Op
   );
   router.get('/api/v1/admin/audit-logs', (req, res) => operatorController.getAuditLogs(req, res));
   router.get('/api/v1/admin/telemetry', (req, res) => operatorController.getTelemetry(req, res));
+  router.post('/api/v1/admin/tenants/:tenantId/impersonate', (req, res, params) =>
+    operatorController.impersonateTenant(req, res, params),
+  );
+  router.post('/api/v1/admin/tenants/:tenantId/impersonate/exit', (req, res, params) =>
+    operatorController.exitImpersonation(req, res, params),
+  );
 }
