@@ -24,7 +24,7 @@ const PosView = {
       <!-- BARCODE FAST SCAN BAR -->
       <div class="barcode-action-bar">
         <span class="barcode-icon">📷</span>
-        <input id="pos-barcode-input" type="text" class="barcode-input" placeholder="Arahkan barcode scanner / ketik SKU (contoh: 8991234567890 lalu Enter)..." autofocus onkeypress="handlePosBarcodeKey(event)">
+        <input id="pos-barcode-input" type="text" class="barcode-input" placeholder="Scan barcode / ketik SKU (lalu Enter)..." autofocus onkeypress="handlePosBarcodeKey(event)">
         <button class="btn btn-primary" onclick="handlePosBarcodeScanSubmit()">⚡ Tambah Cepat</button>
       </div>
 
@@ -83,16 +83,18 @@ const PosView = {
                 </div>
               ` : cart.map(item => `
                 <div class="cart-item-row">
-                  <div class="cart-item-info">
+                  <div class="cart-item-top">
                     <div class="cart-item-name">${item.name}</div>
-                    <div class="cart-item-price">${formatRupiah(item.price)} x ${item.qty} ${item.unit}</div>
+                    <div class="cart-item-subtotal">${formatRupiah(item.price * item.qty)}</div>
                   </div>
-                  <div class="cart-item-controls">
-                    <button class="qty-btn" onclick="updatePosCartQty('${item.id}', -1)">-</button>
-                    <span class="qty-label">${item.qty}</span>
-                    <button class="qty-btn" onclick="updatePosCartQty('${item.id}', 1)">+</button>
+                  <div class="cart-item-bottom">
+                    <div class="cart-item-price">${formatRupiah(item.price)} <span class="product-unit">/${item.unit}</span></div>
+                    <div class="cart-item-controls">
+                      <button class="qty-btn" onclick="updatePosCartQty('${item.id}', -1)" title="Kurang">-</button>
+                      <span class="qty-label">${item.qty}</span>
+                      <button class="qty-btn" onclick="updatePosCartQty('${item.id}', 1)" title="Tambah">+</button>
+                    </div>
                   </div>
-                  <div class="cart-item-subtotal">${formatRupiah(item.price * item.qty)}</div>
                 </div>
               `).join('')}
             </div>
@@ -119,6 +121,19 @@ const PosView = {
           </div>
         </div>
       </div>
+
+      <!-- MOBILE STICKY CART JUMP BAR -->
+      ${cart.length > 0 ? `
+        <div class="pos-mobile-cart-bar" onclick="document.querySelector('.pos-cart-col')?.scrollIntoView({ behavior: 'smooth' })">
+          <div class="pos-mobile-cart-summary">
+            <span class="pos-mobile-cart-count">🛒 ${cart.reduce((sum, item) => sum + item.qty, 0)} Item</span>
+            <span class="pos-mobile-cart-total">${formatRupiah(cartTotal)}</span>
+          </div>
+          <button class="pos-mobile-cart-btn" onclick="event.stopPropagation(); openPosCheckoutModal()">
+            Bayar ⚡
+          </button>
+        </div>
+      ` : ''}
     `;
   },
 };

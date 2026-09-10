@@ -21,18 +21,18 @@ const FifoView = {
         <p style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:12px;">
           Uji coba mesin alokasi pesanan secara otomatis mengambil dari lot terlama (receivedAt ASC).
         </p>
-        <div style="display:flex; gap:12px; align-items:flex-end;">
-          <div class="form-group" style="margin-bottom:0; flex:1;">
+        <div class="fifo-sim-controls">
+          <div class="form-group fifo-sim-field-product">
             <label class="form-label" style="font-size:0.75rem;">Produk</label>
             <select id="fifo-sim-product" class="form-select">
               <option value="a0000002-0000-0000-0000-000000000001">Beras Rojolele Super 50kg</option>
             </select>
           </div>
-          <div class="form-group" style="margin-bottom:0; width:140px;">
+          <div class="form-group fifo-sim-field-qty">
             <label class="form-label" style="font-size:0.75rem;">Qty Pesanan</label>
             <input id="fifo-sim-qty" type="number" class="form-input" value="65" min="1">
           </div>
-          <button class="btn btn-primary" onclick="runFifoSimulation()">⚡ Jalankan Simulasi</button>
+          <button class="btn btn-primary fifo-sim-btn" onclick="runFifoSimulation()">⚡ Jalankan Simulasi</button>
         </div>
         <div id="fifo-simulation-result" style="margin-top:12px;"></div>
       </div>
