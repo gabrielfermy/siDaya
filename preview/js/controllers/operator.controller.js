@@ -5,7 +5,7 @@ const OperatorController = {
   toggleStatus(tenantId) {
     store.dispatch('OPERATOR_TOGGLE_TENANT_STATUS', { tenantId });
     showToast('Status siklus hidup tenant berhasil diperbarui.');
-    const container = document.getElementById('main-viewport');
+    const container = document.getElementById('main-content');
     if (container && window.location.pathname.includes('/telemetry')) {
       container.innerHTML = OperatorView.render(store.getState());
     }

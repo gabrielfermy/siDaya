@@ -58,7 +58,7 @@ const PosController = {
   },
 
   refreshCartView() {
-    const container = document.getElementById('main-viewport');
+    const container = document.getElementById('main-content');
     if (container && window.location.pathname.includes('/pos')) {
       container.innerHTML = PosView.render(store.getState());
     }

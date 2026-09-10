@@ -273,3 +273,13 @@ const ROADMAP_METADATA = {
     ]
   }
 };
+
+/**
+ * Normalized roadmap feature map with leading slash for Router matching
+ */
+const ROADMAP_FEATURES = Object.keys(ROADMAP_METADATA).reduce((acc, key) => {
+  acc['/' + key] = ROADMAP_METADATA[key];
+  acc[key] = ROADMAP_METADATA[key];
+  return acc;
+}, {});
+
