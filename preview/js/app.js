@@ -1,29 +1,60 @@
 /**
- * Main Application Bootstrapper & MVC Coordinator
+ * Main Application Bootstrapper & MVC / Modulith Coordinator
  */
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Mount Auth Overlays
+  // 1. Register Modules into Internal Dependency Manager
+  if (window.moduleManager) {
+    moduleManager.register('Store', [], store);
+    moduleManager.register('View:Layout', ['Store'], LayoutView);
+    moduleManager.register('View:Auth', ['Store'], AuthView);
+    moduleManager.register('View:Modals', ['Store'], ModalsView);
+    moduleManager.register('View:Dashboard', ['Store'], DashboardView);
+    moduleManager.register('View:POS', ['Store'], PosView);
+    moduleManager.register('View:Katalog', ['Store'], KatalogView);
+    moduleManager.register('View:FIFO', ['Store'], FifoView);
+    moduleManager.register('View:Customers', ['Store'], CustomersView);
+    moduleManager.register('View:Invoices', ['Store'], InvoicesView);
+    moduleManager.register('View:SJ', ['Store'], SjView);
+    moduleManager.register('View:Piutang', ['Store'], PiutangView);
+    moduleManager.register('View:Users', ['Store'], UsersView);
+    moduleManager.register('View:Roles', ['Store'], RolesView);
+    moduleManager.register('View:Settings', ['Store'], SettingsView);
+    moduleManager.register('View:Operator', ['Store'], OperatorView);
+
+    moduleManager.register('Controller:Auth', ['Store'], AuthController);
+    moduleManager.register('Controller:POS', ['Store', 'View:POS'], PosController);
+    moduleManager.register('Controller:FIFO', ['Store'], FifoController);
+    moduleManager.register('Controller:Customers', ['Store'], CustomersController);
+    moduleManager.register('Controller:Roles', ['Store'], RolesController);
+    moduleManager.register('Controller:Operator', ['Store'], OperatorController);
+    moduleManager.register('Controller:Invoices', ['Store'], InvoicesController);
+
+    // Validate internal dependency health
+    moduleManager.validateAll();
+  }
+
+  // 2. Mount Auth Overlays
   const authRoot = document.getElementById('auth-root');
   if (authRoot) {
     authRoot.innerHTML = AuthView.renderMerchantLogin() + AuthView.renderOperatorLogin();
   }
 
-  // 2. Mount Modals
+  // 3. Mount Modals
   const modalRoot = document.getElementById('modal-root');
   if (modalRoot) {
     modalRoot.innerHTML = ModalsView.renderAllModals();
   }
 
-  // 3. Mount App Layout Shell
+  // 4. Mount App Layout Shell
   const appRoot = document.getElementById('app-root');
   if (appRoot) {
     appRoot.innerHTML = LayoutView.renderShell();
   }
 
-  // 4. Initialize SPA Router
+  // 5. Initialize SPA Router
   Router.init();
 
-  // 5. Global Keyboard Shortcuts (e.g. F2 for POS, Esc for closing modals)
+  // 6. Global Keyboard Shortcuts
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeModal();
