@@ -28,6 +28,50 @@ html.state-auth-merchant #app-shell { display: flex !important; }
 html.state-auth-ops #operator-shell,
 html.state-auth-ops #app-shell { display: flex !important; }
 
+/* --- FULL-SCREEN STANDALONE ERROR PAGE MODE --- */
+.app-shell.is-error-page {
+  display: flex !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+  background: var(--bg-body) !important;
+  overflow: hidden;
+}
+.app-shell.is-error-page .sidebar,
+.app-shell.is-error-page .topbar,
+.app-shell.is-error-page .sidebar-backdrop,
+.app-shell.is-error-page #impersonation-banner-root {
+  display: none !important;
+}
+.app-shell.is-error-page .main-viewport {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: var(--bg-body) !important;
+}
+.app-shell.is-error-page .content-container {
+  padding: 24px !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 1 !important;
+}
+html.state-unauth-merchant .app-shell.is-error-page,
+html.state-unauth-ops .app-shell.is-error-page {
+  display: flex !important;
+}
+html.state-unauth-merchant:has(.app-shell.is-error-page) #merchant-login-screen,
+html.state-unauth-ops:has(.app-shell.is-error-page) #operator-login-screen {
+  display: none !important;
+}
+
 /* --- SIDEBAR & RESPONSIVE DRAWER ARCHITECTURE --- */
 .sidebar-backdrop {
   position: fixed;
