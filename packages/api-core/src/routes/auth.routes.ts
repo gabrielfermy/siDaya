@@ -8,6 +8,9 @@ export function registerAuthRoutes(router: AppRouter, authController: AuthContro
   router.post('/api/v1/auth/staff/accept-invite', (req, res) => authController.acceptStaffInvite(req, res));
   router.post('/api/v1/auth/password/reset-request', (req, res) => authController.requestPasswordReset(req, res));
   router.post('/api/v1/auth/password/reset-confirm', (req, res) => authController.confirmPasswordReset(req, res));
+  router.get('/api/v1/auth/resolve-tenant', (req, res, params, query) =>
+    authController.resolveTenant(req, res, params, query),
+  );
   router.get('/api/v1/tenants/:tenantId/staff', (req, res, params) => authController.getTenantStaff(req, res, params));
   router.post('/api/v1/tenants/:tenantId/staff/:staffId/pin', (req, res, params) =>
     authController.setStaffPin(req, res, params),

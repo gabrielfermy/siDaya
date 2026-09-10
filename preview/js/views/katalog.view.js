@@ -10,7 +10,9 @@ const KatalogView = {
           <h1 class="view-title">Master SKU & Harga Grosir</h1>
           <p class="view-subtitle">Kelola kode barcode SKU, satuan bertingkat (Karung/Bal/Pcs), dan proteksi HPP (COGS).</p>
         </div>
-        <div class="view-actions">
+        <div class="view-actions" style="display:flex; gap:8px;">
+          <button class="btn btn-outline" onclick="downloadCsvTemplate()">📄 Unduh Template CSV</button>
+          <button class="btn btn-outline" onclick="openCsvImportModal()">📥 Impor Massal CSV</button>
           <button class="btn btn-primary" onclick="openAddProductModal()">+ Tambah Produk SKU</button>
         </div>
       </div>

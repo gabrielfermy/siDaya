@@ -12,4 +12,7 @@ export * from './services/wholesale-pricing.service';
 export * from './services/barcode-lookup.service';
 export * from './services/pin-auth.service';
 export * from './services/pdp-masking.service';
+export * from './services/tenant/subdomain.service';
+export * from './services/operator/impersonation.service';
 export * from './controllers/payment-webhook.controller';
+export * from './controllers/tenant.controller';

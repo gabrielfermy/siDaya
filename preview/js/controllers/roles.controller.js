@@ -1,35 +1,32 @@
 /**
- * Roles & Settings Controller: RBAC Capability Matrix and Store Hardware Settings
+ * @fileoverview Roles & RBAC Matrix Controller (Pilar 08)
+ * @module Controllers:Roles
+ * @description
+ * Event listeners and handlers for 18-Key RBAC Capability Matrix management.
+ *
+ * @author Ashvin Labs Engineering Team
+ * @license Proprietary - SiDaya
  */
+
 const RolesController = {
+  /**
+   * Toggles permission capability checkbox for role
+   * @param {string} role
+   * @param {string} capabilityKey
+   * @param {boolean} isChecked
+   */
   toggleCapability(role, capabilityKey, isChecked) {
     store.dispatch('RBAC_TOGGLE_CAPABILITY', { role, capabilityKey, isChecked });
   },
 
+  /**
+   * Saves RBAC Matrix changes
+   */
   saveMatrix() {
-    showToast('✅ Matriks izin 18 Capability Keys berhasil disimpan ke database tenant.');
+    Toast.show('✅ Matriks izin 18 Capability Keys berhasil disimpan ke database tenant.', 'success');
   },
 };
 
-const SettingsController = {
-  saveSettings() {
-    const storeName = document.getElementById('settings-store-name').value;
-    const storeAddress = document.getElementById('settings-store-address').value;
-    const storePhone = document.getElementById('settings-store-phone').value;
-    const printerType = document.getElementById('settings-printer-type').value;
-    const paperWidth = document.getElementById('settings-paper-width').value;
-
-    store.dispatch('SETTINGS_UPDATE', { storeName, storeAddress, storePhone, printerType, paperWidth });
-    showToast('✅ Konfigurasi toko dan printer hardware berhasil diperbarui.');
-  },
-
-  testPrinter() {
-    showToast('🖨️ Mengirim perintah byte ESC/POS ke printer thermal...');
-    alert('[ESC/POS Test Print]\n\nTOKO GROSIR BERAS JAYA\nPasar Induk Kramat Jati\n================================\nTEST PRINTER BERHASIL\nKertas: 80mm\nKoneksi: OK\n================================\nTerima Kasih!');
-  },
-};
-
-function toggleRbacCapability(role, key, isChecked) { RolesController.toggleCapability(role, key, isChecked); }
-function saveRbacMatrix() { RolesController.saveMatrix(); }
-function saveStoreSettings() { SettingsController.saveSettings(); }
-function testThermalPrinter() { SettingsController.testPrinter(); }
+// Global backward compatibility
+window.toggleRbacCapability = (role, key, isChecked) => RolesController.toggleCapability(role, key, isChecked);
+window.saveRbacMatrix = () => RolesController.saveMatrix();

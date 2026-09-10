@@ -1,7 +1,11 @@
 /**
- * @file toast.js
- * @description Toast Notification Component: Non-blocking fixed floating feedback pills
+ * @fileoverview Toast Notification Component: Non-blocking fixed floating feedback pills
  * @module Component:Toast
+ * @description
+ * High-visibility floating notification pill with micro-animations and severity icons.
+ *
+ * @author Ashvin Labs Engineering Team
+ * @license Proprietary - SiDaya
  */
 
 /**
@@ -34,3 +38,10 @@ function showToast(message, type = 'info') {
     setTimeout(() => toast.remove(), 250);
   }, 2800);
 }
+
+const Toast = {
+  show: showToast,
+};
+
+window.Toast = Toast;
+window.showToast = showToast;

@@ -9,7 +9,10 @@ import {
   SubscriptionTier,
   InviteOperatorPayload,
   AcceptOperatorInvitePayload,
+  StartImpersonationPayload,
+  ExitImpersonationPayload,
 } from '@sidaya/shared-types';
+import { ImpersonationDomainService } from '../services/operator/impersonation.service.js';
 
 export class OperatorController {
   constructor(
@@ -191,6 +194,65 @@ export class OperatorController {
       sendJson(res, 200, { success: true, data: telemetry });
     } catch (err: any) {
       sendJson(res, 403, { success: false, error: { message: err.message } });
+    }
+  }
+
+  public async impersonateTenant(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    params: Record<string, string>,
+  ): Promise<void> {
+    const operator = getOperatorContext(req);
+    const tenantId = params['tenantId'];
+
+    if (!tenantId) {
+      sendJson(res, 400, {
+        success: false,
+        error: { message: 'tenantId parameter is required.', code: 'MISSING_TENANT_ID' },
+      });
+      return;
+    }
+
+    const body = (await parseRequestBody(req)) as unknown as StartImpersonationPayload;
+
+    try {
+      const baseUrl = req.headers.host || 'localhost:3333';
+      const result = ImpersonationDomainService.getInstance().startImpersonation(
+        operator,
+        tenantId,
+        body,
+        baseUrl,
+      );
+      sendJson(res, 200, { success: true, data: result });
+    } catch (err: any) {
+      sendJson(res, 400, {
+        success: false,
+        error: { message: err.message || 'Failed to start tenant impersonation.', code: 'IMPERSONATION_FAILED' },
+      });
+    }
+  }
+
+  public async exitImpersonation(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+    _params: Record<string, string>,
+  ): Promise<void> {
+    const operator = getOperatorContext(req);
+    const body = (await parseRequestBody(req)) as unknown as ExitImpersonationPayload;
+
+    try {
+      const baseUrl = getBaseUrl(req);
+      const result = ImpersonationDomainService.getInstance().exitImpersonation(
+        operator,
+        body,
+        baseUrl,
+      );
+      sendJson(res, 200, { success: true, data: result });
+    } catch (err: any) {
+      sendJson(res, 400, {
+        success: false,
+        error: { message: err.message || 'Failed to exit tenant impersonation.', code: 'EXIT_IMPERSONATION_FAILED' },
+      });
     }
   }
 }

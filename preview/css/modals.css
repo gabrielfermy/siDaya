@@ -186,3 +186,36 @@
   text-align: center;
   line-height: 1.4;
 }
+
+/* ==========================================================================
+   THERMAL RECEIPT PAPER SIMULATOR (58mm / 80mm ESC/POS)
+   ========================================================================== */
+.thermal-paper {
+  background: #ffffff;
+  color: #0f172a;
+  font-family: 'JetBrains Mono', 'Courier New', Courier, monospace;
+  font-size: 11px;
+  line-height: 1.35;
+  padding: 18px 16px;
+  border-radius: 6px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  position: relative;
+  margin: 0 auto;
+  max-width: 320px;
+}
+
+.thermal-header { text-align: center; margin-bottom: 8px; }
+.thermal-brand { font-size: 13px; font-weight: 800; letter-spacing: -0.3px; }
+.thermal-sub { font-size: 9.5px; color: #475569; margin-top: 2px; }
+.thermal-divider { color: #94a3b8; font-size: 10px; margin: 4px 0; overflow: hidden; white-space: nowrap; }
+.thermal-meta { font-size: 10px; margin-bottom: 6px; }
+.thermal-items { margin: 6px 0; font-size: 10.5px; }
+.thermal-item-row { margin-bottom: 4px; }
+.thermal-item-name { font-weight: 700; }
+.thermal-item-calc { display: flex; justify-content: space-between; font-size: 10px; color: #334155; }
+.thermal-totals { font-size: 10.5px; }
+.rec-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+.thermal-bold { font-weight: 800; font-size: 11.5px; color: #000000; }
+.thermal-footer { text-align: center; margin-top: 8px; }
+

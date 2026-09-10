@@ -337,40 +337,82 @@ html.state-auth-ops #app-shell {
 }
 
 /* ==========================================================================
-   FLOATING DEV & SIMULATION DOCKS
+   FLOATING IMPERSONATION DOCK & SIMULATION DOCKS
    ========================================================================== */
-.dev-subdomain-pill {
+.impersonation-dock-banner {
   position: fixed;
-  bottom: 16px;
-  right: 16px;
-  z-index: 99;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-full);
-  padding: 5px 12px;
-  box-shadow: var(--dock-shadow);
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+  color: #ffffff;
+  padding: 8px 20px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+  animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.dev-subdomain-link {
-  color: var(--text-secondary);
-  text-decoration: none;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
+.impersonation-dock-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.dev-subdomain-link.active {
-  background: var(--primary-soft);
-  color: var(--primary);
+.impersonation-pulse-icon {
+  font-size: 1.2rem;
+  animation: pulse 2s infinite;
+}
+
+.impersonation-title {
+  font-size: 0.85rem;
   font-weight: 800;
+  letter-spacing: 0.02em;
 }
+
+.impersonation-sub {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.btn-exit-impersonation {
+  background: #ffffff !important;
+  color: #7c3aed !important;
+  font-weight: 800 !important;
+  border: none !important;
+  border-radius: var(--radius-sm, 6px) !important;
+  padding: 5px 12px !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.btn-exit-impersonation:hover {
+  background: #f3f4f6 !important;
+  transform: translateY(-1px);
+}
+
+body.impersonation-active .topbar {
+  top: 48px;
+}
+
+body.impersonation-active .sidebar {
+  top: 48px;
+  height: calc(100vh - 48px);
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
 
 .error-tester-dock {
   position: fixed;

@@ -1,11 +1,20 @@
 # API Specification & Contracts
-> **RESTful OpenAPI Standards, Multi-Tenant Headers, Request/Response Payloads & Webhook Contracts**
+> **Canonical RESTful OpenAPI 3.1.0 Standards, Multi-Tenant Headers, Request/Response Payloads & Webhook Contracts**
+
+* **Canonical OpenAPI 3.1 Specification**: [openapi.yaml](file:///k:/Personal/bikin%20duit/ashvin-book/docs/technical/openapi.yaml) | [openapi.json](file:///k:/Personal/bikin%20duit/ashvin-book/docs/technical/openapi.json)
+* **Interactive Swagger UI**: `GET /api/v1/docs` (Hosted on Fastify API Core)
+* **Machine-Readable Spec**: `GET /api/v1/openapi.json`
 
 ---
 
 ## 1. Global API Standards & Conventions
 
-* **Base URL**: `https://api.sidaya.id/api/v1`
+* **Specification Version**: OpenAPI 3.1.0
+* **Base URLs**:
+  * **Production Tenant Plane**: `https://{subdomain}.sidaya.biz.id/api/v1`
+  * **Production Operator Control Plane**: `https://ops.sidaya.biz.id/api/v1`
+  * **Staging Tenant Plane**: `https://{subdomain}.sidaya.my.id/api/v1`
+  * **Local Core API**: `http://localhost:4000/api/v1`
 * **Protocol**: HTTPS / TLS 1.3
 * **Content Negotiation**: `Content-Type: application/json; charset=utf-8`
 * **Standard Error Representation Envelope**:
@@ -809,4 +818,107 @@ Returns aggregated platform-wide telemetry: total GMV across all tenants, active
 
 #### `POST /api/v1/admin/tenants/:id/breakglass`
 Requests a temporary, time-bounded technical debug session on a specific tenant. Requires a valid support ticket reference and writes an un-deletable audit log under UU PDP compliance.
+
+#### `POST /api/v1/admin/tenants/:id/impersonate`
+Authorizes an operator (`SUPER_ADMIN`, `DEV_ENGINEER`, or authorized `OPS_SUPPORT`) to assume a tenant staff identity for diagnostic reproduction. Bound to a mandatory support ticket ID.
+
+```http
+POST /api/v1/admin/tenants/c4b8e219-9831-482a-bc91-23a9cf8e12d4/impersonate HTTP/1.1
+Host: ops.sidaya.biz.id
+Authorization: Bearer <OPERATOR_JWT>
+Content-Type: application/json
+
+{
+  "target_user_id": "u0000001-0000-0000-0000-000000000001",
+  "ticket_reference": "#TICKET-8492",
+  "reason": "Investigasi laporan selisih stok FIFO pada batch Mei"
+}
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "impersonation_token": "eyJhbGciOiJSUzI1NiIs...",
+    "target_subdomain": "berasjaya",
+    "redirect_url": "https://berasjaya.sidaya.biz.id/dashboard?impersonate_ref=TICKET-8492",
+    "audit_log_id": "aud_018892"
+  }
+}
+```
+
+#### `POST /api/v1/admin/tenants/:id/impersonate/exit`
+Terminates the active tenant impersonation session, records `OPERATOR_IMPERSONATION_ENDED` in immutable audit logs, and restores operator context.
+
+---
+
+### M. Subdomain Management & Centralized Authentication Endpoints
+
+#### `GET /api/v1/auth/resolve-tenant?email=joni@berasjaya.com`
+Resolves tenant information and subdomain destination for Universal Gateway login on root domain (`sidaya.biz.id` / `sidaya.my.id`).
+
+```json
+{
+  "success": true,
+  "data": {
+    "user_id": "u0000001-0000-0000-0000-000000000001",
+    "tenant_id": "c4b8e219-9831-482a-bc91-23a9cf8e12d4",
+    "subdomain": "berasjaya",
+    "target_url": "https://berasjaya.sidaya.biz.id/dashboard"
+  }
+}
+```
+
+#### `GET /api/v1/tenants/check-subdomain?slug=berasjayagrosir`
+Checks whether a proposed subdomain slug is available and not matching reserved keywords.
+
+```json
+{
+  "success": true,
+  "data": {
+    "slug": "berasjayagrosir",
+    "is_available": true,
+    "is_reserved": false
+  }
+}
+```
+
+#### `PUT /api/v1/tenants/subdomain`
+Modifies the tenant's primary subdomain, registering the old subdomain as a 30-day alias with HTTP 301 redirection (Owner only).
+
+```http
+PUT /api/v1/tenants/subdomain HTTP/1.1
+Authorization: Bearer <OWNER_JWT>
+X-Tenant-ID: c4b8e219-9831-482a-bc91-23a9cf8e12d4
+Content-Type: application/json
+
+{
+  "new_subdomain": "berasjayagrosir"
+}
+```
+
+```json
+{
+  "success": true,
+  "data": {
+    "active_subdomain": "berasjayagrosir",
+    "alias_subdomain": "berasjaya",
+    "alias_expires_at": "2026-10-10T09:30:00Z",
+    "new_primary_url": "https://berasjayagrosir.sidaya.biz.id"
+  }
+}
+```
+
+---
+
+### N. Future Architectural Backlog: Multi-Store Organization Endpoints
+
+*(Roadmap Baseline - ADR-16)*
+
+#### `GET /api/v1/user/workspaces`
+Lists all store branches where the authenticated user holds an active membership.
+
+#### `POST /api/v1/auth/switch-store`
+Switches active store context for multi-store users (e.g., `siti@berasjaya.com` switching between `berasjaya1` and `berasjaya2`), issuing a store-scoped JWT.
+
 

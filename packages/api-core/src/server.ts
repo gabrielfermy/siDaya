@@ -21,13 +21,16 @@ import { FifoController } from './controllers/fifo.controller';
 import { DeliveryController } from './controllers/delivery.controller';
 import { ShiftController } from './controllers/shift.controller';
 import { OperatorController } from './controllers/operator.controller';
+import { TenantController } from './controllers/tenant.controller';
 import { registerAuthRoutes } from './routes/auth.routes';
 import { registerOrderRoutes } from './routes/order.routes';
 import { registerFifoRoutes } from './routes/fifo.routes';
 import { registerDeliveryRoutes } from './routes/delivery.routes';
 import { registerShiftRoutes } from './routes/shift.routes';
 import { registerOperatorRoutes } from './routes/operator.routes';
+import { registerTenantRoutes } from './routes/tenant.routes';
 import { registerWebhookRoutes } from './routes/webhook.routes';
+import { registerOpenApiRoutes } from './routes/openapi.routes';
 import { sendJson } from './middleware/cors.middleware';
 
 const PORT = parseInt(process.env['API_PORT'] || '4000', 10);
@@ -71,6 +74,7 @@ const fifoController = new FifoController(inboundFifoDomainService);
 const deliveryController = new DeliveryController(deliveryOrderDomainService);
 const shiftController = new ShiftController(shiftDomainService);
 const operatorController = new OperatorController(platformAdminDomainService, authTenantDomainService);
+const tenantController = new TenantController();
 
 // Setup App Router
 const router = new AppRouter();
@@ -91,7 +95,9 @@ registerFifoRoutes(router, fifoController);
 registerDeliveryRoutes(router, deliveryController);
 registerShiftRoutes(router, shiftController);
 registerOperatorRoutes(router, operatorController);
+registerTenantRoutes(router, tenantController);
 registerWebhookRoutes(router, webhookController);
+registerOpenApiRoutes(router);
 
 const server = http.createServer((req, res) => router.handleRequest(req, res));
 

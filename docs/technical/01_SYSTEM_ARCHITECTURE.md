@@ -703,6 +703,128 @@ To cater to mid-sized wholesalers, FMCG distributors, and multi-outlet trade net
 * **Customer Payment Behavior Index**: Tracks historical Days Beyond Terms (DBT) and on-time payment percentages.
 * **Automated Credit Limit Scaling**: Automatically recommends or increases credit limits (e.g. from Rp 10M to Rp 25M) for verified reliable wholesale customers.
 
+---
+
+## 14. Subdomain Routing, Wildcard DNS & Centralized Gateway Architecture
+
+SiDaya utilizes a multi-environment wildcard DNS routing topology to deliver isolated subdomains per merchant while providing a centralized login gateway:
+
+```
++---------------------------------------------------------------------------------------------------------------+
+|                                    WILDCARD DNS & EDGE INGRESS LAYER                                          |
+|                 Production: *.sidaya.biz.id  |  Staging: *.sidaya.my.id  |  Local: localhost:3333             |
++-------------------------------------------------------+-------------------------------------------------------+
+                                                        |
+                            +---------------------------+---------------------------+
+                            |                                                       |
+                            v                                                       v
++-------------------------------------------------------+ +-----------------------------------------------------+
+|      CENTRALIZED GATEWAY (sidaya.biz.id / .my.id)      | |         STORE SUBDOMAINS ([subdomain].sidaya.*)      |
++-------------------------------------------------------+ +-----------------------------------------------------+
+| 1. Universal Login Form for all merchant staff        | | 1. Direct Store-Branded Workspace & POS Cashier     |
+| 2. Resolves User Credentials -> Tenant Subdomain      | | 2. Client-Side Pre-Paint Session Validator (30m TTL)|
+| 3. Direct HTTP 302 Redirect to Store Dashboard        | | 3. 30-Day Subdomain Alias (HTTP 301 Permanent Redir)|
+| 4. Zero Operator Links / Zero Administrative Exposure | | 4. Pro Tier Custom Domain (CNAME -> Cloudflare SaaS)|
++-------------------------------------------------------+ +-----------------------------------------------------+
+                                                        |
+                                                        v
+                                +-----------------------------------------------------+
+                                |      OPERATOR CONTROL PLANE (ops.sidaya.biz.id)     |
+                                +-----------------------------------------------------+
+                                | 1. Dedicated Super Admin & Dev Telemetry Dashboard  |
+                                | 2. Ticket-Bound Impersonation ("Act as Tenant User")|
+                                | 3. Top Impersonation Alert Banner & Return Hook     |
+                                +-----------------------------------------------------+
+```
+
+### Subdomain Redirection Sequence:
+1. **User accesses `https://sidaya.biz.id`**: Gateway prompts Universal Login.
+2. **User authenticates**: Server validates credentials against `users`, queries `tenant_memberships` for `tenant_id`, and resolves `subdomain` (e.g. `berasjaya`).
+3. **Immediate Redirection**: HTTP 302 redirect sent to `https://berasjaya.sidaya.biz.id/dashboard`.
+4. **Subdomain Direct Visit**: When cashier tablet loads `https://berasjaya.sidaya.biz.id`, client-side pre-paint verifies session age (`< 30 minutes`). If valid, POS renders instantly without flashing login screen.
+
+---
+
+## 15. Client-Side Modulith MVC Architecture & Zero God Files Standard
+
+To ensure maximum codebase maintainability, rapid page loads, and eliminate monolithic "God Files", the web and prototype architectures enforce strict modular MVC boundaries:
+
+```
+preview/js/
+├── config/             # Immutable constants, session TTL, reserved words, theme tokens
+├── services/           # Network drivers, barcode scanner listeners, printer bridges
+├── store/              # Reactive central state (state.js, store.js, deep migration versioning)
+├── views/              # Pure rendering templates (layout, pos, fifo, sj, piutang, settings, operator)
+├── controllers/        # Business logic & event dispatchers (pos, fifo, auth, operator controllers)
+├── components/         # Reusable glassmorphic UI widgets (toast, modals, quick PIN pad)
+└── router.js           # Client-side hash/path router with synchronous pre-paint route guards
+```
+
+### Architectural Guardrails:
+1. **Strict File Size Cap (< 450 Lines)**: Every single JavaScript, CSS, or HTML file must remain strictly under 450 lines. Files approaching 400 lines must be refactored by splitting view templates from event controllers.
+2. **Single Responsibility Principle (SRP)**: View files (`*.view.js`) only construct HTML strings and templates. Controller files (`*.controller.js`) only attach event listeners and dispatch actions to the Store.
+3. **Internal Dependency Manager**: Dynamic module initialization is orchestrated via an asynchronous Dependency Manager that verifies prerequisite DOM elements, state stores, and controllers before mounting routes.
+4. **Standardized TSDoc / JSDoc Headers**: Every class, controller method, and view component must declare formal JSDoc metadata specifying `@module`, `@author`, `@param`, `@returns`, and `@description`.
+
+---
+
+## 16. Future Architectural Roadmap: Decoupled Multi-Store Organization Engine
+
+*(Roadmap Baseline - ADR-16)*
+
+In future expansion phases, large distributors operating multiple physical outlets will require multi-store management under a single master organization:
+
+```mermaid
+erDiagram
+    ORGANIZATIONS ||--o{ TENANTS : "owns multiple stores"
+    USERS ||--o{ TENANT_MEMBERSHIPS : "holds roles across stores"
+    TENANTS ||--o{ TENANT_MEMBERSHIPS : "has staff members"
+    TENANTS ||--o{ INVENTORY_BATCHES : "isolated warehouse stock"
+    TENANTS ||--o{ SALES_INVOICES : "isolated POS sales"
+    TENANTS ||--o{ PIUTANG_LEDGERS : "isolated customer debt"
+
+    ORGANIZATIONS {
+        uuid id PK
+        string corporate_name "PT Beras Jaya Nusantara"
+        uuid primary_owner_id FK
+        string billing_plan "ENTERPRISE_MULTI_STORE"
+        timestamp created_at
+    }
+
+    USERS {
+        uuid id PK
+        string email UK "joni@berasjaya.com / siti@berasjaya.com"
+        string password_hash
+        string full_name
+        string phone
+    }
+
+    TENANTS {
+        uuid id PK
+        uuid organization_id FK
+        string subdomain UK "berasjaya1 / berasjaya2"
+        string store_name "Toko Beras Jaya Cabang 1"
+        string address
+    }
+
+    TENANT_MEMBERSHIPS {
+        uuid id PK
+        uuid user_id FK
+        uuid tenant_id FK
+        enum role "OWNER, ADMIN, KASIR, GUDANG, SALES, DRIVER"
+        enum status "ACTIVE, SUSPENDED"
+        jsonb permissions_override
+    }
+```
+
+### Multi-Store Governance Characteristics:
+1. **Isolated Physical Domains**: Each physical store (`berasjaya1`, `berasjaya2`) maintains completely independent inventory stock lots, FIFO cost queues, cashier cash drawers, and customer credit ledgers.
+2. **Flexible Cross-Store User Assignment**:
+   * Management staff (`siti@berasjaya.com`) can be granted `ADMIN` access across all branch subdomains.
+   * Operational field staff (`agus@berasjaya.com`) are granted access strictly to their assigned branch warehouse.
+3. **Zero Destructive Migration**: Because the base data model isolates store-level tables by `tenant_id` and decouples user identities via `tenant_memberships`, transitioning from Phase 1 (1-Email-1-Store) to Multi-Store requires zero database schema rewrites.
+
+
 
 
 

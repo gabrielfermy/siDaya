@@ -20,12 +20,22 @@ const INITIAL_DEFAULT_STATE = {
       role: '👑 OWNER',
       avatar: 'B',
       tenant: 'Toko Grosir Beras Jaya Bersama',
+      subdomain: 'berasjaya',
     },
     operatorUser: {
       email: 'gabriel@ashvinlabs.com',
       name: 'Gabriel (CEO)',
       role: 'SUPER_ADMIN',
       badgeClass: 'role-super-admin',
+    },
+    impersonation: {
+      active: false,
+      originalOperator: null,
+      targetTenant: null,
+      targetUser: null,
+      ticketRef: null,
+      reason: null,
+      startedAt: null,
     },
   },
 
@@ -134,6 +144,11 @@ const INITIAL_DEFAULT_STATE = {
       storeName: 'Toko Grosir Beras Jaya Bersama',
       storeAddress: 'Pasar Induk Cipinang Blok A No. 12, Jakarta Timur',
       storePhone: '+6281234567890',
+      subdomain: 'berasjaya',
+      subdomainAliases: [
+        { alias: 'berasjaya-lama', expiresAt: '2026-10-10' }
+      ],
+      customDomain: '',
       printerType: 'USB',
       paperWidth: '80mm',
     },
@@ -157,5 +172,10 @@ const INITIAL_DEFAULT_STATE = {
       { name: 'Alex (Lead Developer)', email: 'alex@ashvinlabs.com', role: 'DEV_ENGINEER', status: 'ACTIVE' },
       { name: 'Dina (Customer Ops)', email: 'dina@ashvinlabs.com', role: 'OPS_SUPPORT', status: 'ACTIVE' },
     ],
+    auditLogs: [
+      { id: 'aud_001', time: '09 Sep 2026 10:15', operatorEmail: 'gabriel@ashvinlabs.com', action: 'TENANT_PROVISIONED', target: 'Toko Grosir Beras Jaya (berasjaya)', ticketRef: '#TICKET-8100', status: 'SUCCESS' },
+      { id: 'aud_002', time: '09 Sep 2026 14:40', operatorEmail: 'alex@ashvinlabs.com', action: 'BREAKGLASS_DIAGNOSTIC', target: 'CV Sembako Nusantara (sembakonusantara)', ticketRef: '#INC-9482', status: 'SUCCESS' },
+    ],
   },
 };
+

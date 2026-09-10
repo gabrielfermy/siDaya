@@ -253,6 +253,27 @@ class SiDayaStateStore {
         break;
       }
 
+      /* Master SKU & Catalog Bulk Import */
+      case 'ADD_PRODUCTS_BULK': {
+        const newItems = payload.products || [];
+        for (const item of newItems) {
+          const idx2 = this.state.pilar2.products.findIndex((p) => p.sku === item.sku);
+          if (idx2 !== -1) {
+            Object.assign(this.state.pilar2.products[idx2], item);
+          } else {
+            this.state.pilar2.products.push(item);
+          }
+
+          const idx5 = this.state.pilar5.products.findIndex((p) => p.sku === item.sku);
+          if (idx5 !== -1) {
+            Object.assign(this.state.pilar5.products[idx5], item);
+          } else {
+            this.state.pilar5.products.push(item);
+          }
+        }
+        break;
+      }
+
       /* Logistics & Surat Jalan */
       case 'SJ_SIGN_POD': {
         const { sjId, signature } = payload;
@@ -274,9 +295,103 @@ class SiDayaStateStore {
         break;
       }
 
-      /* RBAC Matrix */
-      case 'ROLE_MATRIX_SAVE': {
-        this.state.pilar8.rbacMatrix = payload;
+      /* Settings & Subdomain Management */
+      case 'UPDATE_SUBDOMAIN': {
+        const { newSubdomain } = payload;
+        const oldSubdomain = this.state.pilar9.settings.subdomain || 'berasjaya';
+        if (newSubdomain && newSubdomain !== oldSubdomain) {
+          if (!Array.isArray(this.state.pilar9.settings.subdomainAliases)) {
+            this.state.pilar9.settings.subdomainAliases = [];
+          }
+          const expiry = new Date();
+          expiry.setDate(expiry.getDate() + 30);
+          this.state.pilar9.settings.subdomainAliases.unshift({
+            alias: oldSubdomain,
+            expiresAt: expiry.toISOString().split('T')[0]
+          });
+          this.state.pilar9.settings.subdomain = newSubdomain;
+          if (this.state.auth && this.state.auth.merchantUser) {
+            this.state.auth.merchantUser.subdomain = newSubdomain;
+          }
+          const t1 = this.state.operator.tenants.find((t) => t.id === 't1');
+          if (t1) t1.subdomain = newSubdomain;
+        }
+        break;
+      }
+
+      /* Operator Impersonation Actions */
+      case 'START_IMPERSONATION': {
+        const { targetTenant, targetUser, ticketRef, reason } = payload;
+        const originalOp = JSON.parse(JSON.stringify(this.state.auth.operatorUser || {}));
+        this.state.auth.impersonation = {
+          active: true,
+          originalOperator: originalOp,
+          targetTenant,
+          targetUser,
+          ticketRef: ticketRef || '#TICKET-8492',
+          reason: reason || 'Investigasi laporan issue teknis',
+          startedAt: new Date().toISOString()
+        };
+        this.state.auth.merchantUser = {
+          email: targetUser.email,
+          name: targetUser.name,
+          role: targetUser.role,
+          avatar: targetUser.avatar || (targetUser.name ? targetUser.name[0] : 'U'),
+          tenant: targetTenant.businessName,
+          subdomain: targetTenant.subdomain
+        };
+        this.state.ui.portalMode = 'MERCHANT';
+        this.state.ui.activePath = '/dashboard';
+        
+        if (!Array.isArray(this.state.operator.auditLogs)) {
+          this.state.operator.auditLogs = [];
+        }
+        this.state.operator.auditLogs.unshift({
+          id: 'aud_' + Date.now(),
+          time: 'Hari ini ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+          operatorEmail: originalOp.email || 'operator@ashvinlabs.com',
+          action: 'OPERATOR_IMPERSONATION_STARTED',
+          target: targetTenant.businessName + ' (' + targetUser.email + ')',
+          ticketRef: ticketRef || '#TICKET-8492',
+          status: 'SUCCESS'
+        });
+        break;
+      }
+
+      case 'EXIT_IMPERSONATION': {
+        const originalOp = this.state.auth.impersonation && this.state.auth.impersonation.originalOperator;
+        const targetTenant = this.state.auth.impersonation && this.state.auth.impersonation.targetTenant;
+        const targetUser = this.state.auth.impersonation && this.state.auth.impersonation.targetUser;
+        const ticketRef = this.state.auth.impersonation && this.state.auth.impersonation.ticketRef;
+
+        if (originalOp) {
+          this.state.auth.operatorUser = originalOp;
+        }
+        
+        if (!Array.isArray(this.state.operator.auditLogs)) {
+          this.state.operator.auditLogs = [];
+        }
+        this.state.operator.auditLogs.unshift({
+          id: 'aud_' + Date.now(),
+          time: 'Hari ini ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+          operatorEmail: (originalOp && originalOp.email) || 'operator@ashvinlabs.com',
+          action: 'OPERATOR_IMPERSONATION_ENDED',
+          target: (targetTenant ? targetTenant.businessName : 'Tenant') + ' (' + (targetUser ? targetUser.email : 'User') + ')',
+          ticketRef: ticketRef || '#TICKET-8492',
+          status: 'SUCCESS'
+        });
+
+        this.state.auth.impersonation = {
+          active: false,
+          originalOperator: null,
+          targetTenant: null,
+          targetUser: null,
+          ticketRef: null,
+          reason: null,
+          startedAt: null
+        };
+        this.state.ui.portalMode = 'OPS';
+        this.state.ui.activePath = '/telemetry';
         break;
       }
 

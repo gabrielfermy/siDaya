@@ -1,0 +1,1255 @@
+openapi: 3.1.0
+info:
+  title: SiDaya Enterprise OS API
+  version: 1.0.0
+  description: >
+    Canonical RESTful OpenAPI 3.1.0 Specification for SiDaya Enterprise Wholesale ERP,
+    Multi-Tenant Subdomain Gateway, POS Fast-Scan, Inbound FIFO Allocation, Field Driver POD,
+    and Ashvin Labs Operator Control Plane.
+  contact:
+    name: Ashvin Labs API Engineering
+    email: api@ashvinlabs.com
+    url: https://ashvinlabs.com
+  license:
+    name: Proprietary - SiDaya
+    url: https://sidaya.biz.id/terms
+
+servers:
+  - url: https://{subdomain}.sidaya.biz.id/api/v1
+    description: Production Multi-Tenant Workspace Gateway
+    variables:
+      subdomain:
+        default: berasjaya
+        description: Unique tenant workspace subdomain
+  - url: https://ops.sidaya.biz.id/api/v1
+    description: Production Platform Operator Control Plane
+  - url: https://{subdomain}.sidaya.my.id/api/v1
+    description: Staging Multi-Tenant Workspace Gateway
+    variables:
+      subdomain:
+        default: berasjaya
+        description: Staging tenant subdomain
+  - url: http://localhost:4000/api/v1
+    description: Local Development API Server
+
+paths:
+  # =========================================================================
+  # 1. AUTHENTICATION & IDENTITY GATEWAY
+  # =========================================================================
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User Login
+      description: Authenticates merchant owner or staff credentials and returns session token with tenant context.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /auth/resolve-tenant:
+    get:
+      tags:
+        - Authentication
+      summary: Centralized Gateway Tenant Resolution
+      description: Resolves tenant ID and target subdomain URL from user email for root domain redirect.
+      operationId: resolveTenantByEmail
+      parameters:
+        - name: email
+          in: query
+          required: true
+          description: Registered user email address
+          schema:
+            type: string
+            format: email
+            example: budi@berasjaya.com
+      responses:
+        '200':
+          description: Tenant resolved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResolveTenantResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /auth/register-owner:
+    post:
+      tags:
+        - Authentication
+      summary: Owner Self-Service Registration
+      description: Registers a new business tenant, allocates primary subdomain, and creates owner credentials.
+      operationId: registerOwner
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterOwnerRequest'
+      responses:
+        '201':
+          description: Tenant and owner account registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterOwnerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+
+  /auth/staff/invite:
+    post:
+      tags:
+        - Authentication
+      summary: Invite Staff Member
+      description: Sends an email invitation to onboard a new cashier, warehouse staff, or delivery driver.
+      operationId: inviteStaff
+      security:
+        - BearerAuth: []
+        - TenantHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InviteStaffRequest'
+      responses:
+        '201':
+          description: Invitation sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InviteStaffResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  # =========================================================================
+  # 2. TENANTS & SUBDOMAIN LIFECYCLE
+  # =========================================================================
+  /tenants/check-subdomain:
+    get:
+      tags:
+        - Tenants
+      summary: Validate Subdomain Availability
+      description: Checks if a subdomain slug is available, valid, and not blacklisted by system reserved keywords.
+      operationId: checkSubdomain
+      parameters:
+        - name: slug
+          in: query
+          required: true
+          schema:
+            type: string
+            example: berasjayagrosir
+      responses:
+        '200':
+          description: Subdomain availability status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckSubdomainResponse'
+
+  /tenants/{tenantId}/subdomain:
+    put:
+      tags:
+        - Tenants
+      summary: Update Tenant Primary Subdomain
+      description: Migrates primary subdomain and registers old subdomain as a 30-day alias with HTTP 301 redirect.
+      operationId: updateTenantSubdomain
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubdomainRequest'
+      responses:
+        '200':
+          description: Subdomain migrated with 30-day alias created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateSubdomainResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  /tenants/{tenantId}/aliases:
+    get:
+      tags:
+        - Tenants
+      summary: List Active Subdomain Aliases
+      description: Returns active 30-day aliases and their expiration timestamps for a tenant.
+      operationId: getTenantAliases
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of active aliases
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantAliasesResponse'
+
+  /tenants/{tenantId}/custom-domain:
+    post:
+      tags:
+        - Tenants
+      summary: Bind Custom Domain (PRO Tier)
+      description: Configures custom domain CNAME target and initiates SSL provisioning.
+      operationId: registerCustomDomain
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customDomain
+              properties:
+                customDomain:
+                  type: string
+                  example: pos.berasjaya.com
+      responses:
+        '200':
+          description: Custom domain configured successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomDomainResponse'
+
+  # =========================================================================
+  # 3. OPERATOR CONTROL PLANE
+  # =========================================================================
+  /admin/auth/login:
+    post:
+      tags:
+        - Operator Control Plane
+      summary: Operator Portal Login
+      description: Authenticates Ashvin Labs platform operator on ops.sidaya.biz.id.
+      operationId: loginOperator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperatorLoginRequest'
+      responses:
+        '200':
+          description: Operator session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperatorLoginResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /admin/tenants:
+    get:
+      tags:
+        - Operator Control Plane
+      summary: List Tenant Fleet
+      description: Retrieves tenant fleet list with UU PDP privacy masking guardrails.
+      operationId: listTenantFleet
+      security:
+        - BearerAuth: []
+        - OperatorRoleHeader: []
+      parameters:
+        - name: breakglass
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Tenant fleet summary list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantFleetResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /admin/tenants/{tenantId}/impersonate:
+    post:
+      tags:
+        - Operator Control Plane
+      summary: Start Ticket-Bound Tenant Impersonation
+      description: Issues a scoped token to impersonate a tenant user for customer support diagnostics.
+      operationId: startImpersonation
+      security:
+        - BearerAuth: []
+        - OperatorRoleHeader: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartImpersonationRequest'
+      responses:
+        '200':
+          description: Impersonation token and tenant redirect URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartImpersonationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  /admin/tenants/{tenantId}/impersonate/exit:
+    post:
+      tags:
+        - Operator Control Plane
+      summary: Exit Tenant Impersonation Session
+      description: Safely terminates impersonation session, records audit trail, and returns operator portal URL.
+      operationId: exitImpersonation
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExitImpersonationRequest'
+      responses:
+        '200':
+          description: Session terminated and audit log emitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExitImpersonationResponse'
+
+  /admin/telemetry:
+    get:
+      tags:
+        - Operator Control Plane
+      summary: Platform Telemetry & System Health
+      description: Aggregates real-time platform GMV, active tenants, API latency P95, and connection pool metrics.
+      operationId: getPlatformTelemetry
+      security:
+        - BearerAuth: []
+        - OperatorRoleHeader: []
+      responses:
+        '200':
+          description: Telemetry data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlatformTelemetryResponse'
+
+  /admin/audit-logs:
+    get:
+      tags:
+        - Operator Control Plane
+      summary: Platform Operator Audit Logs
+      description: Retrieves immutable forensic audit log trails of operator actions.
+      operationId: getOperatorAuditLogs
+      security:
+        - BearerAuth: []
+        - OperatorRoleHeader: []
+      responses:
+        '200':
+          description: Audit log list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLogsResponse'
+
+  # =========================================================================
+  # 4. POS & SALES ORDERS
+  # =========================================================================
+  /orders:
+    post:
+      tags:
+        - POS & Orders
+      summary: Create Sales Order
+      description: Submits a new wholesale sales order from POS or mobile client.
+      operationId: createSalesOrder
+      security:
+        - BearerAuth: []
+        - TenantHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSalesOrderRequest'
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrderResponse'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+
+  # =========================================================================
+  # 5. INBOUND FIFO WAREHOUSE
+  # =========================================================================
+  /fifo/inbound:
+    post:
+      tags:
+        - Warehouse & FIFO
+      summary: Record Inbound Lot
+      description: Registers new incoming commodity lot with batch number, initial cost, and storage location.
+      operationId: recordInboundFifo
+      security:
+        - BearerAuth: []
+        - TenantHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InboundFifoRequest'
+      responses:
+        '201':
+          description: Inbound lot registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundFifoResponse'
+
+  # =========================================================================
+  # 6. FIELD DRIVER & DELIVERY MANIFEST POD
+  # =========================================================================
+  /delivery/manifest/{doNumber}/masked:
+    get:
+      tags:
+        - Delivery & Logistics
+      summary: Get Price-Masked Driver Manifest
+      description: Retrieves sanitized delivery manifest with zero financial leaks for field drivers.
+      operationId: getMaskedDriverManifest
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: doNumber
+          in: path
+          required: true
+          schema:
+            type: string
+            example: DO-20260910-001
+      responses:
+        '200':
+          description: Price-masked delivery order manifest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MaskedDriverManifestResponse'
+
+  /delivery/pod/submit:
+    post:
+      tags:
+        - Delivery & Logistics
+      summary: Submit Signed Proof of Delivery (POD)
+      description: Submits digital recipient signature, GPS geotags, and delivery completion status.
+      operationId: submitProofOfDelivery
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitPodRequest'
+      responses:
+        '200':
+          description: POD submitted and verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmitPodResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: User or Operator session JWT token.
+    TenantHeader:
+      type: apiKey
+      in: header
+      name: X-Tenant-ID
+      description: Multi-tenant workspace UUID identifier.
+    OperatorRoleHeader:
+      type: apiKey
+      in: header
+      name: X-Operator-Role
+      description: Platform Operator role (SUPER_ADMIN, DEV_ENGINEER, OPS_SUPPORT).
+    BreakGlassHeader:
+      type: apiKey
+      in: header
+      name: X-Breakglass-Auth
+      description: Emergency diagnostic break-glass elevation flag.
+
+  responses:
+    BadRequestError:
+      description: Invalid request payload or missing parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardErrorResponse'
+    UnauthorizedError:
+      description: Missing or expired authentication token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardErrorResponse'
+    ForbiddenError:
+      description: Access forbidden for current role or tenant
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardErrorResponse'
+    NotFoundError:
+      description: Requested resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardErrorResponse'
+    ConflictError:
+      description: Resource conflict or duplicate identifier
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandardErrorResponse'
+
+  schemas:
+    StandardErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required:
+            - message
+          properties:
+            message:
+              type: string
+              example: Subdomain 'ops' is a reserved system keyword.
+            code:
+              type: string
+              example: RESERVED_SUBDOMAIN
+            status:
+              type: integer
+              example: 400
+            details:
+              type: object
+              additionalProperties: true
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: budi@berasjaya.com
+        password:
+          type: string
+          format: password
+          example: Password123!
+
+    LoginResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            userId:
+              type: string
+            fullName:
+              type: string
+            email:
+              type: string
+            sessionToken:
+              type: string
+            activeTenant:
+              type: object
+              properties:
+                tenantId:
+                  type: string
+                businessName:
+                  type: string
+                subdomain:
+                  type: string
+                role:
+                  type: string
+
+    ResolveTenantResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            userId:
+              type: string
+            tenantId:
+              type: string
+            subdomain:
+              type: string
+              example: berasjaya
+            businessName:
+              type: string
+              example: Toko Grosir Beras Jaya Bersama
+            targetUrl:
+              type: string
+              example: https://berasjaya.sidaya.biz.id/dashboard
+
+    RegisterOwnerRequest:
+      type: object
+      required:
+        - email
+        - businessName
+        - ownerName
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: hendro@berasmakmur.com
+        businessName:
+          type: string
+          example: CV Beras Makmur Abadi
+        desiredSubdomain:
+          type: string
+          example: berasmakmur
+        ownerName:
+          type: string
+          example: H. Hendro Wijaya
+        phoneNumber:
+          type: string
+          example: 081234567890
+        password:
+          type: string
+          format: password
+
+    RegisterOwnerResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            tenantId:
+              type: string
+            subdomain:
+              type: string
+            ownerUserId:
+              type: string
+            loginUrl:
+              type: string
+
+    InviteStaffRequest:
+      type: object
+      required:
+        - tenantId
+        - email
+        - fullName
+        - role
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [OWNER, ADMIN, CASHIER, WAREHOUSE, DRIVER]
+
+    InviteStaffResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            invitationId:
+              type: string
+            token:
+              type: string
+            expiresAt:
+              type: string
+
+    CheckSubdomainResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            slug:
+              type: string
+            isAvailable:
+              type: boolean
+            isReserved:
+              type: boolean
+            reason:
+              type: string
+
+    UpdateSubdomainRequest:
+      type: object
+      required:
+        - newSubdomain
+      properties:
+        newSubdomain:
+          type: string
+          example: berasjayagrosir
+
+    UpdateSubdomainResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            tenantId:
+              type: string
+            activeSubdomain:
+              type: string
+            aliasSubdomain:
+              type: string
+            aliasExpiresAt:
+              type: string
+            primaryUrl:
+              type: string
+
+    TenantAliasesResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              aliasSubdomain:
+                type: string
+              expiresAt:
+                type: string
+              createdAt:
+                type: string
+
+    CustomDomainResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            tenantId:
+              type: string
+            customDomain:
+              type: string
+            status:
+              type: string
+              example: ACTIVE
+            cnameTarget:
+              type: string
+              example: cname.sidaya.biz.id
+            sslActive:
+              type: boolean
+
+    OperatorLoginRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          example: gabriel@ashvinlabs.com
+        password:
+          type: string
+          format: password
+
+    OperatorLoginResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            operatorId:
+              type: string
+            email:
+              type: string
+            fullName:
+              type: string
+            role:
+              type: string
+              enum: [SUPER_ADMIN, DEV_ENGINEER, OPS_SUPPORT]
+            sessionToken:
+              type: string
+
+    TenantFleetResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              tenantId:
+                type: string
+              businessName:
+                type: string
+              subdomain:
+                type: string
+              ownerName:
+                type: string
+              ownerPhone:
+                type: string
+              subscriptionTier:
+                type: string
+              status:
+                type: string
+              monthlyGmv:
+                type: number
+
+    StartImpersonationRequest:
+      type: object
+      required:
+        - ticketReference
+        - reason
+      properties:
+        targetUserId:
+          type: string
+        ticketReference:
+          type: string
+          example: '#TICKET-8492'
+        reason:
+          type: string
+          example: Diagnosa selisih perhitungan alokasi batch FIFO
+
+    StartImpersonationResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            impersonationToken:
+              type: string
+            targetTenantId:
+              type: string
+            targetSubdomain:
+              type: string
+            redirectUrl:
+              type: string
+            auditLogId:
+              type: string
+            sessionContext:
+              type: object
+
+    ExitImpersonationRequest:
+      type: object
+      properties:
+        impersonationToken:
+          type: string
+
+    ExitImpersonationResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            terminated:
+              type: boolean
+              example: true
+            operatorEmail:
+              type: string
+            returnUrl:
+              type: string
+            auditLogId:
+              type: string
+
+    PlatformTelemetryResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            totalPlatformGmvMonth:
+              type: number
+            activeTenantsCount:
+              type: integer
+            totalOrdersCount:
+              type: integer
+            apiLatencyP95Ms:
+              type: number
+            apiErrorRatePercent:
+              type: number
+            healthyServicesCount:
+              type: integer
+
+    AuditLogsResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              operatorEmail:
+                type: string
+              action:
+                type: string
+              ticketReference:
+                type: string
+              timestamp:
+                type: string
+
+    CreateSalesOrderRequest:
+      type: object
+      required:
+        - tenantId
+        - storeId
+        - cashierUserId
+        - items
+        - paymentMethod
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        storeId:
+          type: string
+          format: uuid
+        cashierUserId:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+        paymentMethod:
+          type: string
+          enum: [CASH, PAYLINK_QRIS, TEMPO_KASBON, BANK_TRANSFER]
+        items:
+          type: array
+          items:
+            type: object
+            required:
+              - productId
+              - quantity
+              - unitPrice
+            properties:
+              productId:
+                type: string
+              quantity:
+                type: integer
+              unitPrice:
+                type: number
+              selectedUnit:
+                type: string
+
+    SalesOrderResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            orderId:
+              type: string
+            orderNumber:
+              type: string
+            totalAmount:
+              type: number
+            paymentStatus:
+              type: string
+            createdAt:
+              type: string
+
+    InboundFifoRequest:
+      type: object
+      required:
+        - tenantId
+        - storeId
+        - sku
+        - initialQty
+        - costPerUnit
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+        storeId:
+          type: string
+          format: uuid
+        sku:
+          type: string
+          example: BRS-PDK-50K
+        lotNumber:
+          type: string
+          example: LOT-2026-0901
+        initialQty:
+          type: integer
+          example: 100
+        costPerUnit:
+          type: number
+          example: 12000
+        storageLocation:
+          type: string
+          example: Rak A-02
+
+    InboundFifoResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            batchId:
+              type: string
+            lotNumber:
+              type: string
+            availableQty:
+              type: integer
+            costPerUnit:
+              type: number
+
+    MaskedDriverManifestResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            deliveryOrderId:
+              type: string
+            deliveryOrderNumber:
+              type: string
+            recipientName:
+              type: string
+            recipientPhone:
+              type: string
+            destinationAddress:
+              type: string
+            verificationToken:
+              type: string
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  productName:
+                    type: string
+                  unitName:
+                    type: string
+                  quantity:
+                    type: integer
+                  storageLocation:
+                    type: string
+
+    SubmitPodRequest:
+      type: object
+      required:
+        - deliveryOrderId
+        - signature
+        - location
+      properties:
+        deliveryOrderId:
+          type: string
+        signature:
+          type: object
+          required:
+            - signerName
+            - signatureVectorData
+          properties:
+            signerName:
+              type: string
+            signerRelation:
+              type: string
+            signatureVectorData:
+              type: string
+        location:
+          type: object
+          required:
+            - latitude
+            - longitude
+          properties:
+            latitude:
+              type: number
+            longitude:
+              type: number
+            accuracyMeters:
+              type: number
+
+    SubmitPodResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            deliveryOrderId:
+              type: string
+            status:
+              type: string
+              example: DELIVERED
+            completedAt:
+              type: string
