@@ -18,19 +18,57 @@
   <link rel="stylesheet" href="/css/modules.css">
 
   <script>
-    /* Synchronous Pre-Paint Auth State & Theme Resolver (Zero FOUC Flash) */
+    /* Synchronous Pre-Paint Auth State & Session Expiry Resolver (Zero FOUC Flash) */
     (function() {
       try {
         var hostname = window.location.hostname.toLowerCase();
-        var path = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
-        var isOps = hostname.startsWith('ops.') || path === 'telemetry' || path === 'fleet' || path === 'operators' || path === 'audit';
+        var rawPath = window.location.pathname.replace(/^\/+|\/+$/g, '').toLowerCase();
+        var isOps = hostname.startsWith('ops.') || rawPath === 'telemetry' || rawPath === 'fleet' || rawPath === 'operators' || rawPath === 'audit';
         
         var theme = localStorage.getItem('sidaya_theme') || 'light';
         document.documentElement.setAttribute('data-theme', theme);
 
-        var hasOpsSession = !!localStorage.getItem('sidaya_operator_session');
-        var hasMerchantSession = !!localStorage.getItem('sidaya_merchant_session');
+        var now = Date.now();
+        var hasOpsSession = false;
+        var hasMerchantSession = false;
 
+        // 1. Validate Operator Session Expiry
+        var rawOps = localStorage.getItem('sidaya_operator_session');
+        if (rawOps) {
+          try {
+            var opsObj = JSON.parse(rawOps);
+            if (opsObj && opsObj.expiresAt && opsObj.expiresAt > now) {
+              hasOpsSession = true;
+            } else {
+              localStorage.removeItem('sidaya_operator_session');
+              sessionStorage.setItem('sidaya_session_expired_flag', '1');
+            }
+          } catch(e) { localStorage.removeItem('sidaya_operator_session'); }
+        }
+
+        // 2. Validate Merchant Session Expiry
+        var rawMerchant = localStorage.getItem('sidaya_merchant_session');
+        if (rawMerchant) {
+          try {
+            var merchObj = JSON.parse(rawMerchant);
+            if (merchObj && merchObj.expiresAt && merchObj.expiresAt > now) {
+              hasMerchantSession = true;
+            } else {
+              localStorage.removeItem('sidaya_merchant_session');
+              sessionStorage.setItem('sidaya_session_expired_flag', '1');
+            }
+          } catch(e) { localStorage.removeItem('sidaya_merchant_session'); }
+        }
+
+        // 3. Preserve User's Intended Destination Route upon session expiry/unauthenticated landing
+        var fullPath = window.location.pathname;
+        if (fullPath && fullPath !== '/' && fullPath !== '/dashboard' && !fullPath.includes('404')) {
+          if ((isOps && !hasOpsSession) || (!isOps && !hasMerchantSession)) {
+            sessionStorage.setItem('sidaya_intended_path', fullPath);
+          }
+        }
+
+        // 4. Set Pre-paint Declarative State Classes
         if (isOps) {
           document.documentElement.className = hasOpsSession ? 'state-auth-ops' : 'state-unauth-ops';
         } else {
