@@ -43,6 +43,18 @@ const Router = {
   },
 
   /**
+   * Toggles standalone error full-screen layout mode
+   * @param {boolean} active
+   */
+  setErrorMode(active) {
+    const appShell = document.getElementById('app-shell');
+    if (appShell) {
+      if (active) appShell.classList.add('is-error-page');
+      else appShell.classList.remove('is-error-page');
+    }
+  },
+
+  /**
    * Navigates to a specific path, rendering the appropriate MVC view into #main-content
    * @param {string} path - Target route path
    * @param {boolean} [pushState=true] - Whether to push to browser history
@@ -67,11 +79,9 @@ const Router = {
       const errSpec = typeof ERROR_PAGES !== 'undefined' && ERROR_PAGES['/404']
         ? ERROR_PAGES['/404']
         : { statusCode: '404', title: 'Halaman Tidak Ditemukan', desc: 'Rute tidak terdaftar.' };
+      this.setErrorMode(true);
       container.innerHTML = ErrorView.render(errSpec, cleanPath);
       document.title = 'SiDaya - 404 Halaman Tidak Ditemukan';
-      this.updateActiveNav('');
-      this.updateBreadcrumb('404 Not Found');
-      this.syncPlaneShell(false, state);
       return;
     }
 
@@ -100,11 +110,13 @@ const Router = {
 
     try {
       if (route) {
+        this.setErrorMode(false);
         container.innerHTML = route.render(state);
         document.title = `SiDaya - ${route.title}`;
         this.updateActiveNav(cleanPath);
         this.updateBreadcrumb(route.title);
       } else if (typeof ROADMAP_FEATURES !== 'undefined' && ROADMAP_FEATURES[cleanPath]) {
+        this.setErrorMode(false);
         const spec = ROADMAP_FEATURES[cleanPath];
         container.innerHTML = RoadmapView.render(spec);
         document.title = `SiDaya - ${spec.title} (Roadmap)`;
@@ -112,29 +124,21 @@ const Router = {
         this.updateBreadcrumb(`${spec.title} (Roadmap)`);
       } else if (typeof ERROR_PAGES !== 'undefined' && ERROR_PAGES[cleanPath]) {
         const errSpec = ERROR_PAGES[cleanPath];
+        this.setErrorMode(true);
         container.innerHTML = ErrorView.render(errSpec, cleanPath);
         document.title = `SiDaya - Error ${errSpec.statusCode}`;
-        this.updateActiveNav('');
-        this.updateBreadcrumb(`Error ${errSpec.statusCode}`);
       } else {
         const errSpec = typeof ERROR_PAGES !== 'undefined' && ERROR_PAGES['/404']
           ? ERROR_PAGES['/404']
           : { statusCode: '404', title: 'Halaman Tidak Ditemukan', desc: 'Rute tidak terdaftar.' };
+        this.setErrorMode(true);
         container.innerHTML = ErrorView.render(errSpec, cleanPath);
         document.title = 'SiDaya - 404 Halaman Tidak Ditemukan';
-        this.updateActiveNav('');
-        this.updateBreadcrumb('404 Not Found');
       }
     } catch (err) {
       console.error('[Router Navigation Error]', err);
-      container.innerHTML = `
-        <div class="card" style="max-width:540px; margin:40px auto; text-align:center; padding:32px 24px;">
-          <div style="font-size:2.5rem; margin-bottom:12px;">⚠️</div>
-          <h2 style="font-size:1.2rem; font-weight:800; color:var(--text-primary); margin-bottom:8px;">Terjadi Kendala Memuat Tampilan</h2>
-          <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:20px; line-height:1.5;">${err.message || 'Gagal merender komponen modul tampilan.'}</p>
-          <button class="btn btn-primary" onclick="resetAndReloadState()">🔄 Muat Ulang & Pulihkan State</button>
-        </div>
-      `;
+      this.setErrorMode(true);
+      container.innerHTML = ErrorView.render({ statusCode: '500', title: 'Terjadi Kendala Sistem', desc: err.message || 'Gagal memuat modul tampilan.' }, cleanPath);
     }
 
     // Close mobile drawer if open

@@ -1,58 +1,48 @@
 /**
  * Dynamic Standard Error Page View (HTTP 400-503)
+ * Full-screen Standalone Clean Architecture
  */
 const ErrorView = {
   render(errSpec, path) {
-    const h = (typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '');
-    const isOps = h.startsWith('ops.') || h === 'ops.localhost';
+    const statusCode = errSpec.statusCode || errSpec.code || '404';
+    const title = errSpec.title || 'Halaman Tidak Ditemukan';
+    const desc = errSpec.desc || 'Tautan atau rute yang Anda tuju tidak terdaftar, telah dihapus, atau sedang dipindahkan ke alamat baru.';
+    const actionCode = errSpec.action || ('ERR_' + statusCode);
 
-    const returnRoute = isOps ? '/telemetry' : '/dashboard';
-    const returnLabel = isOps ? '⚡ Kembali ke Control Plane' : '🏠 Kembali ke Dashboard';
+    const isDanger = ['500', '403'].includes(String(statusCode));
+    const codeClass = isDanger ? 'code-danger' : 'code-gradient';
 
     return `
-      <div class="error-page-wrap">
-        <div class="error-page-card">
-          <div class="error-badge">
-            <span>🛡️</span>
-            <span>HTTP ${errSpec.statusCode || errSpec.code || '404'} - ${errSpec.title || 'Error'}</span>
+      <div class="error-standalone-container">
+        <div class="error-card-v2">
+          <div class="error-header-pill">
+            <span class="error-pill-dot"></span>
+            <span>HTTP ${statusCode} • ${statusCode === '404' ? 'NOT FOUND' : 'SYSTEM NOTICE'}</span>
           </div>
-          <div class="error-icon">${errSpec.icon || errSpec.badgeIcon || '⚠️'}</div>
-          <h1 class="error-title">${errSpec.title || 'Terjadi Kendala'}</h1>
-          <p class="error-desc">${errSpec.desc || 'Halaman tidak dapat ditampilkan.'}</p>
-          <div class="error-meta-box">
-            <div class="error-meta-row">
-              <span class="error-meta-label">Path Diminta</span>
-              <span class="error-meta-value"><code>${path}</code></span>
-            </div>
-            <div class="error-meta-row">
-              <span class="error-meta-label">Kode Internal</span>
-              <span class="error-meta-value">${errSpec.action || 'ERR_' + (errSpec.statusCode || errSpec.code || '404')}</span>
-            </div>
+
+          <div class="error-hero-code ${codeClass}">
+            ${statusCode}
           </div>
-          <div class="error-actions">
-            <button class="btn btn-primary" onclick="navigate('${returnRoute}')">
-              ${returnLabel}
+
+          <h1 class="error-hero-title">${title}</h1>
+          <p class="error-hero-desc">${desc}</p>
+
+          <div class="error-hero-meta">
+            <span class="meta-tag">Path: <code>${path}</code></span>
+            <span class="meta-divider">•</span>
+            <span class="meta-tag">Code: <code>${actionCode}</code></span>
+          </div>
+
+          <div class="error-hero-actions">
+            <button class="btn btn-outline error-btn-lg" onclick="window.history.length > 1 ? window.history.back() : navigate('/dashboard')" title="Kembali ke halaman sebelumnya">
+              <span style="font-size:1.05rem; line-height:1;">←</span> Back
             </button>
-            <button class="btn btn-outline" onclick="window.location.reload()">
-              🔄 Muat Ulang Halaman
+            <button class="btn btn-primary error-btn-lg" onclick="navigate('/dashboard')" title="Kembali ke Dashboard Utama">
+              <span>🏠</span> Kembali ke Dashboard
             </button>
           </div>
         </div>
       </div>
-
-      ${isOps ? `
-        <!-- OPERATOR EXCLUSIVE HTTP STATUS SWITCHER DOCK -->
-        <div class="error-tester-dock">
-          <span style="font-size:0.75rem; font-weight:800; color:#7c3aed;">⚡ Ops Simulator:</span>
-          <button class="error-pill-btn" onclick="navigate('/400')">400</button>
-          <button class="error-pill-btn" onclick="navigate('/401')">401</button>
-          <button class="error-pill-btn" onclick="navigate('/403')">403</button>
-          <button class="error-pill-btn" onclick="navigate('/404')">404</button>
-          <button class="error-pill-btn" onclick="navigate('/429')">429</button>
-          <button class="error-pill-btn" onclick="navigate('/500')">500</button>
-          <button class="error-pill-btn" onclick="navigate('/503')">503</button>
-        </div>
-      ` : ''}
     `;
   },
 };
