@@ -1,11 +1,12 @@
 /**
  * @file state.js
- * @description Initial Reactive State Tree for SiDaya Enterprise OS Preview
+ * @description Decoupled Reactive State Trees for SiDaya Enterprise OS Preview
  * @module Store:State
  */
 
-const INITIAL_DEFAULT_STATE = {
-  version: 5,
+// 1. Strictly Scoped Tenant (Merchant) State - Zero Operator Data Leakage
+const INITIAL_TENANT_STATE = {
+  version: 6,
   ui: {
     theme: 'light',
     portalMode: 'MERCHANT',
@@ -148,29 +149,66 @@ const INITIAL_DEFAULT_STATE = {
       paperWidth: '80mm',
     },
   },
-
-  // Operator Platform Domain
-  operator: {
-    currentRole: null,
-    telemetry: {
-      totalGmv: 428500000,
-      activeTenants: 12,
-      latencyP95: 38,
-      dbPoolPercent: 42,
-    },
-    tenants: [
-      { id: 't1', businessName: 'Toko Grosir Beras Jaya', subdomain: 'berasjaya', ownerName: 'Budi Santoso', ownerPhone: '+6281234567890', tier: 'GROSIR_PRO', status: 'ACTIVE' },
-      { id: 't2', businessName: 'CV Sembako Nusantara', subdomain: 'sembakonusantara', ownerName: 'Hendro Wijaya', ownerPhone: '+6281398765432', tier: 'STARTER_FREE', status: 'ACTIVE' },
-    ],
-    operators: [
-      { name: 'Gabriel (CEO)', email: 'gabriel@ashvinlabs.com', role: 'SUPER_ADMIN', status: 'ACTIVE' },
-      { name: 'Alex (Lead Developer)', email: 'alex@ashvinlabs.com', role: 'DEV_ENGINEER', status: 'ACTIVE' },
-      { name: 'Dina (Customer Ops)', email: 'dina@ashvinlabs.com', role: 'OPS_SUPPORT', status: 'ACTIVE' },
-    ],
-    auditLogs: [
-      { id: 'aud_001', time: '09 Sep 2026 10:15', operatorEmail: 'gabriel@ashvinlabs.com', action: 'TENANT_PROVISIONED', target: 'Toko Grosir Beras Jaya (berasjaya)', ticketRef: '#TICKET-8100', status: 'SUCCESS' },
-      { id: 'aud_002', time: '09 Sep 2026 14:40', operatorEmail: 'alex@ashvinlabs.com', action: 'BREAKGLASS_DIAGNOSTIC', target: 'CV Sembako Nusantara (sembakonusantara)', ticketRef: '#INC-9482', status: 'SUCCESS' },
-    ],
-  },
 };
 
+// 2. Operator Control Plane Domain Data (Telemetry, Tenants Directory, Operators, Audit)
+const INITIAL_OPERATOR_DATA = {
+  currentRole: null,
+  telemetry: {
+    totalGmv: 428500000,
+    activeTenants: 12,
+    latencyP95: 38,
+    dbPoolPercent: 42,
+  },
+  tenants: [
+    { id: 't1', businessName: 'Toko Grosir Beras Jaya', subdomain: 'berasjaya', ownerName: 'Budi Santoso', ownerPhone: '+6281234567890', tier: 'GROSIR_PRO', status: 'ACTIVE' },
+    { id: 't2', businessName: 'CV Sembako Nusantara', subdomain: 'sembakonusantara', ownerName: 'Hendro Wijaya', ownerPhone: '+6281398765432', tier: 'STARTER_FREE', status: 'ACTIVE' },
+  ],
+  operators: [
+    { name: 'Gabriel (CEO)', email: 'gabriel@ashvinlabs.com', role: 'SUPER_ADMIN', status: 'ACTIVE' },
+    { name: 'Alex (Lead Developer)', email: 'alex@ashvinlabs.com', role: 'DEV_ENGINEER', status: 'ACTIVE' },
+    { name: 'Dina (Customer Ops)', email: 'dina@ashvinlabs.com', role: 'OPS_SUPPORT', status: 'ACTIVE' },
+  ],
+  auditLogs: [
+    { id: 'aud_001', time: '09 Sep 2026 10:15', operatorEmail: 'gabriel@ashvinlabs.com', action: 'TENANT_PROVISIONED', target: 'Toko Grosir Beras Jaya (berasjaya)', ticketRef: '#TICKET-8100', status: 'SUCCESS' },
+    { id: 'aud_002', time: '09 Sep 2026 14:40', operatorEmail: 'alex@ashvinlabs.com', action: 'BREAKGLASS_DIAGNOSTIC', target: 'CV Sembako Nusantara (sembakonusantara)', ticketRef: '#INC-9482', status: 'SUCCESS' },
+  ],
+};
+
+// 3. Strictly Scoped Operator Control Plane State Tree
+const INITIAL_OPERATOR_STATE = {
+  version: 6,
+  ui: {
+    theme: 'light',
+    portalMode: 'OPS',
+    activePath: '/telemetry',
+    sidebarOpen: false,
+    activeModal: null,
+  },
+  auth: {
+    merchantUser: null,
+    operatorUser: null,
+    impersonation: {
+      active: false,
+      originalOperator: null,
+      targetTenant: null,
+      targetUser: null,
+      ticketRef: null,
+      reason: null,
+      startedAt: null,
+    },
+  },
+  operator: JSON.parse(JSON.stringify(INITIAL_OPERATOR_DATA)),
+  // Workspace blueprints for operator impersonation sessions
+  pilar1: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar1)),
+  pilar2: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar2)),
+  pilar3: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar3)),
+  pilar5: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar5)),
+  pilar6: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar6)),
+  pilar7: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar7)),
+  pilar8: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar8)),
+  pilar9: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar9)),
+};
+
+// Canonical fallback: Safe default pointing strictly to Tenant State (sanitized from operator data)
+const INITIAL_DEFAULT_STATE = INITIAL_TENANT_STATE;
