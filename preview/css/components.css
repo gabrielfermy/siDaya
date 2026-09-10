@@ -220,10 +220,58 @@
 .kpi-subtext.positive { color: var(--accent-green); }
 
 /* ==========================================================================
-   DATA TABLES
+   DATA TABLES (MOBILE-FIRST RESPONSIVE HORIZONTAL SCROLL)
    ========================================================================== */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  position: relative;
+  scrollbar-width: thin;
+}
+
+.card:has(.data-table),
+.card:has(table) {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive::-webkit-scrollbar,
+.card:has(.data-table)::-webkit-scrollbar {
+  height: 6px;
+}
+.table-responsive::-webkit-scrollbar-thumb,
+.card:has(.data-table)::-webkit-scrollbar-thumb {
+  background: var(--border-medium, #94a3b8);
+  border-radius: 4px;
+}
+.table-responsive::-webkit-scrollbar-track,
+.card:has(.data-table)::-webkit-scrollbar-track {
+  background: var(--bg-surface-soft, rgba(0, 0, 0, 0.05));
+  border-radius: 4px;
+}
+
+.table-scroll-hint {
+  display: none;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+  user-select: none;
+}
+
+@media (max-width: 768px) {
+  .table-scroll-hint {
+    display: inline-flex;
+  }
+}
+
 .data-table, .operator-table {
   width: 100%;
+  min-width: 620px; /* Guarantees readable columns on mobile without squishing */
   border-collapse: collapse;
   font-size: 0.82rem;
   text-align: left;
@@ -237,11 +285,13 @@
   font-size: 0.74rem;
   text-transform: uppercase;
   letter-spacing: 0.4px;
+  white-space: nowrap;
 }
 .data-table td, .operator-table td {
   padding: 12px 14px;
   border-bottom: 1px solid var(--border-subtle);
   color: var(--text-primary);
+  white-space: nowrap;
 }
 .data-table tr:hover td { background: var(--bg-surface-soft); }
 .data-table tr:last-child td, .operator-table tr:last-child td { border-bottom: none; }
@@ -251,6 +301,7 @@
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 0.75rem;
+  white-space: nowrap;
 }
 
 /* ==========================================================================

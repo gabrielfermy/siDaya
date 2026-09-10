@@ -42,37 +42,40 @@ const RolesView = {
 
       <div class="card">
         <div class="card-title">Matriks Izin 18 Capability Keys</div>
-        <table class="data-table rbac-matrix-table">
-          <thead>
-            <tr>
-              <th style="min-width:260px;">Capability Key / Deskripsi Fitur</th>
-              ${roles.map(r => `
-                <th style="text-align:center;">${roleLabels[r]}</th>
-              `).join('')}
-            </tr>
-          </thead>
-          <tbody>
-            ${keys.map(item => `
+        <div class="table-scroll-hint"><span>⇄</span> Geser ke samping untuk melihat seluruh peran kerja</div>
+        <div class="table-responsive">
+          <table class="data-table rbac-matrix-table">
+            <thead>
               <tr>
-                <td>
-                  <strong>${item.label}</strong>
-                  <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">
-                    <code>${item.key}</code> - ${item.desc}
-                  </div>
-                </td>
-                ${roles.map(r => {
-                  const isChecked = matrix[r] && matrix[r].includes(item.key);
-                  const isOwner = r === 'OWNER';
-                  return `
-                    <td style="text-align:center;">
-                      <input type="checkbox" ${isChecked ? 'checked' : ''} ${isOwner ? 'disabled' : ''} onchange="toggleRbacCapability('${r}', '${item.key}', this.checked)">
-                    </td>
-                  `;
-                }).join('')}
+                <th style="min-width:260px;">Capability Key / Deskripsi Fitur</th>
+                ${roles.map(r => `
+                  <th style="text-align:center;">${roleLabels[r]}</th>
+                `).join('')}
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              ${keys.map(item => `
+                <tr>
+                  <td>
+                    <strong>${item.label}</strong>
+                    <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">
+                      <code>${item.key}</code> - ${item.desc}
+                    </div>
+                  </td>
+                  ${roles.map(r => {
+                    const isChecked = matrix[r] && matrix[r].includes(item.key);
+                    const isOwner = r === 'OWNER';
+                    return `
+                      <td style="text-align:center;">
+                        <input type="checkbox" ${isChecked ? 'checked' : ''} ${isOwner ? 'disabled' : ''} onchange="toggleRbacCapability('${r}', '${item.key}', this.checked)">
+                      </td>
+                    `;
+                  }).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     `;
   },

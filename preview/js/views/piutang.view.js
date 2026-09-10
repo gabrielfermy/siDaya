@@ -43,36 +43,39 @@ const PiutangView = {
       <!-- OUTSTANDING INVOICES LIST -->
       <div class="card" style="margin-top:16px;">
         <div class="card-title">Daftar Tagihan Kasbon Belum Lunas</div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>No. Faktur</th>
-              <th>Nama Toko Pembeli</th>
-              <th>Kontak WhatsApp</th>
-              <th>Tgl Jatuh Tempo</th>
-              <th>Sisa Tagihan</th>
-              <th>Status Penuaan</th>
-              <th>Aksi Tagih WhatsApp</th>
-            </tr>
-          </thead>
-          <tbody id="piutang-tbody">
-            ${debts.map(d => `
+        <div class="table-scroll-hint"><span>⇄</span> Geser ke samping untuk melihat sisa tagihan & tombol WA</div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
               <tr>
-                <td><code>${d.invoiceNumber}</code></td>
-                <td><strong>${d.customerName}</strong></td>
-                <td>${d.phone}</td>
-                <td>${d.dueDate}</td>
-                <td><strong style="color:var(--accent-rose);">${formatRupiah(d.amount)}</strong></td>
-                <td><span class="tier-badge ${d.daysOverdue > 0 ? 'tier-starter-free' : 'tier-grosir-pro'}">${d.daysOverdue > 0 ? `Lewat ${d.daysOverdue} Hari` : 'Belum Jatuh Tempo'}</span></td>
-                <td>
-                  <button class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem; background: #25D366; border-color:#25D366; color:#ffffff;" onclick="dispatchWhatsAppPaylink('${d.invoiceNumber}', '${d.customerName}', '${d.phone}', ${d.amount})">
-                    💬 Kirim WA PayLink
-                  </button>
-                </td>
+                <th>No. Faktur</th>
+                <th>Nama Toko Pembeli</th>
+                <th>Kontak WhatsApp</th>
+                <th>Tgl Jatuh Tempo</th>
+                <th>Sisa Tagihan</th>
+                <th>Status Penuaan</th>
+                <th>Aksi Tagih WhatsApp</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
+            </thead>
+            <tbody id="piutang-tbody">
+              ${debts.map(d => `
+                <tr>
+                  <td><code>${d.invoiceNumber}</code></td>
+                  <td><strong>${d.customerName}</strong></td>
+                  <td>${d.phone}</td>
+                  <td>${d.dueDate}</td>
+                  <td><strong style="color:var(--accent-rose);">${formatRupiah(d.amount)}</strong></td>
+                  <td><span class="tier-badge ${d.daysOverdue > 0 ? 'tier-starter-free' : 'tier-grosir-pro'}">${d.daysOverdue > 0 ? `Lewat ${d.daysOverdue} Hari` : 'Belum Jatuh Tempo'}</span></td>
+                  <td>
+                    <button class="btn btn-primary" style="padding:4px 10px; font-size:0.75rem; background: #25D366; border-color:#25D366; color:#ffffff;" onclick="dispatchWhatsAppPaylink('${d.invoiceNumber}', '${d.customerName}', '${d.phone}', ${d.amount})">
+                      💬 Kirim WA PayLink
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     `;
   },
