@@ -5,11 +5,11 @@
  */
 
 const INITIAL_DEFAULT_STATE = {
-  version: 4,
+  version: 5,
   ui: {
     theme: 'light',
     portalMode: 'MERCHANT',
-    activePath: 'dashboard',
+    activePath: '/dashboard',
     sidebarOpen: false,
     activeModal: null,
   },

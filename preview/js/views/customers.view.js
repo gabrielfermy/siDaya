@@ -3,7 +3,7 @@
  */
 const CustomersView = {
   render(state) {
-    const customers = state.pilar3.customers;
+    const customers = state?.pilar3?.customers || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar3.customers : []);
     return `
       <div class="view-header">
         <div>

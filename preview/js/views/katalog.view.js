@@ -3,7 +3,7 @@
  */
 const KatalogView = {
   render(state) {
-    const products = state.pilar2.products;
+    const products = state?.pilar2?.products || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar2.products : []);
     return `
       <div class="view-header">
         <div>

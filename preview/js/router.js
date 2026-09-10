@@ -41,29 +41,43 @@ const Router = {
     const state = store.getState();
     const route = this.routes[cleanPath];
 
-    if (route) {
-      container.innerHTML = route.render(state);
-      document.title = `SiDaya - ${route.title}`;
-      this.updateActiveNav(cleanPath);
-      this.updateBreadcrumb(route.title);
-    } else if (ROADMAP_FEATURES && ROADMAP_FEATURES[cleanPath]) {
-      const spec = ROADMAP_FEATURES[cleanPath];
-      container.innerHTML = RoadmapView.render(spec);
-      document.title = `SiDaya - ${spec.title} (Roadmap)`;
-      this.updateActiveNav(cleanPath);
-      this.updateBreadcrumb(`${spec.title} (Roadmap)`);
-    } else if (ERROR_PAGES && ERROR_PAGES[cleanPath]) {
-      const errSpec = ERROR_PAGES[cleanPath];
-      container.innerHTML = ErrorView.render(errSpec, cleanPath);
-      document.title = `SiDaya - Error ${errSpec.statusCode}`;
-      this.updateActiveNav('');
-      this.updateBreadcrumb(`Error ${errSpec.statusCode}`);
-    } else {
-      const errSpec = ERROR_PAGES ? ERROR_PAGES['/404'] : { statusCode: '404', title: 'Halaman Tidak Ditemukan', desc: 'Rute tidak terdaftar.' };
-      container.innerHTML = ErrorView.render(errSpec, cleanPath);
-      document.title = 'SiDaya - 404 Halaman Tidak Ditemukan';
-      this.updateActiveNav('');
-      this.updateBreadcrumb('404 Not Found');
+    try {
+      if (route) {
+        container.innerHTML = route.render(state);
+        document.title = `SiDaya - ${route.title}`;
+        this.updateActiveNav(cleanPath);
+        this.updateBreadcrumb(route.title);
+      } else if (typeof ROADMAP_FEATURES !== 'undefined' && ROADMAP_FEATURES[cleanPath]) {
+        const spec = ROADMAP_FEATURES[cleanPath];
+        container.innerHTML = RoadmapView.render(spec);
+        document.title = `SiDaya - ${spec.title} (Roadmap)`;
+        this.updateActiveNav(cleanPath);
+        this.updateBreadcrumb(`${spec.title} (Roadmap)`);
+      } else if (typeof ERROR_PAGES !== 'undefined' && ERROR_PAGES[cleanPath]) {
+        const errSpec = ERROR_PAGES[cleanPath];
+        container.innerHTML = ErrorView.render(errSpec, cleanPath);
+        document.title = `SiDaya - Error ${errSpec.statusCode}`;
+        this.updateActiveNav('');
+        this.updateBreadcrumb(`Error ${errSpec.statusCode}`);
+      } else {
+        const errSpec = typeof ERROR_PAGES !== 'undefined' && ERROR_PAGES['/404']
+          ? ERROR_PAGES['/404']
+          : { statusCode: '404', title: 'Halaman Tidak Ditemukan', desc: 'Rute tidak terdaftar.' };
+        container.innerHTML = ErrorView.render(errSpec, cleanPath);
+        document.title = 'SiDaya - 404 Halaman Tidak Ditemukan';
+        this.updateActiveNav('');
+        this.updateBreadcrumb('404 Not Found');
+      }
+    } catch (err) {
+      console.error('[Router Navigation Error]', err);
+      container.innerHTML = `
+        <div class="card" style="max-width:540px; margin:40px auto; text-align:center; padding:32px 24px;">
+          <div style="font-size:2.5rem; margin-bottom:12px;">⚠️</div>
+          <h2 style="font-size:1.2rem; font-weight:800; color:var(--text-primary); margin-bottom:8px;">Terjadi Kendala Memuat Tampilan</h2>
+          <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:20px; line-height:1.5;">${err.message || 'Gagal merender komponen modul tampilan.'}</p>
+          <button class="btn btn-primary" onclick="resetAndReloadState()">🔄 Muat Ulang & Pulihkan State</button>
+        </div>
+      `;
     }
 
     // Close mobile drawer if open
@@ -71,6 +85,11 @@ const Router = {
     const backdrop = document.getElementById('sidebar-backdrop');
     if (sidebar) sidebar.classList.remove('open');
     if (backdrop) backdrop.classList.remove('active');
+
+    // Trigger smooth view transition animation
+    container.classList.remove('view-enter');
+    void container.offsetWidth; // trigger reflow
+    container.classList.add('view-enter');
 
     window.scrollTo(0, 0);
   },

@@ -3,7 +3,12 @@
  */
 const PiutangView = {
   render(state) {
-    const s = state.pilar7;
+    const s = state?.pilar7 || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar7 : {});
+    const aging0to7 = s.aging0to7 || 0;
+    const aging8to14 = s.aging8to14 || 0;
+    const aging15to30 = s.aging15to30 || 0;
+    const agingOver30 = s.agingOver30 || 0;
+    const debts = s.debts || [];
     return `
       <div class="view-header">
         <div>
@@ -19,19 +24,19 @@ const PiutangView = {
       <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr);">
         <div class="kpi-card">
           <div class="kpi-header"><span class="kpi-title">0 - 7 Hari (Lancar)</span><span class="kpi-icon">🟢</span></div>
-          <div class="kpi-value">${formatRupiah(s.aging0to7)}</div>
+          <div class="kpi-value">${formatRupiah(aging0to7)}</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-header"><span class="kpi-title">8 - 14 Hari (Jatuh Tempo)</span><span class="kpi-icon">🟡</span></div>
-          <div class="kpi-value">${formatRupiah(s.aging8to14)}</div>
+          <div class="kpi-value">${formatRupiah(aging8to14)}</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-header"><span class="kpi-title">15 - 30 Hari (Menunggak)</span><span class="kpi-icon">🟠</span></div>
-          <div class="kpi-value warning">${formatRupiah(s.aging15to30)}</div>
+          <div class="kpi-value warning">${formatRupiah(aging15to30)}</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-header"><span class="kpi-title">> 30 Hari (Macet)</span><span class="kpi-icon">🔴</span></div>
-          <div class="kpi-value danger">${formatRupiah(s.agingOver30)}</div>
+          <div class="kpi-value danger">${formatRupiah(agingOver30)}</div>
         </div>
       </div>
 
@@ -51,7 +56,7 @@ const PiutangView = {
             </tr>
           </thead>
           <tbody id="piutang-tbody">
-            ${s.debts.map(d => `
+            ${debts.map(d => `
               <tr>
                 <td><code>${d.invoiceNumber}</code></td>
                 <td><strong>${d.customerName}</strong></td>

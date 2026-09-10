@@ -3,7 +3,7 @@
  */
 const UsersView = {
   render(state) {
-    const staffList = state.pilar8.staff;
+    const staffList = state?.pilar8?.staff || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar8.staff : []);
     return `
       <div class="view-header">
         <div>

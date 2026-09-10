@@ -3,7 +3,13 @@
  */
 const SettingsView = {
   render(state) {
-    const s = state.pilar9.settings;
+    const s = state?.pilar9?.settings || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar9.settings : {
+      storeName: 'Toko Grosir Beras Jaya Bersama',
+      storeAddress: 'Pasar Induk Cipinang Blok A No. 12, Jakarta Timur',
+      storePhone: '+6281234567890',
+      printerType: 'USB',
+      paperWidth: '80mm',
+    });
     return `
       <div class="view-header">
         <div>

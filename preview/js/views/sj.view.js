@@ -3,7 +3,7 @@
  */
 const SjView = {
   render(state) {
-    const sjList = state.pilar6.deliveryOrders;
+    const sjList = state?.pilar6?.deliveryOrders || (typeof INITIAL_DEFAULT_STATE !== 'undefined' ? INITIAL_DEFAULT_STATE.pilar6.deliveryOrders : []);
     return `
       <div class="view-header">
         <div>
