@@ -75,3 +75,13 @@ const ERROR_DEFINITIONS = {
     statusText: '503 Service Unavailable (Maintenance Window)'
   }
 };
+
+const ERROR_PAGES = {
+  '/400': { statusCode: '400', title: ERROR_DEFINITIONS['400'].title, desc: ERROR_DEFINITIONS['400'].desc, icon: '⚠️', action: 'ERR_BAD_REQUEST_400' },
+  '/401': { statusCode: '401', title: ERROR_DEFINITIONS['401'].title, desc: ERROR_DEFINITIONS['401'].desc, icon: '🔒', action: 'ERR_UNAUTHORIZED_401' },
+  '/403': { statusCode: '403', title: ERROR_DEFINITIONS['403'].title, desc: ERROR_DEFINITIONS['403'].desc, icon: '🚫', action: 'ERR_FORBIDDEN_403' },
+  '/404': { statusCode: '404', title: ERROR_DEFINITIONS['404'].title, desc: ERROR_DEFINITIONS['404'].desc, icon: '🔍', action: 'ERR_NOT_FOUND_404' },
+  '/429': { statusCode: '429', title: ERROR_DEFINITIONS['429'].title, desc: ERROR_DEFINITIONS['429'].desc, icon: '⏳', action: 'ERR_RATE_LIMIT_429' },
+  '/500': { statusCode: '500', title: ERROR_DEFINITIONS['500'].title, desc: ERROR_DEFINITIONS['500'].desc, icon: '💥', action: 'ERR_INTERNAL_500' },
+  '/503': { statusCode: '503', title: ERROR_DEFINITIONS['503'].title, desc: ERROR_DEFINITIONS['503'].desc, icon: '🛠️', action: 'ERR_MAINTENANCE_503' },
+};

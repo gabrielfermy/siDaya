@@ -227,6 +227,13 @@ body.impersonation-active .sidebar { top: 48px; height: calc(100vh - 48px); }
   flex-wrap: wrap;
 }
 
+/* Strict Plane Guardrail: HTTP Simulator is exclusively visible on Operator Plane */
+html.state-auth-merchant .error-tester-dock,
+html.state-unauth-merchant .error-tester-dock,
+body:not(.operator-plane) #app-shell > .error-tester-dock {
+  display: none !important;
+}
+
 /* --- RESPONSIVE BREAKPOINTS (MOBILE & TABLET DRAWER) --- */
 @media (max-width: 900px) {
   .mobile-menu-toggle { display: inline-flex !important; }

@@ -48,7 +48,8 @@ const Router = {
     // Strict Tenant Isolation: Block operator routes from regular tenant sessions
     if (isOpsRoute && !state?.auth?.impersonation?.active) {
       const isOpsUser = !!localStorage.getItem('sidaya_operator_session');
-      if (!isOpsUser) {
+      const isMerchUser = !!localStorage.getItem('sidaya_merchant_session');
+      if (!isOpsUser && isMerchUser) {
         Toast.show('⛔ Akses Ditolak: Rute ini khusus Operator Platform.', 'error');
         Router.navigate('/dashboard', false);
         return;
@@ -60,6 +61,9 @@ const Router = {
       const isValid = AuthController.validateSession(isOpsRoute ? 'operator' : 'merchant', cleanPath);
       if (!isValid) return;
     }
+
+    // Synchronize Plane Isolation (Sidebar, Branding, Breadcrumbs)
+    this.syncPlaneShell(isOpsRoute, state);
 
     // Floating Top Impersonation Banner Docking
     this.updateImpersonationBanner(state?.auth?.impersonation);
@@ -120,6 +124,50 @@ const Router = {
   },
 
   /**
+   * Synchronizes UI Shell branding and sidebar navigation to enforce strict plane isolation
+   * @param {boolean} isOps
+   * @param {Object} state
+   */
+  syncPlaneShell(isOps, state) {
+    const navContent = document.getElementById('sidebar-nav-content');
+    const badgeLabel = document.getElementById('sidebar-tenant-badge-label');
+    const tenantName = document.getElementById('sidebar-tenant-name');
+    const userAvatar = document.getElementById('sidebar-user-avatar');
+    const userName = document.getElementById('sidebar-user-name');
+    const userRole = document.getElementById('sidebar-user-role');
+    const topbarSub = document.getElementById('topbar-breadcrumb-sub');
+    const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
+
+    if (isOps) {
+      if (navContent && typeof LayoutView !== 'undefined' && LayoutView.renderOperatorNav) {
+        navContent.innerHTML = LayoutView.renderOperatorNav();
+      }
+      if (badgeLabel) badgeLabel.textContent = 'Platform Scope';
+      if (tenantName) tenantName.textContent = 'Ashvin Labs Fleet Ops';
+      if (userAvatar) userAvatar.textContent = '⚡';
+      if (userName) userName.textContent = state?.auth?.operatorUser?.name || 'Platform Operator';
+      if (userRole) userRole.textContent = state?.auth?.operatorUser?.roleName || 'SUPER_ADMIN';
+      if (topbarSub) topbarSub.innerHTML = `Ashvin Labs Platform Operations • Subdomain: <code id="topbar-subdomain-code">ops.${baseDomain}</code>`;
+    } else {
+      if (navContent && typeof LayoutView !== 'undefined' && LayoutView.renderMerchantNav) {
+        navContent.innerHTML = LayoutView.renderMerchantNav();
+      }
+      if (badgeLabel) badgeLabel.textContent = 'Active Workspace';
+      if (tenantName) tenantName.textContent = state?.auth?.impersonation?.active ? (state.auth.impersonation.targetTenant?.businessName || 'Toko Grosir Beras Jaya') : 'Toko Grosir Beras Jaya';
+      if (userAvatar) userAvatar.textContent = state?.auth?.impersonation?.active ? (state.auth.impersonation.targetUser?.avatar || 'S') : 'B';
+      if (userName) userName.textContent = state?.auth?.impersonation?.active ? (state.auth.impersonation.targetUser?.name || 'Staf') : 'Budi Santoso';
+      if (userRole) userRole.textContent = state?.auth?.impersonation?.active ? (state.auth.impersonation.targetUser?.role || 'Staff') : 'OWNER';
+      if (topbarSub) topbarSub.innerHTML = `Toko Grosir Beras Jaya Bersama • Subdomain: <code id="topbar-subdomain-code">berasjaya.${baseDomain}</code>`;
+
+      // Strictly purge any floating operator remnants from tenant DOM
+      const floatingDocks = document.querySelectorAll('#app-shell > .error-tester-dock, body > .error-tester-dock');
+      floatingDocks.forEach(d => d.remove());
+      const devPills = document.querySelectorAll('.dev-subdomain-pill');
+      devPills.forEach(p => p.remove());
+    }
+  },
+
+  /**
    * Updates sidebar active link indicators
    * @param {string} path - Current active path
    */
@@ -144,9 +192,14 @@ const Router = {
 
     const subEl = document.getElementById('topbar-subdomain-code');
     if (subEl) {
-      const currentSub = store.getState()?.pilar9?.settings?.subdomain || 'berasjaya';
+      const isOps = window.location.pathname.includes('telemetry') || window.location.pathname.includes('fleet');
       const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
-      subEl.textContent = `${currentSub}.${baseDomain}`;
+      if (isOps) {
+        subEl.textContent = `ops.${baseDomain}`;
+      } else {
+        const currentSub = store.getState()?.pilar9?.settings?.subdomain || 'berasjaya';
+        subEl.textContent = `${currentSub}.${baseDomain}`;
+      }
     }
   },
 
