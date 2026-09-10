@@ -29,6 +29,7 @@ const SettingsView = {
 
     const currentSubdomain = s.subdomain || 'berasjaya';
     const aliases = Array.isArray(s.subdomainAliases) ? s.subdomainAliases : [];
+    const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
 
     return `
       <div class="view-header">
@@ -60,7 +61,7 @@ const SettingsView = {
               <div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px; font-weight:600;">URL UTAMA AKTIF:</div>
               <div style="display:flex; align-items:center; justify-content:space-between;">
                 <span style="font-family:var(--font-mono, monospace); font-size:15px; font-weight:700; color:var(--color-primary, #6366f1);">
-                  https://<span id="current-subdomain-display">${currentSubdomain}</span>.sidaya.biz.id
+                  https://<span id="current-subdomain-display">${currentSubdomain}</span>.${baseDomain}
                 </span>
                 <button class="btn btn-sm btn-outline" onclick="SettingsController.copyStoreUrl('${currentSubdomain}')" title="Salin URL">
                   📋 Salin
@@ -80,7 +81,7 @@ const SettingsView = {
                          oninput="SettingsController.handleSubdomainInput(this.value)"
                          style="padding-right:110px; font-family:var(--font-mono, monospace); font-weight:600;">
                   <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text-muted); pointer-events:none;">
-                    .sidaya.biz.id
+                    .${baseDomain}
                   </span>
                 </div>
                 <button class="btn btn-outline" onclick="SettingsController.handleChangeSubdomain()">

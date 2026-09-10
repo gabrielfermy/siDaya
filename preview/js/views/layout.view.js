@@ -115,7 +115,7 @@ const LayoutView = {
               <button class="mobile-menu-toggle" onclick="toggleMobileDrawer()">☰</button>
               <div>
                 <div class="breadcrumb-title" id="breadcrumb-current-page">Dashboard</div>
-                <div class="breadcrumb-sub">Toko Grosir Beras Jaya Bersama • Subdomain: <code>berasjaya.sidaya.id</code></div>
+                <div class="breadcrumb-sub">Toko Grosir Beras Jaya Bersama • Subdomain: <code id="topbar-subdomain-code">berasjaya.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'}</code></div>
               </div>
             </div>
 
@@ -137,9 +137,9 @@ const LayoutView = {
       <!-- DEV SUBDOMAIN & HTTP ERROR SIMULATOR FLOATING DOCKS -->
       <div class="dev-subdomain-pill">
         <span style="font-size:0.8rem;">🌐</span>
-        <a href="javascript:void(0)" class="dev-subdomain-link active" onclick="switchDevSubdomain('berasjaya')">berasjaya.sidaya.id (Merchant)</a>
+        <a href="javascript:void(0)" class="dev-subdomain-link active" onclick="switchDevSubdomain('berasjaya')">berasjaya.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'} (Merchant)</a>
         <span style="color:var(--border-medium)">|</span>
-        <a href="javascript:void(0)" class="dev-subdomain-link" onclick="switchDevSubdomain('ops')">ops.sidaya.id (Platform Operator)</a>
+        <a href="javascript:void(0)" class="dev-subdomain-link" onclick="switchDevSubdomain('ops')">ops.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'} (Operator)</a>
       </div>
 
       <div class="error-tester-dock">

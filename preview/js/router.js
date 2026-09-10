@@ -145,7 +145,8 @@ const Router = {
     const subEl = document.getElementById('topbar-subdomain-code');
     if (subEl) {
       const currentSub = store.getState()?.pilar9?.settings?.subdomain || 'berasjaya';
-      subEl.textContent = `${currentSub}.sidaya.biz.id`;
+      const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
+      subEl.textContent = `${currentSub}.${baseDomain}`;
     }
   },
 
