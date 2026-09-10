@@ -66,44 +66,47 @@ const OperatorView = {
             ${isOpsSupport ? '🔒 PII MASKED (OPS_SUPPORT)' : '🔓 UNMASKED (SUPER_ADMIN)'}
           </span>
         </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Nama Usaha Tenant</th>
-              <th>Subdomain URL</th>
-              <th>Nama Pemilik (PII)</th>
-              <th>Kontak Owner (PII)</th>
-              <th>Paket Langganan</th>
-              <th>Status Tenant</th>
-              <th>Aksi Operator</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${tenants.map(t => {
-              const displayOwner = isOpsSupport ? t.ownerName.split(' ').map(w => w[0] + '***').join(' ') : t.ownerName;
-              const displayPhone = isOpsSupport ? t.ownerPhone.replace(/(\+\d{4})\d+(\d{4})/, '$1****$2') : t.ownerPhone;
-              return `
-                <tr>
-                  <td><strong>${t.businessName}</strong></td>
-                  <td><code>${t.subdomain}.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'}</code></td>
-                  <td>${displayOwner}</td>
-                  <td>${displayPhone}</td>
-                  <td><span class="tier-badge ${t.tier === 'GROSIR_PRO' ? 'tier-grosir-pro' : 'tier-starter-free'}">${t.tier}</span></td>
-                  <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${t.status}</span></td>
-                  <td style="display:flex; gap:6px;">
-                    <button class="btn btn-primary btn-sm" style="background:linear-gradient(135deg, #7c3aed, #4f46e5); border:none; padding:4px 8px; font-size:0.75rem;" 
-                            onclick="OperatorController.openImpersonateModal('${t.id}')" title="Masuk sebagai user tenant untuk investigasi">
-                      🎭 Impersonate
-                    </button>
-                    <button class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="toggleTenantStatus('${t.id}')">
-                      Status
-                    </button>
-                  </td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
+        <div class="table-scroll-hint"><span>⇄</span> Geser ke samping untuk melihat detail tenant & aksi</div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nama Usaha Tenant</th>
+                <th>Subdomain URL</th>
+                <th>Nama Pemilik (PII)</th>
+                <th>Kontak Owner (PII)</th>
+                <th>Paket Langganan</th>
+                <th>Status Tenant</th>
+                <th>Aksi Operator</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tenants.map(t => {
+                const displayOwner = isOpsSupport ? t.ownerName.split(' ').map(w => w[0] + '***').join(' ') : t.ownerName;
+                const displayPhone = isOpsSupport ? t.ownerPhone.replace(/(\+\d{4})\d+(\d{4})/, '$1****$2') : t.ownerPhone;
+                return `
+                  <tr>
+                    <td><strong>${t.businessName}</strong></td>
+                    <td><code>${t.subdomain}.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'}</code></td>
+                    <td>${displayOwner}</td>
+                    <td>${displayPhone}</td>
+                    <td><span class="tier-badge ${t.tier === 'GROSIR_PRO' ? 'tier-grosir-pro' : 'tier-starter-free'}">${t.tier}</span></td>
+                    <td><span class="tier-badge" style="background:var(--accent-green-soft); color:var(--accent-green);">${t.status}</span></td>
+                    <td style="display:flex; gap:6px;">
+                      <button class="btn btn-primary btn-sm" style="background:linear-gradient(135deg, #7c3aed, #4f46e5); border:none; padding:4px 8px; font-size:0.75rem;" 
+                              onclick="OperatorController.openImpersonateModal('${t.id}')" title="Masuk sebagai user tenant untuk investigasi">
+                        🎭 Impersonate
+                      </button>
+                      <button class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="toggleTenantStatus('${t.id}')">
+                        Status
+                      </button>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- AUDIT TRAIL LOGS -->
@@ -112,30 +115,33 @@ const OperatorView = {
           <span>🛡️ Rekam Jejak Audit Operator (Immutable Forensic Logs)</span>
           <span class="badge badge-outline" style="font-size:11px;">UU PDP COMPLIANT</span>
         </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Waktu / Timestamp</th>
-              <th>Operator</th>
-              <th>Aksi / Event</th>
-              <th>Target Tenant / User</th>
-              <th>Ref. Tiket</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${auditLogs.map(log => `
+        <div class="table-scroll-hint"><span>⇄</span> Geser ke samping untuk melihat log forensic lengkap</div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
               <tr>
-                <td style="font-size:12px; color:var(--text-secondary);">${log.time}</td>
-                <td><code>${log.operatorEmail}</code></td>
-                <td><span class="badge ${log.action.includes('IMPERSONATION') ? 'badge-primary' : 'badge-warning'}">${log.action}</span></td>
-                <td><strong>${log.target}</strong></td>
-                <td><code>${log.ticketRef}</code></td>
-                <td><span class="badge badge-success">${log.status}</span></td>
+                <th>Waktu / Timestamp</th>
+                <th>Operator</th>
+                <th>Aksi / Event</th>
+                <th>Target Tenant / User</th>
+                <th>Ref. Tiket</th>
+                <th>Status</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              ${auditLogs.map(log => `
+                <tr>
+                  <td style="font-size:12px; color:var(--text-secondary);">${log.time}</td>
+                  <td><code>${log.operatorEmail}</code></td>
+                  <td><span class="badge ${log.action.includes('IMPERSONATION') ? 'badge-primary' : 'badge-warning'}">${log.action}</span></td>
+                  <td><strong>${log.target}</strong></td>
+                  <td><code>${log.ticketRef}</code></td>
+                  <td><span class="badge badge-success">${log.status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     `;
   },

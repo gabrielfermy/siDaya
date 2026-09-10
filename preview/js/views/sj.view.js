@@ -17,46 +17,49 @@ const SjView = {
 
       <div class="card">
         <div class="card-title">Manifest Pengiriman Barang & Status Serah Terima</div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>No. Surat Jalan</th>
-              <th>No. Referensi Pesanan</th>
-              <th>Supir & Plat Kendaraan</th>
-              <th>Tujuan Toko</th>
-              <th>Muatan Komoditas</th>
-              <th>Status POD</th>
-              <th>Aksi Serah Terima</th>
-            </tr>
-          </thead>
-          <tbody id="sj-tbody">
-            ${sjList.map(sj => `
+        <div class="table-scroll-hint"><span>⇄</span> Geser ke samping untuk melihat muatan & TTD POD</div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
               <tr>
-                <td><code>${sj.sjNumber}</code></td>
-                <td>${sj.orderNumber}</td>
-                <td><strong>${sj.driverName}</strong> (${sj.plateNumber})</td>
-                <td>${sj.destination}</td>
-                <td><span class="badge-tag">${sj.itemSummary}</span></td>
-                <td>
-                  <span class="tier-badge ${sj.status === 'DELIVERED' ? 'tier-grosir-pro' : 'tier-starter-free'}">
-                    ${sj.status === 'DELIVERED' ? '✅ DITERIMA (TTD)' : '🚚 DALAM PENGIRIMAN'}
-                  </span>
-                </td>
-                <td>
-                  ${sj.status === 'DELIVERED' ? `
-                    <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem;" onclick="viewPodSignature('${sj.sjNumber}')">
-                      Lihat Bukti TTD
-                    </button>
-                  ` : `
-                    <button class="btn btn-primary" style="padding:4px 8px; font-size:0.75rem;" onclick="openPodSignModal('${sj.id}')">
-                      ✍️ Tanda Tangani POD
-                    </button>
-                  `}
-                </td>
+                <th>No. Surat Jalan</th>
+                <th>No. Referensi Pesanan</th>
+                <th>Supir & Plat Kendaraan</th>
+                <th>Tujuan Toko</th>
+                <th>Muatan Komoditas</th>
+                <th>Status POD</th>
+                <th>Aksi Serah Terima</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
+            </thead>
+            <tbody id="sj-tbody">
+              ${sjList.map(sj => `
+                <tr>
+                  <td><code>${sj.sjNumber}</code></td>
+                  <td>${sj.orderNumber}</td>
+                  <td><strong>${sj.driverName}</strong> (${sj.plateNumber})</td>
+                  <td>${sj.destination}</td>
+                  <td><span class="badge-tag">${sj.itemSummary}</span></td>
+                  <td>
+                    <span class="tier-badge ${sj.status === 'DELIVERED' ? 'tier-grosir-pro' : 'tier-starter-free'}">
+                      ${sj.status === 'DELIVERED' ? '✅ DITERIMA (TTD)' : '🚚 DALAM PENGIRIMAN'}
+                    </span>
+                  </td>
+                  <td>
+                    ${sj.status === 'DELIVERED' ? `
+                      <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem;" onclick="viewPodSignature('${sj.sjNumber}')">
+                        Lihat Bukti TTD
+                      </button>
+                    ` : `
+                      <button class="btn btn-primary" style="padding:4px 8px; font-size:0.75rem;" onclick="openPodSignModal('${sj.id}')">
+                        ✍️ Tanda Tangani POD
+                      </button>
+                    `}
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     `;
   },

@@ -169,36 +169,39 @@ const DashboardView = {
       <!-- RECENT TRANSACTIONS TABLE -->
       <div class="card" style="margin-top:16px;">
         <div class="card-title">🧾 Transaksi Kasir & Pesanan Terbaru</div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>No. Pesanan</th>
-              <th>Waktu</th>
-              <th>Pelanggan</th>
-              <th>Metode</th>
-              <th>Total Nominal</th>
-              <th>Status Bayar</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="dashboard-recent-orders">
-            ${recentOrders.map(o => `
+        <div class="table-scroll-hint"><span>⇄</span> Geser ke samping untuk melihat detail & aksi</div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
               <tr>
-                <td><strong>${o.orderNumber}</strong></td>
-                <td>${o.time}</td>
-                <td>${o.customer}</td>
-                <td><span class="badge-tag">${o.method}</span></td>
-                <td><strong>${formatRupiah(o.total)}</strong></td>
-                <td><span class="tier-badge ${o.status === 'PAID' ? 'tier-grosir-pro' : 'tier-starter-free'}">${o.status}</span></td>
-                <td>
-                  <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem;" onclick="viewReceipt('${o.orderNumber}')">
-                    Cetak Struk
-                  </button>
-                </td>
+                <th>No. Pesanan</th>
+                <th>Waktu</th>
+                <th>Pelanggan</th>
+                <th>Metode</th>
+                <th>Total Nominal</th>
+                <th>Status Bayar</th>
+                <th>Aksi</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
+            </thead>
+            <tbody id="dashboard-recent-orders">
+              ${recentOrders.map(o => `
+                <tr>
+                  <td><strong>${o.orderNumber}</strong></td>
+                  <td>${o.time}</td>
+                  <td>${o.customer}</td>
+                  <td><span class="badge-tag">${o.method}</span></td>
+                  <td><strong>${formatRupiah(o.total)}</strong></td>
+                  <td><span class="tier-badge ${o.status === 'PAID' ? 'tier-grosir-pro' : 'tier-starter-free'}">${o.status}</span></td>
+                  <td>
+                    <button class="btn btn-outline" style="padding:4px 8px; font-size:0.75rem;" onclick="viewReceipt('${o.orderNumber}')">
+                      Cetak Struk
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     `;
   },

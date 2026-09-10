@@ -40,34 +40,37 @@ const FifoView = {
       <!-- BATCH TIMELINE TABLE -->
       <div class="card">
         <div class="card-title">📦 Daftar Batch & Lot Inventaris Aktif</div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Nomor Lot Batch</th>
-              <th>Komoditas</th>
-              <th>Lokasi Bin / Rak</th>
-              <th>Tgl Masuk (FIFO Rank)</th>
-              <th>HPP Masuk / Unit</th>
-              <th>Sisa Stok / Awal</th>
-              <th>Status Lot</th>
-            </tr>
-          </thead>
-          <tbody id="fifo-batches-tbody">
-            ${batches.map(b => `
+        <div class="table-scroll-hint"><span>⇄</span> Geser ke samping untuk melihat detail lot & HPP</div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
               <tr>
-                <td><code>${b.lotNumber}</code></td>
-                <td><strong>${b.productName}</strong></td>
-                <td><span class="badge-tag">${b.binLabel}</span></td>
-                <td>${b.receivedDate}</td>
-                <td>${formatRupiah(b.cogsUnit)}</td>
-                <td><strong>${b.remainingQty} / ${b.initialQty} Karung</strong></td>
-                <td>
-                  <span class="tier-badge ${b.status === 'ACTIVE' ? 'tier-grosir-pro' : 'tier-starter-free'}">${b.status}</span>
-                </td>
+                <th>Nomor Lot Batch</th>
+                <th>Komoditas</th>
+                <th>Lokasi Bin / Rak</th>
+                <th>Tgl Masuk (FIFO Rank)</th>
+                <th>HPP Masuk / Unit</th>
+                <th>Sisa Stok / Awal</th>
+                <th>Status Lot</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
+            </thead>
+            <tbody id="fifo-batches-tbody">
+              ${batches.map(b => `
+                <tr>
+                  <td><code>${b.lotNumber}</code></td>
+                  <td><strong>${b.productName}</strong></td>
+                  <td><span class="badge-tag">${b.binLabel}</span></td>
+                  <td>${b.receivedDate}</td>
+                  <td>${formatRupiah(b.cogsUnit)}</td>
+                  <td><strong>${b.remainingQty} / ${b.initialQty} Karung</strong></td>
+                  <td>
+                    <span class="tier-badge ${b.status === 'ACTIVE' ? 'tier-grosir-pro' : 'tier-starter-free'}">${b.status}</span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     `;
   },
