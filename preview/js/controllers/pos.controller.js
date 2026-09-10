@@ -1,5 +1,19 @@
 /**
- * POS Controller: Barcode scanner, cart manipulation, checkout, and receipt printing
+ * @module Controller:POS
+ * @description Mengelola input fast-scan barcode, filter kategori produk, manipulasi kuantitas keranjang POS, dan orkestrasi checkout transaksi.
+ * @dependencies Store (state.js, store.js), View:POS (pos.view.js), Formatters (formatters.js), Toast (toast.js)
+ * @exports
+ *   - handleBarcodeKey(e): Menangkap penekanan tombol Enter pada barcode input
+ *   - handleBarcodeScanSubmit(): Mencari SKU dan menambahkan ke keranjang
+ *   - addToCart(productId): Menambahkan 1 unit produk ke keranjang
+ *   - updateCartQty(productId, delta): Mengubah kuantitas item (+/-)
+ *   - clearCart(): Mengosongkan keranjang belanja
+ *   - filterCategory(cat, btn): Memfilter grid produk berdasarkan kategori komoditas
+ *   - openCheckoutModal(): Membuka dialog pilihan metode bayar
+ *   - executeCheckout(method): Menyelesaikan transaksi dan memperbarui state
+ * @example
+ *   PosController.addToCart('prod-01');
+ *   PosController.executeCheckout('TUNAI');
  */
 const PosController = {
   handleBarcodeKey(e) {
