@@ -1,7 +1,5 @@
 /**
- * ==========================================================================
- * PILAR 08: DAFTAR STAF & HAK AKSES PIN
- * ==========================================================================
+ * Staff Directory and Security Management Module
  */
 function renderStaffTable(staffList) {
   const tbody = document.getElementById('tenant-staff-tbody');
