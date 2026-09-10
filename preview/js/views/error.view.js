@@ -3,11 +3,8 @@
  */
 const ErrorView = {
   render(errSpec, path) {
-    const isOps = (typeof window !== 'undefined' && (
-      window.location.hostname.startsWith('ops.') ||
-      !!localStorage.getItem('sidaya_operator_session') ||
-      (document.documentElement && document.documentElement.className.includes('ops'))
-    ));
+    const h = (typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '');
+    const isOps = h.startsWith('ops.') || h === 'ops.localhost';
 
     const returnRoute = isOps ? '/telemetry' : '/dashboard';
     const returnLabel = isOps ? '⚡ Kembali ke Control Plane' : '🏠 Kembali ke Dashboard';

@@ -22,12 +22,7 @@ const INITIAL_DEFAULT_STATE = {
       tenant: 'Toko Grosir Beras Jaya Bersama',
       subdomain: 'berasjaya',
     },
-    operatorUser: {
-      email: 'gabriel@ashvinlabs.com',
-      name: 'Gabriel (CEO)',
-      role: 'SUPER_ADMIN',
-      badgeClass: 'role-super-admin',
-    },
+    operatorUser: null,
     impersonation: {
       active: false,
       originalOperator: null,
@@ -156,7 +151,7 @@ const INITIAL_DEFAULT_STATE = {
 
   // Operator Platform Domain
   operator: {
-    currentRole: 'SUPER_ADMIN',
+    currentRole: null,
     telemetry: {
       totalGmv: 428500000,
       activeTenants: 12,
