@@ -42,7 +42,7 @@ const SettingsView = {
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 20px; max-width: 1100px;">
+      <div class="settings-grid">
         
         <!-- Kolom 1: Subdomain & Domain Management -->
         <div style="display:flex; flex-direction:column; gap:20px;">
@@ -74,17 +74,16 @@ const SettingsView = {
                 <span>Ubah Subdomain Toko</span>
                 <span id="subdomain-check-status" style="font-size:12px; font-weight:600; color:var(--color-success, #10b981);">Tersedia</span>
               </label>
-              <div style="display:flex; gap:8px;">
-                <div style="position:relative; flex:1;">
-                  <input id="settings-new-subdomain" type="text" class="form-input" value="${currentSubdomain}" 
+              <div class="subdomain-input-group">
+                <div class="subdomain-input-wrap">
+                  <input id="settings-new-subdomain" type="text" class="form-input subdomain-input" value="${currentSubdomain}" 
                          placeholder="contoh: berasjayagrosir" 
-                         oninput="SettingsController.handleSubdomainInput(this.value)"
-                         style="padding-right:110px; font-family:var(--font-mono, monospace); font-weight:600;">
-                  <span style="position:absolute; right:12px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--text-muted); pointer-events:none;">
+                         oninput="SettingsController.handleSubdomainInput(this.value)">
+                  <span class="subdomain-suffix">
                     .${baseDomain}
                   </span>
                 </div>
-                <button class="btn btn-outline" onclick="SettingsController.handleChangeSubdomain()">
+                <button class="btn btn-outline subdomain-apply-btn" onclick="SettingsController.handleChangeSubdomain()">
                   Terapkan
                 </button>
               </div>
