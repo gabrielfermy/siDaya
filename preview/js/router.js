@@ -38,6 +38,16 @@ const Router = {
       window.history.pushState({}, '', cleanPath);
     }
 
+    // 1. Session Security & Access Authorization Guard
+    const isOps = cleanPath === '/telemetry' || cleanPath === '/fleet';
+    const isError = typeof ERROR_PAGES !== 'undefined' && !!ERROR_PAGES[cleanPath];
+    if (!isError && typeof AuthController !== 'undefined') {
+      const isValid = AuthController.validateSession(isOps ? 'operator' : 'merchant', cleanPath);
+      if (!isValid) {
+        return;
+      }
+    }
+
     const state = store.getState();
     const route = this.routes[cleanPath];
 

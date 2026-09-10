@@ -55,7 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
     appRoot.innerHTML = LayoutView.renderShell();
   }
 
-  // 5. Initialize SPA Router
+  // 5. Initialize Session Security & Inactivity Expiry Monitor
+  if (typeof AuthController !== 'undefined' && AuthController.initSessionSecurity) {
+    AuthController.initSessionSecurity();
+  }
+
+  // 6. Initialize SPA Router
   Router.init();
 
   // 6. Global Keyboard Shortcuts
