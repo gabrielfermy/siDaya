@@ -123,7 +123,8 @@ const SettingsController = {
    * @param {string} subdomain
    */
   copyStoreUrl(subdomain) {
-    const url = `https://${subdomain}.sidaya.biz.id`;
+    const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
+    const url = `https://${subdomain}.${baseDomain}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url).then(() => {
         Toast.show(`📋 URL ${url} disalin ke clipboard!`, 'success');

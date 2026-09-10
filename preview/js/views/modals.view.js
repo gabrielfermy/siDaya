@@ -33,7 +33,7 @@ const ModalsView = {
                 <label class="form-label">Subdomain Unik Toko</label>
                 <div style="position:relative;">
                   <input id="reg-biz-subdomain" type="text" class="form-input" required placeholder="berasmakmur" style="padding-right:90px;">
-                  <span style="position:absolute; right:8px; top:50%; transform:translateY(-50%); font-size:11px; color:var(--text-muted); pointer-events:none;">.sidaya.biz.id</span>
+                  <span style="position:absolute; right:8px; top:50%; transform:translateY(-50%); font-size:11px; color:var(--text-muted); pointer-events:none;">.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'}</span>
                 </div>
               </div>
             </div>
@@ -356,7 +356,7 @@ const ModalsView = {
             <div class="thermal-header">
               <div class="thermal-brand">TOKO GROSIR BERAS JAYA</div>
               <div class="thermal-sub">Pasar Induk Kramat Jati, Jakarta Timur</div>
-              <div class="thermal-sub">Telp: 0812-3456-7890 | berasjaya.sidaya.biz.id</div>
+              <div class="thermal-sub">Telp: 0812-3456-7890 | berasjaya.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'}</div>
               <div class="thermal-divider">================================</div>
             </div>
             <div class="thermal-meta">
