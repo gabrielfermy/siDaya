@@ -30,8 +30,8 @@ const Router = {
     '/invoices': { title: 'Faktur & Penjualan', render: (s) => InvoicesView.render(s) },
     '/sj': { title: 'Surat Jalan (POD)', render: (s) => SjView.render(s) },
     '/piutang': { title: 'Buku Piutang & WA PayLink', render: (s) => PiutangView.render(s) },
-    '/users': { title: 'Direktori Staf (PIN)', render: (s) => UsersView.render(s) },
-    '/roles': { title: 'Matriks RBAC', render: (s) => RolesView.render(s) },
+    '/users': { title: 'Staf & Hak Akses', render: (s) => UsersView.render(s) },
+    '/roles': { title: 'Staf & Hak Akses', render: (s) => UsersView.render(s) },
     '/settings': { title: 'Pengaturan & Domain', render: (s) => SettingsView.render(s) },
   },
 

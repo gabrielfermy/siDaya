@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     moduleManager.register('Controller:POS', ['Store', 'View:POS'], PosController);
     moduleManager.register('Controller:FIFO', ['Store'], FifoController);
     moduleManager.register('Controller:Customers', ['Store'], CustomersController);
-    moduleManager.register('Controller:Roles', ['Store'], RolesController);
+    moduleManager.register('Controller:Users', ['Store'], UsersController);
     moduleManager.register('Controller:Operator', ['Store'], OperatorController);
     moduleManager.register('Controller:Invoices', ['Store'], InvoicesController);
 
@@ -130,7 +130,13 @@ function openAddProductModal() { showToast('Form Tambah Produk SKU dibuka.'); }
 function openReceiveInboundModal() { showToast('Form Penerimaan Muatan Inbound dibuka.'); }
 function openAddCustomerModal() { showToast('Form Tambah Pelanggan Baru dibuka.'); }
 function openCreateSjModal() { showToast('Form Penerbitan Surat Jalan dibuka.'); }
-function openInviteStaffModal() { showToast('Form Undangan Staf Toko dibuka.'); }
+function openInviteStaffModal() {
+  if (typeof UsersController !== 'undefined' && UsersController.openInviteModal) {
+    UsersController.openInviteModal();
+  } else {
+    showToast('Form Undangan Staf Toko dibuka.');
+  }
+}
 function openInviteOperatorModal() { showToast('Form Undangan Platform Operator dibuka.'); }
 function openShiftCloseModal() { showToast('Dialog Penutupan Shift Kasir dibuka.'); }
 function openOwnerRegistrationModal() { openModal('modal-owner-reg'); }

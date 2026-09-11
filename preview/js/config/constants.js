@@ -38,3 +38,41 @@ const OPERATOR_ACCOUNTS = {
 const MERCHANT_PRESETS = MERCHANT_ACCOUNTS;
 const OPERATOR_PRESETS = OPERATOR_ACCOUNTS;
 
+const STAFF_CAPABILITIES = [
+  { group: 'Kasir & Transaksi POS', key: 'pos:checkout', label: 'Eksekusi Checkout Kasir POS', desc: 'Membuka transaksi penjualan dan menerima kasir' },
+  { group: 'Kasir & Transaksi POS', key: 'pos:void_item', label: 'Batalkan / Void Transaksi', desc: 'Menghapus barang dari transaksi yang sudah dicetak' },
+  { group: 'Kasir & Transaksi POS', key: 'pos:open_cash_drawer', label: 'Buka Laci Kasir Manual (No-Sale)', desc: 'Memicu pembuka laci kasir tanpa transaksi' },
+  { group: 'Katalog & Harga (Sensitif)', key: 'catalog:view_cogs', label: 'Lihat Harga Pokok Modal (COGS)', desc: 'Privasi modal beli asli dari supplier (Sangat Rahasia)' },
+  { group: 'Katalog & Harga (Sensitif)', key: 'catalog:manage_prices', label: 'Ubah Harga Jual & Diskon Grosir', desc: 'Menetapkan harga bertingkat grosir per SKU' },
+  { group: 'Gudang & Inventori FIFO', key: 'inventory:inbound', label: 'Terima Muatan Masuk Gudang (Inbound FIFO)', desc: 'Mencatat lot masuk dan mencetak label pallet' },
+  { group: 'Gudang & Inventori FIFO', key: 'inventory:stock_opname', label: 'Penyesuaian & Opname Stok Gudang', desc: 'Mengubah kuantitas fisik inventaris gudang' },
+  { group: 'Pelanggan & Piutang', key: 'customers:manage_credit_limit', label: 'Atur Plafon & Tempo Kasbon Pelanggan', desc: 'Menetapkan batas piutang dan syarat tempo (TOP)' },
+  { group: 'Logistik & Surat Jalan', key: 'logistics:issue_surat_jalan', label: 'Terbitkan Surat Jalan (SJ)', desc: 'Menerbitkan manifest kirim armada logistik' },
+  { group: 'Logistik & Surat Jalan', key: 'logistics:sign_pod', label: 'Tanda Tangani Bukti Serah Terima (POD)', desc: 'Mengonfirmasi serah terima barang (POD digital)' },
+  { group: 'Keuangan & Pengaturan', key: 'finance:reports', label: 'Akses Laporan Laba Rugi (P&L)', desc: 'Melihat kalkulasi laba kotor & omset global' },
+  { group: 'Keuangan & Pengaturan', key: 'settings:manage', label: 'Konfigurasi Toko & Hardware', desc: 'Mengubah identitas toko dan printer thermal' },
+];
+
+const STAFF_PRESETS = {
+  CASHIER: {
+    label: 'Kasir Toko (POS)',
+    permissions: ['pos:checkout', 'pos:open_cash_drawer'],
+  },
+  WAREHOUSE: {
+    label: 'Kepala Gudang & FIFO',
+    permissions: ['inventory:inbound', 'inventory:stock_opname', 'logistics:issue_surat_jalan'],
+  },
+  DRIVER: {
+    label: 'Supir Logistik (POD)',
+    permissions: ['logistics:sign_pod'],
+  },
+  MANAGER: {
+    label: 'Manajer Operasional',
+    permissions: ['pos:checkout', 'pos:void_item', 'catalog:manage_prices', 'inventory:inbound', 'inventory:stock_opname', 'customers:manage_credit_limit', 'logistics:issue_surat_jalan', 'finance:reports'],
+  },
+  CUSTOM: {
+    label: 'Kustom (Pilih Bebas)',
+    permissions: [],
+  }
+};
+
