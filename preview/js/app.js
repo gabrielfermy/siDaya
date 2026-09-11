@@ -45,7 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. Mount Auth Overlays
   const authRoot = document.getElementById('auth-root');
   if (authRoot) {
-    authRoot.innerHTML = AuthView.renderMerchantLogin() + AuthView.renderOperatorLogin();
+    authRoot.innerHTML = AuthView.renderMerchantLogin() + AuthView.renderMerchantRegister() + AuthView.renderOperatorLogin();
+    if (window.location.pathname === '/register' && typeof AuthController !== 'undefined') {
+      setTimeout(() => AuthController.showRegisterScreen(), 0);
+    }
   }
 
   // 3. Mount Modals

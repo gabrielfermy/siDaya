@@ -302,10 +302,41 @@ const AuthController = {
     navigate(isOps ? '/telemetry' : '/');
   },
 
+  /**
+   * Switches to the full-page merchant owner registration view
+   */
+  showRegisterScreen() {
+    const loginScreen = document.getElementById('merchant-login-screen');
+    const regScreen = document.getElementById('merchant-register-screen');
+    if (loginScreen) loginScreen.style.setProperty('display', 'none', 'important');
+    if (regScreen) regScreen.style.setProperty('display', 'flex', 'important');
+    document.documentElement.classList.add('is-register-page');
+    if (window.history && window.history.pushState && window.location.pathname !== '/register') {
+      window.history.pushState({}, '', '/register');
+    }
+    document.title = 'SiDaya - Pendaftaran Toko Grosir Baru';
+  },
+
+  /**
+   * Switches to the merchant login view
+   */
+  showLoginScreen() {
+    const loginScreen = document.getElementById('merchant-login-screen');
+    const regScreen = document.getElementById('merchant-register-screen');
+    if (regScreen) regScreen.style.setProperty('display', 'none', 'important');
+    if (loginScreen) loginScreen.style.setProperty('display', 'flex', 'important');
+    document.documentElement.classList.remove('is-register-page');
+    if (window.history && window.history.pushState && window.location.pathname !== '/login' && window.location.pathname !== '/') {
+      window.history.pushState({}, '', '/login');
+    }
+    document.title = 'SiDaya - Workspace Login';
+  },
+
   handleOwnerRegistrationSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
     const bizName = document.getElementById('reg-biz-name')?.value.trim();
     const subdomain = document.getElementById('reg-biz-subdomain')?.value.trim().toLowerCase();
+    const entity = document.getElementById('reg-biz-entity')?.value || 'CV';
     const ownerName = document.getElementById('reg-owner-name')?.value.trim();
     const email = document.getElementById('reg-owner-email')?.value.trim();
     const phone = document.getElementById('reg-biz-phone')?.value.trim();
@@ -315,9 +346,14 @@ const AuthController = {
       return;
     }
 
-    store.dispatch('REGISTER_OWNER', { bizName, subdomain, ownerName, email, phone });
-    closeModal();
+    store.dispatch('REGISTER_OWNER', { bizName, subdomain, ownerName, email, phone, legalEntity: entity });
+    
+    // Hide registration screen and activate authenticated shell
+    const regScreen = document.getElementById('merchant-register-screen');
+    if (regScreen) regScreen.style.setProperty('display', 'none', 'important');
+    document.documentElement.classList.remove('is-register-page');
     document.documentElement.className = 'state-auth-merchant';
+
     showToast(`🎉 Selamat datang, ${ownerName}! Workspace ${bizName} berhasil dibuat.`);
     navigate('/dashboard');
   },
@@ -343,4 +379,8 @@ function handleOperatorLoginSubmit() { AuthController.handleOperatorLoginSubmit(
 function handleLogout() { AuthController.handleLogout(); }
 function handleOwnerRegistrationSubmit(e) { AuthController.handleOwnerRegistrationSubmit(e); }
 function handleForgotPasswordSubmit(e) { AuthController.handleForgotPasswordSubmit(e); }
+function showRegisterScreen() { AuthController.showRegisterScreen(); }
+function showLoginScreen() { AuthController.showLoginScreen(); }
+function openOwnerRegistrationModal() { AuthController.showRegisterScreen(); }
+
 
