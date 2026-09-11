@@ -136,6 +136,20 @@ const AuthController = {
     const isOps = host.startsWith('ops.') || host === 'ops.localhost';
     document.documentElement.className = isOps ? 'state-unauth-ops' : 'state-unauth-merchant';
 
+    const state = store.getState();
+    if (state && state.auth) {
+      if (type === 'operator') {
+        state.auth.operatorUser = null;
+        if (state.operator) state.operator.currentRole = null;
+      } else {
+        state.auth.merchantUser = null;
+      }
+      store.saveState();
+    }
+
+    const container = document.getElementById('main-content');
+    if (container) container.innerHTML = '';
+
     showToast('🔒 Sesi Anda telah berakhir demi keamanan data. Silakan masuk kembali.');
   },
 
@@ -279,17 +293,13 @@ const AuthController = {
     const isOps = host.startsWith('ops.') || host === 'ops.localhost';
     document.documentElement.className = isOps ? 'state-unauth-ops' : 'state-unauth-merchant';
     
-    const state = store.getState();
-    if (state && state.auth) {
-      if (isOps) {
-        state.auth.operatorUser = null;
-        if (state.operator) state.operator.currentRole = null;
-      }
-      store.saveState();
-    }
+    store.dispatch('LOGOUT');
+
+    const container = document.getElementById('main-content');
+    if (container) container.innerHTML = '';
 
     showToast('Anda telah berhasil keluar dari sesi.');
-    navigate(isOps ? '/telemetry' : '/dashboard');
+    navigate(isOps ? '/telemetry' : '/');
   },
 
   handleOwnerRegistrationSubmit(e) {

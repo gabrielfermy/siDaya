@@ -184,11 +184,13 @@ const Router = {
       if (navContent && typeof LayoutView !== 'undefined' && LayoutView.renderMerchantNav) {
         navContent.innerHTML = LayoutView.renderMerchantNav();
       }
+      const mUser = state?.auth?.merchantUser;
+      const imp = state?.auth?.impersonation;
       if (badgeLabel) badgeLabel.textContent = 'Active Workspace';
-      if (tenantName) tenantName.textContent = state?.auth?.impersonation?.active ? (state.auth.impersonation.targetTenant?.businessName || 'Toko Grosir Beras Jaya') : 'Toko Grosir Beras Jaya';
-      if (userAvatar) userAvatar.textContent = state?.auth?.impersonation?.active ? (state.auth.impersonation.targetUser?.avatar || 'S') : 'B';
-      if (userName) userName.textContent = state?.auth?.impersonation?.active ? (state.auth.impersonation.targetUser?.name || 'Staf') : 'Budi Santoso';
-      if (userRole) userRole.textContent = state?.auth?.impersonation?.active ? (state.auth.impersonation.targetUser?.role || 'Staff') : 'OWNER';
+      if (tenantName) tenantName.textContent = imp?.active ? (imp.targetTenant?.businessName || 'Toko Grosir Beras Jaya') : (mUser?.tenantName || 'Toko Grosir Beras Jaya');
+      if (userAvatar) userAvatar.textContent = imp?.active ? (imp.targetUser?.avatar || 'S') : (mUser?.avatar || (mUser?.name ? mUser.name.charAt(0) : '—'));
+      if (userName) userName.textContent = imp?.active ? (imp.targetUser?.name || 'Staf') : (mUser?.name || 'Belum Masuk');
+      if (userRole) userRole.textContent = imp?.active ? (imp.targetUser?.role || 'Staff') : (mUser?.role || 'Tamu');
       if (topbarSub) topbarSub.innerHTML = `Toko Grosir Beras Jaya Bersama • Subdomain: <code id="topbar-subdomain-code">berasjaya.${baseDomain}</code>`;
 
       // Strictly purge any floating operator remnants from tenant DOM

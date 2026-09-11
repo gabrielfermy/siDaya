@@ -9,39 +9,24 @@ function openOwnerRegistrationModal() { store.dispatch('OPEN_MODAL', 'owner-reg'
 function openForgotPasswordModal() { store.dispatch('OPEN_MODAL', 'forgot-pwd'); }
 
 function quickLoginPreset(email) {
-  const preset = MERCHANT_PRESETS[email] || {
-    name: email.split('@')[0],
-    role: 'STAFF',
-    avatar: email.charAt(0).toUpperCase(),
-    tenant: 'Toko Grosir Beras Jaya Bersama'
-  };
-  history.pushState(null, '', '/dashboard');
-  store.dispatch('LOGIN_MERCHANT', { email, ...preset });
+  if (typeof AuthController !== 'undefined') AuthController.quickLoginPreset(email);
 }
 
 function handleMerchantLoginSubmit() {
-  const email = document.getElementById('merchant-login-identifier').value || 'budi@berasjaya.com';
-  quickLoginPreset(email);
+  if (typeof AuthController !== 'undefined') AuthController.handleMerchantLoginSubmit();
 }
 
 function quickLoginOperator(email, role) {
-  const preset = OPERATOR_PRESETS[email] || {
-    name: email.split('@')[0],
-    role: role || 'SUPER_ADMIN',
-    badgeClass: role === 'DEV_ENGINEER' ? 'role-dev-engineer' : (role === 'OPS_SUPPORT' ? 'role-ops-support' : 'role-super-admin')
-  };
-  history.pushState(null, '', '/telemetry');
-  store.dispatch('LOGIN_OPERATOR', { email, ...preset });
+  if (typeof AuthController !== 'undefined') AuthController.quickLoginOperator(email, role);
 }
 
 function handleOperatorLoginSubmit() {
-  const email = document.getElementById('operator-login-email').value || 'gabriel@ashvinlabs.com';
-  quickLoginOperator(email, 'SUPER_ADMIN');
+  if (typeof AuthController !== 'undefined') AuthController.handleOperatorLoginSubmit();
 }
 
 function handleLogout() {
-  history.pushState(null, '', '/login');
-  store.dispatch('LOGOUT');
+  if (typeof AuthController !== 'undefined') AuthController.handleLogout();
+  else store.dispatch('LOGOUT');
 }
 
 async function handleOwnerRegistrationSubmit(e) {
