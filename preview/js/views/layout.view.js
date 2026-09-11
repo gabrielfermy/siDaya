@@ -123,8 +123,8 @@ const LayoutView = {
                 <span class="user-role-tag" id="sidebar-user-role">OWNER</span>
               </div>
             </div>
-            <button class="logout-btn" onclick="handleLogout()" title="Keluar dari Akun">
-              <span>🚪</span> Keluar Sesi
+            <button class="logout-btn" onclick="handleLogout()" title="Logout">
+              <span>🚪</span> Logout
             </button>
           </div>
         </aside>
