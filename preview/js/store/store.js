@@ -81,10 +81,26 @@ class SiDayaStateStore {
     stored.ui.sidebarOpen = false;
     stored.ui.activeModal = null;
 
-    // Strict Plane Boundary Enforcement
+    // Strict Plane Boundary & Session Authentication Enforcement
     if (portalMode !== 'OPS') {
       delete stored.operator; // Complete eradication of operator domain in tenant plane
-      if (stored.auth) stored.auth.operatorUser = null;
+      stored.auth = stored.auth || {};
+      stored.auth.operatorUser = null;
+      const rawMerch = localStorage.getItem('sidaya_merchant_session');
+      let merchSession = null;
+      if (rawMerch) {
+        try {
+          const parsed = JSON.parse(rawMerch);
+          if (parsed && parsed.expiresAt && parsed.expiresAt > Date.now()) {
+            merchSession = parsed;
+          } else {
+            localStorage.removeItem('sidaya_merchant_session');
+          }
+        } catch (e) {
+          localStorage.removeItem('sidaya_merchant_session');
+        }
+      }
+      stored.auth.merchantUser = merchSession;
     } else {
       const rawOps = localStorage.getItem('sidaya_operator_session');
       let opsSession = null;
@@ -92,7 +108,10 @@ class SiDayaStateStore {
         try {
           const parsed = JSON.parse(rawOps);
           if (parsed && parsed.expiresAt > Date.now()) opsSession = parsed;
-        } catch (e) {}
+          else localStorage.removeItem('sidaya_operator_session');
+        } catch (e) {
+          localStorage.removeItem('sidaya_operator_session');
+        }
       }
       stored.auth = stored.auth || {};
       stored.auth.operatorUser = opsSession;
@@ -141,9 +160,13 @@ class SiDayaStateStore {
 
       if (this.state.auth?.merchantUser) {
         localStorage.setItem('sidaya_merchant_session', JSON.stringify(this.state.auth.merchantUser));
+      } else {
+        localStorage.removeItem('sidaya_merchant_session');
       }
       if (isOpsHost && this.state.auth?.operatorUser) {
         localStorage.setItem('sidaya_operator_session', JSON.stringify(this.state.auth.operatorUser));
+      } else {
+        localStorage.removeItem('sidaya_operator_session');
       }
     } catch (e) {
       console.warn('[Store] LocalStorage write error:', e);
@@ -330,21 +353,13 @@ class SiDayaStateStore {
         const { targetTenant, targetUser, ticketRef, reason } = payload;
         const originalOp = JSON.parse(JSON.stringify(this.state.auth?.operatorUser || {}));
         this.state.auth.impersonation = {
-          active: true,
-          originalOperator: originalOp,
-          targetTenant,
-          targetUser,
-          ticketRef: ticketRef || '#TICKET-8492',
-          reason: reason || 'Investigasi teknis',
-          startedAt: new Date().toISOString()
+          active: true, originalOperator: originalOp, targetTenant, targetUser,
+          ticketRef: ticketRef || '#TICKET-8492', reason: reason || 'Investigasi teknis', startedAt: new Date().toISOString()
         };
         this.state.auth.merchantUser = {
-          email: targetUser.email,
-          name: targetUser.name,
-          role: targetUser.role,
+          email: targetUser.email, name: targetUser.name, role: targetUser.role,
           avatar: targetUser.avatar || (targetUser.name ? targetUser.name[0] : 'U'),
-          tenant: targetTenant.businessName,
-          subdomain: targetTenant.subdomain
+          tenant: targetTenant.businessName, subdomain: targetTenant.subdomain
         };
         this.state.ui.portalMode = 'MERCHANT';
         this.state.ui.activePath = '/dashboard';
@@ -352,13 +367,9 @@ class SiDayaStateStore {
         if (this.state.operator) {
           if (!Array.isArray(this.state.operator.auditLogs)) this.state.operator.auditLogs = [];
           this.state.operator.auditLogs.unshift({
-            id: 'aud_' + Date.now(),
-            time: 'Hari ini ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-            operatorEmail: originalOp.email || 'operator@ashvinlabs.com',
-            action: 'OPERATOR_IMPERSONATION_STARTED',
-            target: targetTenant.businessName + ' (' + targetUser.email + ')',
-            ticketRef: ticketRef || '#TICKET-8492',
-            status: 'SUCCESS'
+            id: 'aud_' + Date.now(), time: 'Hari ini ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+            operatorEmail: originalOp.email || 'operator@ashvinlabs.com', action: 'OPERATOR_IMPERSONATION_STARTED',
+            target: targetTenant.businessName + ' (' + targetUser.email + ')', ticketRef: ticketRef || '#TICKET-8492', status: 'SUCCESS'
           });
         }
         break;
@@ -375,27 +386,26 @@ class SiDayaStateStore {
         if (this.state.operator) {
           if (!Array.isArray(this.state.operator.auditLogs)) this.state.operator.auditLogs = [];
           this.state.operator.auditLogs.unshift({
-            id: 'aud_' + Date.now(),
-            time: 'Hari ini ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-            operatorEmail: originalOp?.email || 'operator@ashvinlabs.com',
-            action: 'OPERATOR_IMPERSONATION_ENDED',
-            target: (targetTenant?.businessName || 'Tenant') + ' (' + (targetUser?.email || 'User') + ')',
-            ticketRef: ticketRef || '#TICKET-8492',
-            status: 'SUCCESS'
+            id: 'aud_' + Date.now(), time: 'Hari ini ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+            operatorEmail: originalOp?.email || 'operator@ashvinlabs.com', action: 'OPERATOR_IMPERSONATION_ENDED',
+            target: (targetTenant?.businessName || 'Tenant') + ' (' + (targetUser?.email || 'User') + ')', ticketRef: ticketRef || '#TICKET-8492', status: 'SUCCESS'
           });
         }
 
-        this.state.auth.impersonation = {
-          active: false,
-          originalOperator: null,
-          targetTenant: null,
-          targetUser: null,
-          ticketRef: null,
-          reason: null,
-          startedAt: null
-        };
+        this.state.auth.impersonation = { active: false, originalOperator: null, targetTenant: null, targetUser: null, ticketRef: null, reason: null, startedAt: null };
         this.state.ui.portalMode = 'OPS';
         this.state.ui.activePath = '/telemetry';
+        break;
+      }
+
+      /* Session Termination */
+      case 'LOGOUT': {
+        if (this.state.auth) {
+          this.state.auth.merchantUser = null;
+          this.state.auth.operatorUser = null;
+          this.state.auth.impersonation = { active: false, originalOperator: null, targetTenant: null, targetUser: null, ticketRef: null, reason: null, startedAt: null };
+        }
+        if (this.state.operator) this.state.operator.currentRole = null;
         break;
       }
 

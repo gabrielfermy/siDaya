@@ -15,14 +15,7 @@ const INITIAL_TENANT_STATE = {
     activeModal: null,
   },
   auth: {
-    merchantUser: {
-      email: 'budi@berasjaya.com',
-      name: 'Budi Santoso',
-      role: '👑 OWNER',
-      avatar: 'B',
-      tenant: 'Toko Grosir Beras Jaya Bersama',
-      subdomain: 'berasjaya',
-    },
+    merchantUser: null,
     operatorUser: null,
     impersonation: {
       active: false,
