@@ -93,6 +93,14 @@ const Router = {
 
     // Session Security & Inactivity Validation Guard
     if (!isError && typeof AuthController !== 'undefined') {
+      if (cleanPath === '/register') {
+        AuthController.showRegisterScreen();
+        return;
+      }
+      if (cleanPath === '/login') {
+        AuthController.showLoginScreen();
+        return;
+      }
       const sessionType = isOps ? 'operator' : 'merchant';
       const isValid = AuthController.validateSession(sessionType, cleanPath);
       if (!isValid) return;

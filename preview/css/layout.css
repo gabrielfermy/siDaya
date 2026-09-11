@@ -23,6 +23,8 @@
   width: 100%;
 }
 html.state-unauth-merchant #merchant-login-screen { display: flex !important; }
+html.state-unauth-merchant.is-register-page #merchant-login-screen { display: none !important; }
+html.state-unauth-merchant.is-register-page #merchant-register-screen { display: flex !important; }
 html.state-unauth-ops #operator-login-screen { display: flex !important; }
 html.state-auth-merchant #app-shell { display: flex !important; }
 html.state-auth-ops #operator-shell,

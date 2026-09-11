@@ -12,65 +12,6 @@
 const ModalsView = {
   renderAllModals() {
     return `
-      <!-- MODAL: OWNER REGISTRATION -->
-      <div id="modal-owner-reg" class="modal-overlay hidden">
-        <div class="modal-card">
-          <button class="modal-close-btn" onclick="closeModal()">✕</button>
-          <div style="margin-bottom: 16px;">
-            <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary);">🏪 Pendaftaran Pemilik Toko Baru</h3>
-            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
-              Setiap pendaftaran owner otomatis menginisialisasi workspace tenant dan subdomain terisolasi.
-            </p>
-          </div>
-
-          <form id="owner-registration-form" onsubmit="handleOwnerRegistrationSubmit(event)">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-              <div class="form-group">
-                <label class="form-label">Nama Bisnis / Toko</label>
-                <input id="reg-biz-name" type="text" class="form-input" required placeholder="contoh: Beras Makmur Abadi" oninput="handleRegNameChange(this.value)">
-              </div>
-              <div class="form-group">
-                <label class="form-label">Subdomain Unik Toko</label>
-                <div style="position:relative;">
-                  <input id="reg-biz-subdomain" type="text" class="form-input" required placeholder="berasmakmur" style="padding-right:90px;">
-                  <span style="position:absolute; right:8px; top:50%; transform:translateY(-50%); font-size:11px; color:var(--text-muted); pointer-events:none;">.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'}</span>
-                </div>
-              </div>
-            </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-              <div class="form-group">
-                <label class="form-label">Nama Lengkap Owner</label>
-                <input id="reg-owner-name" type="text" class="form-input" required placeholder="H. Hendro">
-              </div>
-              <div class="form-group">
-                <label class="form-label">No. WhatsApp Bisnis</label>
-                <input id="reg-biz-phone" type="tel" class="form-input" required placeholder="0812xxxxxxxx">
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Alamat Email Owner (Login)</label>
-              <input id="reg-owner-email" type="email" class="form-input" required placeholder="hendro@berasmakmur.com">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Kata Sandi Kuat</label>
-              <div class="password-input-wrap">
-                <input id="reg-owner-password" type="password" class="form-input" required placeholder="Minimal 8 karakter" oninput="checkPasswordStrength('reg-owner-password', 'reg-strength-fill', 'reg-strength-label')">
-                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-owner-password', this)">👁️</button>
-              </div>
-              <div class="password-strength-wrap">
-                <div class="password-strength-bar-bg">
-                  <div id="reg-strength-fill" class="password-strength-bar-fill"></div>
-                </div>
-                <div id="reg-strength-label" class="password-strength-text">Masukkan kata sandi</div>
-              </div>
-            </div>
-            <button type="submit" class="login-btn" style="margin-top:12px;">
-              <span>🚀</span> Selesaikan Pendaftaran & Mulai Toko
-            </button>
-          </form>
-        </div>
-      </div>
-
       <!-- MODAL: FORGOT PASSWORD -->
       <div id="modal-forgot-password" class="modal-overlay hidden">
         <div class="modal-card">

@@ -73,6 +73,9 @@
           document.documentElement.className = hasOpsSession ? 'state-auth-ops' : 'state-unauth-ops';
         } else {
           document.documentElement.className = hasMerchantSession ? 'state-auth-merchant' : 'state-unauth-merchant';
+          if (!hasMerchantSession && fullPath === '/register') {
+            document.documentElement.classList.add('is-register-page');
+          }
         }
       } catch (e) {}
     })();

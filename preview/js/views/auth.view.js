@@ -55,11 +55,123 @@ const AuthView = {
 
           <div class="login-action-links">
             <a class="login-action-link" onclick="openForgotPasswordModal()">Lupa Kata Sandi?</a>
-            <a class="login-action-link" onclick="openOwnerRegistrationModal()">Daftar Toko Baru (Owner) →</a>
+            <a class="login-action-link" onclick="showRegisterScreen()">Daftar Toko Baru (Owner) →</a>
           </div>
           <div class="login-footer-meta">
             Subdomain routing otomatis mendeteksi tenant workspace secara transparan.
           </div>
+        </div>
+      </div>
+    `;
+  },
+
+  renderMerchantRegister() {
+    const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
+    return `
+      <div id="merchant-register-screen" class="login-overlay" style="display:none;">
+        <div class="login-card register-card" style="max-width: 580px; width:100%; margin: 24px auto;">
+          
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="showLoginScreen()" style="gap:5px; padding:6px 12px; font-size:12px; font-weight:700;">
+              ← Kembali ke Login
+            </button>
+            <div class="login-security-badge" style="margin:0;">
+              <span>🔒</span> Multi-Tenant Isolation
+            </div>
+          </div>
+
+          <div class="login-brand" style="margin-bottom: 18px;">
+            <div class="login-logo" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">🏪</div>
+            <h2 class="login-title">Pendaftaran Toko Grosir Baru</h2>
+            <p class="login-desc">Inisialisasi workspace mandiri, isolasi database, dan subdomain resmi toko Anda.</p>
+          </div>
+
+          <form id="owner-registration-form" onsubmit="handleOwnerRegistrationSubmit(event)">
+            <!-- Bagian 1: Identitas Bisnis & Subdomain -->
+            <div style="background:var(--bg-hover); border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:12px;">
+              <div style="font-size:12px; font-weight:800; color:var(--text-primary); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                <span>🏢</span> 1. Identitas Usaha & Subdomain Toko
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group" style="margin-bottom:6px;">
+                  <label class="form-label">Nama Bisnis / Toko*</label>
+                  <input id="reg-biz-name" type="text" class="form-input" required placeholder="contoh: Beras Makmur Abadi" oninput="handleRegNameChange(this.value)">
+                </div>
+                <div class="form-group" style="margin-bottom:6px;">
+                  <label class="form-label">Bentuk Badan Usaha</label>
+                  <select id="reg-biz-entity" class="form-select">
+                    <option value="UD">UD / Usaha Dagang</option>
+                    <option value="CV" selected>CV (Komanditer)</option>
+                    <option value="PT">PT (Perseroan Terbatas)</option>
+                    <option value="PERORANGAN">Toko Perorangan</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Subdomain Unik Toko (Alamat Web)*</label>
+                <div style="position:relative;">
+                  <input id="reg-biz-subdomain" type="text" class="form-input" required placeholder="berasmakmur" style="padding-right:110px;">
+                  <span style="position:absolute; right:8px; top:50%; transform:translateY(-50%); font-size:11px; color:var(--text-muted); pointer-events:none;">.${baseDomain}</span>
+                </div>
+                <div id="reg-subdomain-hint" style="font-size:11px; color:var(--text-secondary); margin-top:4px;">
+                  Alamat resmi toko: <code>https://<span id="reg-subdomain-preview">berasmakmur</span>.${baseDomain}</code>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bagian 2: Kontak & Identitas Owner -->
+            <div style="background:var(--bg-hover); border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:12px;">
+              <div style="font-size:12px; font-weight:800; color:var(--text-primary); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                <span>👑</span> 2. Identitas Pemilik Toko (Owner)
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="form-group" style="margin-bottom:6px;">
+                  <label class="form-label">Nama Lengkap Owner*</label>
+                  <input id="reg-owner-name" type="text" class="form-input" required placeholder="H. Hendro Purnomo">
+                </div>
+                <div class="form-group" style="margin-bottom:6px;">
+                  <label class="form-label">No. WhatsApp Bisnis*</label>
+                  <input id="reg-biz-phone" type="tel" class="form-input" required placeholder="081234567890">
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Alamat Email Owner (Akun Login)*</label>
+                <input id="reg-owner-email" type="email" class="form-input" required placeholder="hendro@berasmakmur.com">
+              </div>
+            </div>
+
+            <!-- Bagian 3: Keamanan Sandi -->
+            <div style="background:var(--bg-hover); border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:14px;">
+              <div style="font-size:12px; font-weight:800; color:var(--text-primary); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                <span>🔑</span> 3. Keamanan Sandi Akun
+              </div>
+              <div class="form-group" style="margin-bottom:6px;">
+                <label class="form-label">Kata Sandi Kuat*</label>
+                <div class="password-input-wrap">
+                  <input id="reg-owner-password" type="password" class="form-input" required placeholder="Minimal 8 karakter" oninput="checkPasswordStrength('reg-owner-password', 'reg-strength-fill', 'reg-strength-label')">
+                  <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-owner-password', this)">👁️</button>
+                </div>
+                <div class="password-strength-wrap">
+                  <div class="password-strength-bar-bg">
+                    <div id="reg-strength-fill" class="password-strength-bar-fill"></div>
+                  </div>
+                  <div id="reg-strength-label" class="password-strength-text">Masukkan kata sandi</div>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="login-btn" style="width:100%; margin-top:8px; padding:12px; font-size:14px;">
+              <span>🚀</span> Selesaikan Pendaftaran & Buka Workspace Toko
+            </button>
+          </form>
+
+          <div style="text-align:center; margin-top:16px; font-size:12px; color:var(--text-secondary);">
+            Sudah memiliki akun toko? 
+            <a href="javascript:void(0)" onclick="showLoginScreen()" style="color:var(--color-primary, #6366f1); font-weight:700; text-decoration:underline;">
+              Masuk ke Workspace (Login) →
+            </a>
+          </div>
+
         </div>
       </div>
     `;
