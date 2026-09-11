@@ -110,21 +110,61 @@ const INITIAL_TENANT_STATE = {
     ],
   },
 
-  // Pilar 08: Staff Directory & RBAC Matrix
+  // Pilar 08: Staff Directory & Direct User Permissions
   pilar8: {
     staff: [
-      { name: 'Budi Santoso', email: 'budi@berasjaya.com', phone: '0812-3456-7890', role: '👑 Owner / Billing POC', status: 'VERIFIED', pinConfigured: true },
-      { name: 'Siti Rahma', email: 'siti@berasjaya.com', phone: '0812-8888-1111', role: '💳 Kasir Grosir (POS)', status: 'VERIFIED', pinConfigured: true },
-      { name: 'Agus Santoso', email: 'agus@berasjaya.com', phone: '0812-8888-2222', role: '📦 Kepala Gudang & FIFO', status: 'VERIFIED', pinConfigured: true },
-      { name: 'Joko Supir', email: 'joko@berasjaya.com', phone: '0812-8888-3333', role: '🚚 Supir Logistik (POD)', status: 'VERIFIED', pinConfigured: false },
+      {
+        id: 'stf_1',
+        name: 'Budi Santoso',
+        email: 'budi@berasjaya.com',
+        phone: '0812-3456-7890',
+        role: 'Owner / Direktur Utama',
+        isOwner: true,
+        status: 'VERIFIED',
+        pinConfigured: true,
+        permissions: [
+          'pos:checkout', 'pos:void_item', 'pos:open_cash_drawer',
+          'catalog:view_cogs', 'catalog:manage_prices',
+          'inventory:inbound', 'inventory:stock_opname',
+          'customers:manage_credit_limit',
+          'logistics:issue_surat_jalan', 'logistics:sign_pod',
+          'finance:reports', 'settings:manage'
+        ],
+      },
+      {
+        id: 'stf_2',
+        name: 'Siti Rahma',
+        email: 'siti@berasjaya.com',
+        phone: '0812-8888-1111',
+        role: 'Kasir Grosir (POS)',
+        isOwner: false,
+        status: 'VERIFIED',
+        pinConfigured: true,
+        permissions: ['pos:checkout', 'pos:open_cash_drawer'],
+      },
+      {
+        id: 'stf_3',
+        name: 'Agus Santoso',
+        email: 'agus@berasjaya.com',
+        phone: '0812-8888-2222',
+        role: 'Kepala Gudang & FIFO',
+        isOwner: false,
+        status: 'VERIFIED',
+        pinConfigured: true,
+        permissions: ['inventory:inbound', 'inventory:stock_opname', 'logistics:issue_surat_jalan'],
+      },
+      {
+        id: 'stf_4',
+        name: 'Joko Supir',
+        email: 'joko@berasjaya.com',
+        phone: '0812-8888-3333',
+        role: 'Supir Logistik (POD)',
+        isOwner: false,
+        status: 'VERIFIED',
+        pinConfigured: false,
+        permissions: ['logistics:sign_pod'],
+      },
     ],
-    rbacMatrix: {
-      OWNER: ['catalog:view_cogs', 'catalog:manage_prices', 'pos:checkout', 'pos:void_item', 'pos:open_cash_drawer', 'inventory:inbound', 'inventory:stock_opname', 'customers:manage_credit_limit', 'logistics:issue_surat_jalan', 'logistics:sign_pod', 'finance:reports', 'settings:manage'],
-      MANAGER: ['catalog:manage_prices', 'pos:checkout', 'pos:void_item', 'inventory:inbound', 'inventory:stock_opname', 'customers:manage_credit_limit', 'logistics:issue_surat_jalan', 'finance:reports'],
-      CASHIER: ['pos:checkout', 'pos:open_cash_drawer'],
-      WAREHOUSE: ['inventory:inbound', 'inventory:stock_opname', 'logistics:issue_surat_jalan'],
-      DRIVER: ['logistics:sign_pod'],
-    },
   },
 
   // Pilar 09: Settings

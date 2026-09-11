@@ -91,14 +91,9 @@ class SiDayaStateStore {
       if (rawMerch) {
         try {
           const parsed = JSON.parse(rawMerch);
-          if (parsed && parsed.expiresAt && parsed.expiresAt > Date.now()) {
-            merchSession = parsed;
-          } else {
-            localStorage.removeItem('sidaya_merchant_session');
-          }
-        } catch (e) {
-          localStorage.removeItem('sidaya_merchant_session');
-        }
+          if (parsed && parsed.expiresAt && parsed.expiresAt > Date.now()) merchSession = parsed;
+          else localStorage.removeItem('sidaya_merchant_session');
+        } catch (e) { localStorage.removeItem('sidaya_merchant_session'); }
       }
       stored.auth.merchantUser = merchSession;
     } else {
@@ -107,11 +102,9 @@ class SiDayaStateStore {
       if (rawOps) {
         try {
           const parsed = JSON.parse(rawOps);
-          if (parsed && parsed.expiresAt > Date.now()) opsSession = parsed;
+          if (parsed && parsed.expiresAt && parsed.expiresAt > Date.now()) opsSession = parsed;
           else localStorage.removeItem('sidaya_operator_session');
-        } catch (e) {
-          localStorage.removeItem('sidaya_operator_session');
-        }
+        } catch (e) { localStorage.removeItem('sidaya_operator_session'); }
       }
       stored.auth = stored.auth || {};
       stored.auth.operatorUser = opsSession;
@@ -158,16 +151,10 @@ class SiDayaStateStore {
       localStorage.setItem(key, JSON.stringify(this.state));
       localStorage.setItem('sidaya_theme', this.state.ui.theme);
 
-      if (this.state.auth?.merchantUser) {
-        localStorage.setItem('sidaya_merchant_session', JSON.stringify(this.state.auth.merchantUser));
-      } else {
-        localStorage.removeItem('sidaya_merchant_session');
-      }
-      if (isOpsHost && this.state.auth?.operatorUser) {
-        localStorage.setItem('sidaya_operator_session', JSON.stringify(this.state.auth.operatorUser));
-      } else {
-        localStorage.removeItem('sidaya_operator_session');
-      }
+      if (this.state.auth?.merchantUser) localStorage.setItem('sidaya_merchant_session', JSON.stringify(this.state.auth.merchantUser));
+      else localStorage.removeItem('sidaya_merchant_session');
+      if (isOpsHost && this.state.auth?.operatorUser) localStorage.setItem('sidaya_operator_session', JSON.stringify(this.state.auth.operatorUser));
+      else localStorage.removeItem('sidaya_operator_session');
     } catch (e) {
       console.warn('[Store] LocalStorage write error:', e);
     }
@@ -212,21 +199,12 @@ class SiDayaStateStore {
         this.state.ui.sidebarOpen = false;
         break;
       }
-      case 'TOGGLE_THEME':
-        this.state.ui.theme = this.state.ui.theme === 'light' ? 'dark' : 'light';
-        break;
-      case 'TOGGLE_SIDEBAR':
-        this.state.ui.sidebarOpen = !this.state.ui.sidebarOpen;
-        break;
-      case 'CLOSE_SIDEBAR':
-        this.state.ui.sidebarOpen = false;
-        break;
-      case 'OPEN_MODAL':
-        this.state.ui.activeModal = payload;
-        break;
-      case 'CLOSE_MODAL':
-        this.state.ui.activeModal = null;
-        break;
+      case 'TOGGLE_THEME': this.state.ui.theme = this.state.ui.theme === 'light' ? 'dark' : 'light'; break;
+      case 'TOGGLE_SIDEBAR': this.state.ui.sidebarOpen = !this.state.ui.sidebarOpen; break;
+      case 'CLOSE_SIDEBAR': this.state.ui.sidebarOpen = false; break;
+      case 'OPEN_MODAL': this.state.ui.activeModal = payload; break;
+      case 'CLOSE_MODAL': this.state.ui.activeModal = null; break;
+      case 'POS_CLEAR_CART': this.state.pilar5.cart = []; this._recalculateCart(); break;
 
       /* POS & Cart Actions */
       case 'POS_ADD_TO_CART': {
@@ -252,10 +230,7 @@ class SiDayaStateStore {
         }
         break;
       }
-      case 'POS_CLEAR_CART':
-        this.state.pilar5.cart = [];
-        this._recalculateCart();
-        break;
+
       case 'POS_CHECKOUT': {
         const method = payload?.method || 'CASH';
         const total = this.state.pilar5.cartTotal;
@@ -307,19 +282,14 @@ class SiDayaStateStore {
 
       /* Logistics & Surat Jalan */
       case 'SJ_SIGN_POD': {
-        const { sjId, signature } = payload;
-        const sj = this.state.pilar6.deliveryOrders.find((s) => s.id === sjId || s.sjNumber === sjId);
-        if (sj) {
-          sj.status = 'DELIVERED';
-          sj.signedBy = signature;
-        }
+        const sj = this.state.pilar6.deliveryOrders.find((s) => s.id === payload.sjId || s.sjNumber === payload.sjId);
+        if (sj) { sj.status = 'DELIVERED'; sj.signedBy = payload.signature; }
         break;
       }
 
       /* Operator Fleet Actions */
       case 'OPERATOR_TOGGLE_TENANT_STATUS': {
-        if (!this.state.operator?.tenants) break;
-        const t = this.state.operator.tenants.find((item) => item.id === payload.tenantId);
+        const t = this.state.operator?.tenants?.find((item) => item.id === payload.tenantId);
         if (t) t.status = t.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
         break;
       }
@@ -376,22 +346,16 @@ class SiDayaStateStore {
       }
 
       case 'EXIT_IMPERSONATION': {
-        const originalOp = this.state.auth?.impersonation?.originalOperator;
-        const targetTenant = this.state.auth?.impersonation?.targetTenant;
-        const targetUser = this.state.auth?.impersonation?.targetUser;
-        const ticketRef = this.state.auth?.impersonation?.ticketRef;
-
-        if (originalOp) this.state.auth.operatorUser = originalOp;
-
+        const { originalOperator: origOp, targetTenant, targetUser, ticketRef } = this.state.auth?.impersonation || {};
+        if (origOp) this.state.auth.operatorUser = origOp;
         if (this.state.operator) {
           if (!Array.isArray(this.state.operator.auditLogs)) this.state.operator.auditLogs = [];
           this.state.operator.auditLogs.unshift({
             id: 'aud_' + Date.now(), time: 'Hari ini ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-            operatorEmail: originalOp?.email || 'operator@ashvinlabs.com', action: 'OPERATOR_IMPERSONATION_ENDED',
+            operatorEmail: origOp?.email || 'operator@ashvinlabs.com', action: 'OPERATOR_IMPERSONATION_ENDED',
             target: (targetTenant?.businessName || 'Tenant') + ' (' + (targetUser?.email || 'User') + ')', ticketRef: ticketRef || '#TICKET-8492', status: 'SUCCESS'
           });
         }
-
         this.state.auth.impersonation = { active: false, originalOperator: null, targetTenant: null, targetUser: null, ticketRef: null, reason: null, startedAt: null };
         this.state.ui.portalMode = 'OPS';
         this.state.ui.activePath = '/telemetry';
@@ -406,6 +370,38 @@ class SiDayaStateStore {
           this.state.auth.impersonation = { active: false, originalOperator: null, targetTenant: null, targetUser: null, ticketRef: null, reason: null, startedAt: null };
         }
         if (this.state.operator) this.state.operator.currentRole = null;
+        break;
+      }
+
+      /* Staff Management & Direct User Permissions */
+      case 'INVITE_STAFF': {
+        if (!Array.isArray(this.state.pilar8?.staff)) this.state.pilar8.staff = [];
+        this.state.pilar8.staff.push(payload);
+        break;
+      }
+      case 'UPDATE_STAFF': {
+        const staff = this.state.pilar8?.staff?.find((s) => s.email === payload.email || (payload.id && s.id === payload.id));
+        if (staff) Object.assign(staff, payload);
+        break;
+      }
+      case 'DELETE_STAFF': {
+        if (Array.isArray(this.state.pilar8?.staff)) {
+          this.state.pilar8.staff = this.state.pilar8.staff.filter((s) => s.email !== payload.email && (!payload.id || s.id !== payload.id));
+        }
+        break;
+      }
+      case 'RESET_STAFF_PIN': {
+        const staff = this.state.pilar8?.staff?.find((s) => s.email === payload.email || (payload.id && s.id === payload.id));
+        if (staff) { staff.pinConfigured = true; staff.lastPinResetAt = new Date().toISOString(); staff.pinResetAt = staff.lastPinResetAt; }
+        break;
+      }
+      case 'SEND_STAFF_PASSWORD_RESET': {
+        const staff = this.state.pilar8?.staff?.find((s) => s.email === payload.email || (payload.id && s.id === payload.id));
+        if (staff) {
+          staff.lastPasswordResetSentAt = new Date().toISOString();
+          staff.passwordResetSentAt = staff.lastPasswordResetSentAt;
+          staff.passwordResetLink = `https://${this.state.pilar9?.settings?.subdomain || 'berasjaya'}.sidaya.id/reset-password?token=rst_${Date.now()}`;
+        }
         break;
       }
 

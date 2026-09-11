@@ -56,11 +56,7 @@ const LayoutView = {
       <div class="nav-section-label">PENGATURAN & AKSES</div>
       <a class="nav-item" data-route="/users" onclick="navigate('/users')">
         <span class="nav-icon">👤</span>
-        <span class="nav-label">Direktori Staf (PIN)</span>
-      </a>
-      <a class="nav-item" data-route="/roles" onclick="navigate('/roles')">
-        <span class="nav-icon">🛡️</span>
-        <span class="nav-label">Matriks RBAC</span>
+        <span class="nav-label">Staf & Hak Akses</span>
       </a>
       <a class="nav-item" data-route="/settings" onclick="navigate('/settings')">
         <span class="nav-icon">⚙️</span>
