@@ -152,6 +152,11 @@ const Router = {
     void container.offsetWidth; // reflow
     container.classList.add('view-enter');
 
+    // Synchronize Daya AI Operational Screen Context
+    if (!isOps && typeof DayaController !== 'undefined' && DayaController.onRouteChanged) {
+      DayaController.onRouteChanged(cleanPath);
+    }
+
     window.scrollTo(0, 0);
   },
 

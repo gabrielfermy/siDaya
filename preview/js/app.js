@@ -33,6 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
     moduleManager.register('Controller:Operator', ['Store'], OperatorController);
     moduleManager.register('Controller:Invoices', ['Store'], InvoicesController);
 
+    moduleManager.register('View:Daya', ['Store'], DayaView);
+    moduleManager.register('Controller:Daya', ['Store'], DayaController);
+
     // Validate internal dependency graph integrity
     moduleManager.validateAll();
   }
@@ -55,12 +58,17 @@ document.addEventListener('DOMContentLoaded', () => {
     appRoot.innerHTML = LayoutView.renderShell();
   }
 
-  // 5. Initialize Session Security & Inactivity Expiry Monitor
+  // 5. Initialize Daya AI Co-Pilot Widget
+  if (typeof DayaController !== 'undefined' && DayaController.init) {
+    DayaController.init();
+  }
+
+  // 6. Initialize Session Security & Inactivity Expiry Monitor
   if (typeof AuthController !== 'undefined' && AuthController.initSessionSecurity) {
     AuthController.initSessionSecurity();
   }
 
-  // 6. Initialize SPA Router
+  // 7. Initialize SPA Router
   Router.init();
 
   // 6. Global Keyboard Shortcuts
