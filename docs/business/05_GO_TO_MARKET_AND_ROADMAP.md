@@ -117,10 +117,44 @@ gantt
 * **Target Horizon**: Q2 2027
 * **Primary Objective**: Enterprise scale, multi-channel marketplace integration, and predictive AI automation.
 * **Key Deliverables**:
+  * **Daya AI — Autonomous Tenant Operations & Business Intelligence Agent**: Personal AI co-pilot embedded into each merchant's workspace. Operates via a zero-clutter floating drawer with real-time screen awareness, hybrid SQL/Vector querying, and temporal customer memory.
   * **Marketplace Connectors**: Realtime catalog and order synchronization across Tokopedia, Shopee, and TikTok Shop.
   * **AI Demand Forecasting & Smart Reorder**: Predictive purchasing algorithms optimizing stock levels and preventing stockouts.
   * **Pajak & DJP e-Faktur**: Automated PPN calculation, tax withholding, and direct e-Faktur integration.
   * **Official WhatsApp Cloud API**: Green-tick verified automated WhatsApp transactional messaging with interactive action buttons.
+
+---
+
+### 3.5 Strategic Architecture Spotlight: Daya AI (Tri-Pillar Agentic Memory)
+
+To deliver a business co-pilot that truly understands wholesale operations without hallucinations or data leaks, Daya AI is architected on a **Tri-Pillar Hybrid Memory Engine**:
+
+```mermaid
+graph TD
+    User[Merchant Interacts with Daya via Floating Drawer] --> Router{Daya Orchestrator & Context Router}
+    Router -->|1. Exact Ledger Math| SQL[PostgreSQL Financial Core]
+    Router -->|2. Semantic Document Search| Vec[pgvector Embedding Engine]
+    Router -->|3. Temporal Memory & Habits| Graph[Graphiti / Zep Knowledge Graph]
+    
+    SQL -->|Omset, Margin FIFO, Saldo Kasbon| Synthesizer[Daya Response Synthesizer]
+    Vec -->|Katalog Serupa, SOP Toko, Catatan Kiriman| Synthesizer
+    Graph -->|Evolusi Kebiasaan Pelanggan, Aturan Owner| Synthesizer
+    
+    Synthesizer --> User
+```
+
+1. **Relational SQL Core (PostgreSQL 16)**:
+   * Handles 100% of mathematical aggregations (e.g. *"Berapa total omset hari ini?"*, *"Hitung margin kotor penjualan beras IR-64"*).
+   * Never relies on LLM approximations for financial or stock counts.
+2. **Semantic Vector Search (PostgreSQL `pgvector` via Supabase)**:
+   * Powers semantic catalog discovery, fuzzy SKU matching, and unstructured note retrieval.
+   * Inherits native PostgreSQL Row-Level Security (RLS) to guarantee **zero cross-tenant data leakage**.
+3. **Temporal Knowledge Graph Memory (Graphiti / Zep)**:
+   * Tracks entity relationships and how facts change over time (e.g., tracking customer credit risk deterioration, driver route preferences, and informal owner verbal policies).
+   * Powers multi-hop reasoning (e.g. connecting customer payment history, favorite products, and delivery dispute records).
+4. **Context-Aware Floating UX**:
+   * No menu clutter: Lives as a responsive floating action trigger on the bottom right.
+   * Auto-detects the currently viewed route (`/fifo`, `/pos`, `/piutang`, `/dashboard`) to prime prompt suggestions instantly.
 
 ---
 

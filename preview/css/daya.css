@@ -1,0 +1,438 @@
+/**
+ * @file daya.css
+ * @description Floating UI styles for Daya AI (Personal Tenant Operational Co-Pilot)
+ * @module Styles:DayaAI
+ */
+
+/* --- VISIBILITY & MULTI-TENANT PLANE DEFENSE --- */
+#daya-floating-trigger,
+#daya-chat-panel {
+  display: none;
+}
+
+/* Exclusively render Daya AI on authenticated merchant tenant workspace */
+html.state-auth-merchant:not(:has(.is-error-page)) #daya-floating-trigger {
+  display: flex !important;
+}
+html.state-auth-merchant:not(:has(.is-error-page)) #daya-chat-panel.is-open {
+  display: flex !important;
+}
+
+/* Strictly hide on operator plane, error pages, and login gates */
+html.state-unauth-merchant #daya-floating-trigger,
+html.state-unauth-merchant #daya-chat-panel,
+html.state-unauth-ops #daya-floating-trigger,
+html.state-unauth-ops #daya-chat-panel,
+html.state-auth-ops #daya-floating-trigger,
+html.state-auth-ops #daya-chat-panel,
+.app-shell.is-error-page ~ #daya-root #daya-floating-trigger,
+.app-shell.is-error-page ~ #daya-root #daya-chat-panel {
+  display: none !important;
+}
+
+/* --- FLOATING ACTION TRIGGER BUTTON --- */
+.daya-trigger-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 75;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #059669 100%);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 10px 25px -3px rgba(79, 70, 229, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  color: #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.daya-trigger-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 14px 28px -2px rgba(124, 58, 237, 0.5), 0 6px 10px -4px rgba(0, 0, 0, 0.15);
+}
+.daya-trigger-btn:active { transform: translateY(0) scale(0.96); }
+.daya-trigger-btn .trigger-icon { font-size: 24px; line-height: 1; transition: transform 0.3s ease; }
+.daya-trigger-btn:hover .trigger-icon { transform: rotate(12deg) scale(1.1); }
+}
+
+/* Ambient Pulse Aura */
+.daya-trigger-pulse {
+  position: absolute;
+  top: -4px; left: -4px; right: -4px; bottom: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(124, 58, 237, 0.6);
+  animation: daya-pulse-glow 2.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes daya-pulse-glow {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.18); opacity: 0; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+/* Trigger Tooltip Label */
+.daya-trigger-label {
+  position: absolute;
+  right: 68px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: all 0.2s ease;
+}
+
+.daya-trigger-btn:hover .daya-trigger-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* --- FLOATING CHAT PANEL DRAWER --- */
+.daya-panel {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  z-index: 76;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  height: 580px;
+  max-height: calc(100vh - 120px);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.2), 0 8px 16px -4px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: daya-panel-slide-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes daya-panel-slide-up {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header */
+.daya-header {
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.daya-header-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.daya-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3);
+}
+
+.daya-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.daya-badge-status {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.daya-subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.daya-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.daya-btn-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+
+.daya-btn-icon:hover {
+  background: var(--border-color);
+  color: var(--text-primary);
+}
+
+/* Active Context Ribbon */
+.daya-context-ribbon {
+  padding: 8px 14px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.daya-context-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: #4F46E5;
+}
+
+.daya-context-route {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(79, 70, 229, 0.1);
+  color: #4F46E5;
+}
+
+/* Chat Message Stream */
+.daya-messages-stream {
+  flex: 1;
+  padding: 14px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.daya-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 88%;
+  animation: daya-msg-fade 0.2s ease;
+}
+
+@keyframes daya-msg-fade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.daya-msg.msg-daya {
+  align-self: flex-start;
+}
+
+.daya-msg.msg-user {
+  align-self: flex-end;
+}
+
+.daya-msg-bubble {
+  padding: 10px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.daya-msg.msg-daya .daya-msg-bubble {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+}
+
+.daya-msg.msg-user .daya-msg-bubble {
+  background: linear-gradient(135deg, #4F46E5 0%, #6366F1 100%);
+  color: #FFFFFF;
+  border-bottom-right-radius: 4px;
+}
+
+.daya-msg-time {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.daya-msg.msg-user .daya-msg-time {
+  text-align: right;
+}
+
+/* Formatted Highlight Badges in Daya's Message */
+.daya-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: rgba(79, 70, 229, 0.12);
+  color: #4F46E5;
+  margin: 2px 0;
+}
+
+.daya-stat-pill.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.daya-stat-pill.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #D97706;
+}
+
+.daya-stat-pill.danger {
+  background: rgba(225, 29, 72, 0.15);
+  color: #E11D48;
+}
+
+/* Typing indicator */
+.daya-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.daya-typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: daya-typing-bounce 1.4s infinite ease-in-out both;
+}
+
+.daya-typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.daya-typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes daya-typing-bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+
+/* Quick Suggestion Chips */
+.daya-quick-chips {
+  padding: 8px 12px;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.daya-quick-chips::-webkit-scrollbar { display: none; }
+
+.daya-chip-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.daya-chip-btn:hover {
+  background: rgba(79, 70, 229, 0.1);
+  border-color: #4F46E5;
+  color: #4F46E5;
+}
+
+/* Footer Input Area */
+.daya-footer {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border-color);
+  background: var(--card-bg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.daya-input {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.daya-input:focus {
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
+.daya-send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  color: #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.daya-send-btn:hover {
+  transform: scale(1.05);
+}
+
+.daya-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
