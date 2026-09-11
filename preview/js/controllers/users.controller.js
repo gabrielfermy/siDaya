@@ -231,7 +231,7 @@ const UsersController = {
   },
 
   /**
-   * Deletes a staff member from the workspace (owner protected)
+   * Deletes a staff member from the workspace with mandatory audit reason (owner protected)
    * @param {string} email
    */
   deleteStaff(email) {
@@ -244,15 +244,16 @@ const UsersController = {
       return;
     }
 
-    const confirmMsg = `Yakin ingin menghapus staf "${staff.name}" (${staff.email}) dari toko? Akses akan langsung dicabut.`;
-    if (typeof window !== 'undefined' && !window.confirm(confirmMsg)) {
-      return;
-    }
+    const reason = (typeof window !== 'undefined' && window.prompt)
+      ? window.prompt(`Konfirmasi pencabutan akses staf "${staff.name}" (${staff.email}). Masukkan alasan audit:`, 'Rotasi operasional toko')
+      : 'Pencabutan akun staf';
 
-    store.dispatch('DELETE_STAFF', { email });
+    if (reason === null) return; // Dibatalkan oleh user
+
+    store.dispatch('DELETE_STAFF', { email, reason: reason.trim() || 'Pencabutan akun staf' });
 
     if (typeof showToast === 'function') {
-      showToast(`🗑️ Staf ${staff.name} berhasil dihapus.`);
+      showToast(`🗑️ Staf ${staff.name} berhasil dihapus dari sistem.`);
     }
 
     if (typeof navigate === 'function') navigate('/users', false);

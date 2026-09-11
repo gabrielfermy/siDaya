@@ -82,24 +82,92 @@ const SettingsController = {
   },
 
   /**
-   * Saves store profile and hardware preferences
+   * Saves store profile, legal business entity, bank details and hardware preferences
    */
   saveStoreSettings() {
     const nameEl = document.getElementById('settings-store-name');
+    const legalEl = document.getElementById('settings-legal-entity');
+    const npwpEl = document.getElementById('settings-npwp');
+    const nibEl = document.getElementById('settings-nib');
     const addrEl = document.getElementById('settings-store-address');
     const phoneEl = document.getElementById('settings-store-phone');
+    const emailEl = document.getElementById('settings-contact-email');
+    const bankNameEl = document.getElementById('settings-bank-name');
+    const bankNumEl = document.getElementById('settings-bank-number');
+    const bankHolderEl = document.getElementById('settings-bank-holder');
     const printerEl = document.getElementById('settings-printer-type');
     const widthEl = document.getElementById('settings-paper-width');
 
-    if (nameEl && store.state?.pilar9?.settings) {
-      store.state.pilar9.settings.storeName = nameEl.value;
-      store.state.pilar9.settings.storeAddress = addrEl ? addrEl.value : store.state.pilar9.settings.storeAddress;
-      store.state.pilar9.settings.storePhone = phoneEl ? phoneEl.value : store.state.pilar9.settings.storePhone;
-      store.state.pilar9.settings.printerType = printerEl ? printerEl.value : 'USB';
-      store.state.pilar9.settings.paperWidth = widthEl ? widthEl.value : '80mm';
-      store.saveState();
-      Toast.show('✓ Pengaturan toko & printer berhasil disimpan', 'success');
+    if (nameEl) {
+      const payload = {
+        storeName: nameEl.value.trim(),
+        storeAddress: addrEl ? addrEl.value.trim() : '',
+        storePhone: phoneEl ? phoneEl.value.trim() : '',
+        legalEntity: legalEl ? legalEl.value : 'CV',
+        npwp: npwpEl ? npwpEl.value.trim() : '',
+        nib: nibEl ? nibEl.value.trim() : '',
+        contactEmail: emailEl ? emailEl.value.trim() : '',
+        bankAccount: {
+          bank: bankNameEl ? bankNameEl.value.trim() : 'BCA',
+          accountNumber: bankNumEl ? bankNumEl.value.trim() : '',
+          accountHolder: bankHolderEl ? bankHolderEl.value.trim() : ''
+        }
+      };
+      store.dispatch('UPDATE_BUSINESS_PROFILE', payload);
+
+      if (store.state?.pilar9?.settings) {
+        store.state.pilar9.settings.printerType = printerEl ? printerEl.value : 'USB';
+        store.state.pilar9.settings.paperWidth = widthEl ? widthEl.value : '80mm';
+        store.saveState();
+      }
+      Toast.show('✓ Profil badan usaha, rekening bank & pengaturan toko berhasil disimpan', 'success');
     }
+  },
+
+  /**
+   * Opens delete tenant modal
+   */
+  openDeleteTenantModal() {
+    const input = document.getElementById('delete-tenant-confirm-input');
+    if (input) input.value = '';
+    const modal = document.getElementById('modal-delete-tenant');
+    if (modal) modal.classList.remove('hidden');
+  },
+
+  /**
+   * Closes delete tenant modal
+   */
+  closeDeleteTenantModal() {
+    const modal = document.getElementById('modal-delete-tenant');
+    if (modal) modal.classList.add('hidden');
+  },
+
+  /**
+   * Handles tenant deletion confirmation
+   * @param {string} expectedStoreName
+   */
+  handleDeleteTenantSubmit(expectedStoreName) {
+    const input = document.getElementById('delete-tenant-confirm-input');
+    const typed = (input ? input.value : '').trim();
+
+    if (!typed || typed.toLowerCase() !== (expectedStoreName || '').trim().toLowerCase()) {
+      Toast.show('Nama toko tidak cocok! Ketik persis untuk mengonfirmasi penghapusan.', 'error');
+      return;
+    }
+
+    this.closeDeleteTenantModal();
+    store.dispatch('DELETE_TENANT', { ticketRef: '#OFFBOARD-SELF', reason: 'Penghapusan mandiri workspace oleh owner' });
+    Toast.show('🗑️ Workspace toko berhasil dihapus permanen. Mengalihkan...', 'info');
+
+    setTimeout(() => {
+      if (typeof Router !== 'undefined' && Router.navigate) {
+        Router.navigate('/login');
+      } else if (typeof navigate !== 'undefined') {
+        navigate('/login');
+      } else {
+        window.location.href = '/login';
+      }
+    }, 1000);
   },
 
   /**
@@ -146,5 +214,7 @@ const SettingsController = {
 };
 
 // Global backward compatibility
+window.SettingsController = SettingsController;
 window.saveStoreSettings = () => SettingsController.saveStoreSettings();
 window.testThermalPrinter = () => SettingsController.testThermalPrinter();
+

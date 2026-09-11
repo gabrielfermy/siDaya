@@ -304,22 +304,34 @@ const AuthController = {
 
   handleOwnerRegistrationSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
-    const bizName = document.getElementById('reg-biz-name').value;
-    const subdomain = document.getElementById('reg-biz-subdomain').value;
-    const ownerName = document.getElementById('reg-owner-name').value;
-    const email = document.getElementById('reg-owner-email').value;
-    const phone = document.getElementById('reg-biz-phone').value;
+    const bizName = document.getElementById('reg-biz-name')?.value.trim();
+    const subdomain = document.getElementById('reg-biz-subdomain')?.value.trim().toLowerCase();
+    const ownerName = document.getElementById('reg-owner-name')?.value.trim();
+    const email = document.getElementById('reg-owner-email')?.value.trim();
+    const phone = document.getElementById('reg-biz-phone')?.value.trim();
+
+    if (!bizName || !subdomain || !ownerName || !email) {
+      showToast('Harap lengkapi semua kolom pendaftaran');
+      return;
+    }
 
     store.dispatch('REGISTER_OWNER', { bizName, subdomain, ownerName, email, phone });
     closeModal();
-    showToast(`Pendaftaran ${bizName} berhasil! Silakan periksa email verifikasi.`);
+    document.documentElement.className = 'state-auth-merchant';
+    showToast(`🎉 Selamat datang, ${ownerName}! Workspace ${bizName} berhasil dibuat.`);
+    navigate('/dashboard');
   },
 
   handleForgotPasswordSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
-    const email = document.getElementById('forgot-email').value;
+    const email = document.getElementById('forgot-email')?.value.trim();
+    if (!email) {
+      showToast('Harap masukkan alamat email akun Anda');
+      return;
+    }
     closeModal();
-    showToast(`Tautan atur ulang kata sandi telah dikirimkan ke ${email}`);
+    const resetToken = 'rst_' + Math.random().toString(36).substring(2, 10);
+    showToast(`✉️ Tautan atur ulang kata sandi telah dikirimkan ke ${email} (Token: ${resetToken})`);
   },
 };
 

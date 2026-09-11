@@ -130,9 +130,193 @@ const OperatorController = {
     closeModal();
     Toast.show(`🚨 Sesi Break-Glass aktif untuk tiket ${ticketId}. Audit log dicatat.`, 'success');
   },
+
+  /**
+   * Opens modal by ID
+   * @param {string} modalId
+   */
+  openModal(modalId) {
+    const el = document.getElementById(modalId);
+    if (el) el.classList.remove('hidden');
+  },
+
+  /**
+   * Closes modal by ID or all modal overlays
+   * @param {string} [modalId]
+   */
+  closeModal(modalId) {
+    if (modalId) {
+      const el = document.getElementById(modalId);
+      if (el) el.classList.add('hidden');
+    } else {
+      document.querySelectorAll('.modal-overlay').forEach((m) => m.classList.add('hidden'));
+    }
+  },
+
+  /**
+   * Opens Invite Operator modal
+   */
+  openInviteOperatorModal() {
+    const nameInput = document.getElementById('inv-op-name');
+    const emailInput = document.getElementById('inv-op-email');
+    const roleInput = document.getElementById('inv-op-role');
+    if (nameInput) nameInput.value = '';
+    if (emailInput) emailInput.value = '';
+    if (roleInput) roleInput.value = 'OPS_SUPPORT';
+    this.openModal('modal-invite-operator');
+  },
+
+  /**
+   * Handles submission of operator invitation form
+   */
+  handleInviteSubmit() {
+    const name = (document.getElementById('inv-op-name')?.value || '').trim();
+    const email = (document.getElementById('inv-op-email')?.value || '').trim().toLowerCase();
+    const role = document.getElementById('inv-op-role')?.value || 'OPS_SUPPORT';
+
+    if (!name || !email) {
+      Toast.show('Nama dan email korporat operator wajib diisi!', 'warning');
+      return;
+    }
+    if (!email.endsWith('@ashvinlabs.com')) {
+      Toast.show('Email operator harus menggunakan domain korporat @ashvinlabs.com!', 'warning');
+      return;
+    }
+
+    const state = store.getState();
+    const existing = state?.operator?.operators?.find((o) => o.email === email);
+    if (existing) {
+      Toast.show('Operator dengan email tersebut sudah terdaftar!', 'warning');
+      return;
+    }
+
+    store.dispatch('INVITE_OPERATOR', { name, email, role, ticketRef: '#OP-INVITE-' + Date.now().toString().slice(-4) });
+    this.closeModal('modal-invite-operator');
+    Toast.show(`✉️ Undangan operator platform berhasil dikirimkan ke ${email}`, 'success');
+
+    const container = document.getElementById('main-content');
+    if (container && (window.location.pathname.includes('/telemetry') || window.location.pathname.includes('/fleet') || window.location.pathname === '/')) {
+      container.innerHTML = OperatorView.render(store.getState());
+    }
+  },
+
+  /**
+   * Opens Edit Operator modal
+   * @param {string} email
+   */
+  openEditOperatorModal(email) {
+    const state = store.getState();
+    const op = (state?.operator?.operators || []).find((o) => o.email === email);
+    if (!op) return;
+
+    const emailEl = document.getElementById('edit-op-email');
+    const nameEl = document.getElementById('edit-op-name');
+    const roleEl = document.getElementById('edit-op-role');
+
+    if (emailEl) emailEl.value = op.email;
+    if (nameEl) nameEl.value = op.name;
+    if (roleEl) roleEl.value = op.role;
+
+    this.openModal('modal-edit-operator');
+  },
+
+  /**
+   * Handles submission of Edit Operator form
+   */
+  handleEditSubmit() {
+    const email = document.getElementById('edit-op-email')?.value;
+    const name = (document.getElementById('edit-op-name')?.value || '').trim();
+    const role = document.getElementById('edit-op-role')?.value;
+
+    if (!email || !name) {
+      Toast.show('Nama operator wajib diisi!', 'warning');
+      return;
+    }
+
+    store.dispatch('UPDATE_OPERATOR', { email, name, role, ticketRef: '#OP-EDIT-' + Date.now().toString().slice(-4) });
+    this.closeModal('modal-edit-operator');
+    Toast.show(`✓ Data operator ${name} berhasil diperbarui.`, 'success');
+
+    const container = document.getElementById('main-content');
+    if (container && (window.location.pathname.includes('/telemetry') || window.location.pathname.includes('/fleet') || window.location.pathname === '/')) {
+      container.innerHTML = OperatorView.render(store.getState());
+    }
+  },
+
+  /**
+   * Toggles operator status between ACTIVE and SUSPENDED
+   * @param {string} email
+   */
+  toggleOperatorStatus(email) {
+    store.dispatch('TOGGLE_OPERATOR_STATUS', { email });
+    Toast.show(`✓ Status operasional ${email} berhasil diubah.`, 'info');
+
+    const container = document.getElementById('main-content');
+    if (container && (window.location.pathname.includes('/telemetry') || window.location.pathname.includes('/fleet') || window.location.pathname === '/')) {
+      container.innerHTML = OperatorView.render(store.getState());
+    }
+  },
+
+  /**
+   * Opens Delete Operator Confirmation Modal
+   * @param {string} email
+   */
+  openDeleteOperatorModal(email) {
+    const state = store.getState();
+    const op = (state?.operator?.operators || []).find((o) => o.email === email);
+    if (!op) return;
+
+    const emailEl = document.getElementById('del-op-email');
+    const displayEl = document.getElementById('del-op-display');
+    const ticketEl = document.getElementById('del-op-ticket');
+    const reasonEl = document.getElementById('del-op-reason');
+
+    if (emailEl) emailEl.value = op.email;
+    if (displayEl) displayEl.value = `${op.name} (${op.email})`;
+    if (ticketEl) ticketEl.value = '#SEC-REVOKE-' + Date.now().toString().slice(-4);
+    if (reasonEl) reasonEl.value = 'Pencabutan akses operasional platform';
+
+    this.openModal('modal-delete-operator');
+  },
+
+  /**
+   * Handles deletion of operator
+   */
+  handleDeleteSubmit() {
+    const email = document.getElementById('del-op-email')?.value;
+    const ticketRef = (document.getElementById('del-op-ticket')?.value || '').trim();
+    const reason = (document.getElementById('del-op-reason')?.value || '').trim();
+
+    if (!email) return;
+    if (!ticketRef || !reason) {
+      Toast.show('Nomor tiket dan alasan pencabutan akses wajib diisi!', 'warning');
+      return;
+    }
+
+    store.dispatch('DELETE_OPERATOR', { email, ticketRef, reason });
+    this.closeModal('modal-delete-operator');
+    Toast.show(`🗑️ Akses operator ${email} telah dicabut secara permanen.`, 'success');
+
+    const container = document.getElementById('main-content');
+    if (container && (window.location.pathname.includes('/telemetry') || window.location.pathname.includes('/fleet') || window.location.pathname === '/')) {
+      container.innerHTML = OperatorView.render(store.getState());
+    }
+  },
+
+  /**
+   * Sends password reset email link to operator
+   * @param {string} email
+   */
+  sendPasswordReset(email) {
+    Toast.show(`✉️ Tautan reset kata sandi korporat telah dikirimkan ke ${email}.`, 'info');
+  },
 };
 
 // Global handles
+window.OperatorController = OperatorController;
 window.toggleTenantStatus = (id) => OperatorController.toggleStatus(id);
 window.openBreakglassModal = () => OperatorController.openBreakglassModal();
 window.executeBreakglass = () => OperatorController.executeBreakglass();
+window.openInviteOperatorModal = () => OperatorController.openInviteOperatorModal();
+window.closeModal = (id) => OperatorController.closeModal(id);
+window.openModal = (id) => OperatorController.openModal(id);
