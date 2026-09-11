@@ -165,6 +165,12 @@ const INITIAL_TENANT_STATE = {
         permissions: ['logistics:sign_pod'],
       },
     ],
+    auditLogs: [
+      { id: 'aud_t_01', time: '09/09/2026 08:30', actor: 'Budi Santoso (Owner)', action: 'WORKSPACE_INITIALIZED', target: 'Toko Grosir Beras Jaya', reason: 'Inisialisasi tenant workspace', status: 'SUCCESS' },
+      { id: 'aud_t_02', time: '09/09/2026 09:15', actor: 'Budi Santoso (Owner)', action: 'STAFF_INVITED', target: 'Siti Rahma (Kasir)', reason: 'Akses Kasir POS diberikan', status: 'SUCCESS' },
+      { id: 'aud_t_03', time: '09/09/2026 10:00', actor: 'Budi Santoso (Owner)', action: 'STAFF_INVITED', target: 'Agus Santoso (Gudang)', reason: 'Akses Inbound & FIFO diberikan', status: 'SUCCESS' },
+      { id: 'aud_t_04', time: '10/09/2026 11:20', actor: 'Siti Rahma (Kasir)', action: 'PIN_UPDATED', target: 'Siti Rahma', reason: 'Pembaruan PIN kasir mandiri', status: 'SUCCESS' },
+    ],
   },
 
   // Pilar 09: Settings
@@ -180,6 +186,18 @@ const INITIAL_TENANT_STATE = {
       customDomain: '',
       printerType: 'USB',
       paperWidth: '80mm',
+      businessProfile: {
+        legalEntity: 'CV',
+        companyName: 'CV Beras Jaya Bersama',
+        npwp: '01.234.567.8-012.000',
+        nib: '9120001234567',
+        bankAccount: {
+          bank: 'BCA',
+          accountNumber: '8492-019-283',
+          accountHolder: 'CV Beras Jaya Bersama',
+        },
+        contactEmail: 'kontak@berasjaya.com',
+      },
     },
   },
 };
@@ -198,13 +216,14 @@ const INITIAL_OPERATOR_DATA = {
     { id: 't2', businessName: 'CV Sembako Nusantara', subdomain: 'sembakonusantara', ownerName: 'Hendro Wijaya', ownerPhone: '+6281398765432', tier: 'STARTER_FREE', status: 'ACTIVE' },
   ],
   operators: [
-    { name: 'Gabriel (CEO)', email: 'gabriel@ashvinlabs.com', role: 'SUPER_ADMIN', status: 'ACTIVE' },
-    { name: 'Alex (Lead Developer)', email: 'alex@ashvinlabs.com', role: 'DEV_ENGINEER', status: 'ACTIVE' },
-    { name: 'Dina (Customer Ops)', email: 'dina@ashvinlabs.com', role: 'OPS_SUPPORT', status: 'ACTIVE' },
+    { id: 'op_1', name: 'Gabriel (CEO)', email: 'gabriel@ashvinlabs.com', role: 'SUPER_ADMIN', status: 'ACTIVE', joinedAt: '2026-01-01', lastActive: 'Aktif saat ini', isPrimary: true },
+    { id: 'op_2', name: 'Alex (Lead Developer)', email: 'alex@ashvinlabs.com', role: 'DEV_ENGINEER', status: 'ACTIVE', joinedAt: '2026-02-15', lastActive: '15 menit lalu', isPrimary: false },
+    { id: 'op_3', name: 'Dina (Customer Ops)', email: 'dina@ashvinlabs.com', role: 'OPS_SUPPORT', status: 'ACTIVE', joinedAt: '2026-03-01', lastActive: '1 jam lalu', isPrimary: false },
   ],
   auditLogs: [
     { id: 'aud_001', time: '09 Sep 2026 10:15', operatorEmail: 'gabriel@ashvinlabs.com', action: 'TENANT_PROVISIONED', target: 'Toko Grosir Beras Jaya (berasjaya)', ticketRef: '#TICKET-8100', status: 'SUCCESS' },
     { id: 'aud_002', time: '09 Sep 2026 14:40', operatorEmail: 'alex@ashvinlabs.com', action: 'BREAKGLASS_DIAGNOSTIC', target: 'CV Sembako Nusantara (sembakonusantara)', ticketRef: '#INC-9482', status: 'SUCCESS' },
+    { id: 'aud_003', time: '10 Sep 2026 16:00', operatorEmail: 'dina@ashvinlabs.com', action: 'TENANT_TIER_UPDATED', target: 'Toko Grosir Beras Jaya (GROSIR_PRO)', ticketRef: '#TICKET-8230', status: 'SUCCESS' },
   ],
 };
 

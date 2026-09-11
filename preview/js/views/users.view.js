@@ -156,6 +156,43 @@ const UsersView = {
         </div>
       </div>
 
+      <!-- TENANT AUDIT TRAIL LOGS -->
+      <div class="card" style="margin-top:20px;">
+        <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>📋 Log Audit Akses & Keamanan Staf Toko</span>
+          <span class="badge badge-outline" style="font-size:11px;">TERISOLASI DI LEVEL TENANT</span>
+        </div>
+        <p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:12px;">
+          Catatan riwayat aktivitas operasional akun staf (undang, ubah izin, reset PIN, dan pencabutan akses).
+        </p>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Waktu</th>
+                <th>Pelaku</th>
+                <th>Aksi</th>
+                <th>Target & Deskripsi</th>
+                <th>Alasan / Catatan</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(state?.pilar8?.auditLogs || []).map(log => `
+                <tr>
+                  <td style="font-size:12px; color:var(--text-secondary);">${log.time}</td>
+                  <td><strong>${log.actor}</strong></td>
+                  <td><span class="badge ${log.action.includes('DELETED') ? 'badge-danger' : log.action.includes('INVITED') ? 'badge-primary' : 'badge-warning'}">${log.action}</span></td>
+                  <td>${log.target}</td>
+                  <td style="font-size:12px; color:var(--text-secondary);">${log.reason}</td>
+                  <td><span class="badge badge-success">${log.status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- MODALS CONTAINER -->
       ${this.renderInviteModal(capabilities)}
       ${this.renderEditModal(capabilities)}

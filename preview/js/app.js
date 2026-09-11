@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     moduleManager.register('View:Piutang', ['Store'], PiutangView);
     moduleManager.register('View:Users', ['Store'], UsersView);
     moduleManager.register('View:Roles', ['Store'], RolesView);
+    moduleManager.register('View:Profile', ['Store'], ProfileView);
     moduleManager.register('View:Settings', ['Store'], SettingsView);
     moduleManager.register('View:Operator', ['Store'], OperatorView);
 

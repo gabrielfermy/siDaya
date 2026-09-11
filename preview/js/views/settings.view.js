@@ -142,22 +142,70 @@ const SettingsView = {
 
         </div>
 
-        <!-- Kolom 2: Identitas Toko & Hardware Printer -->
+        <!-- Kolom 2: Profil Bisnis, Bank & Hardware Printer -->
         <div style="display:flex; flex-direction:column; gap:20px;">
           
           <div class="card">
-            <div class="card-title">🏪 Identitas Toko & Header Struk</div>
-            <div class="form-group">
-              <label class="form-label">Nama Usaha / Toko</label>
-              <input id="settings-store-name" type="text" class="form-input" value="${s.storeName}">
+            <div class="card-title">🏪 Profil Bisnis & Identitas Perusahaan</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">Nama Usaha / Merk Toko</label>
+                <input id="settings-store-name" type="text" class="form-input" value="${s.storeName}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Bentuk Badan Usaha</label>
+                <select id="settings-legal-entity" class="form-select">
+                  <option value="CV" ${(s.businessProfile?.legalEntity === 'CV') ? 'selected' : ''}>CV (Persekutuan Komanditer)</option>
+                  <option value="PT" ${(s.businessProfile?.legalEntity === 'PT') ? 'selected' : ''}>PT (Perseroan Terbatas)</option>
+                  <option value="UD" ${(s.businessProfile?.legalEntity === 'UD') ? 'selected' : ''}>UD / Usaha Dagang</option>
+                  <option value="PERORANGAN" ${(s.businessProfile?.legalEntity === 'PERORANGAN') ? 'selected' : ''}>Toko Perorangan</option>
+                </select>
+              </div>
             </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">NPWP Perusahaan / Pemilik</label>
+                <input id="settings-npwp" type="text" class="form-input" value="${s.businessProfile?.npwp || '01.234.567.8-012.000'}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nomor Induk Berusaha (NIB)</label>
+                <input id="settings-nib" type="text" class="form-input" value="${s.businessProfile?.nib || '9120001234567'}">
+              </div>
+            </div>
+
             <div class="form-group">
-              <label class="form-label">Alamat Lengkap (Tercetak di Struk)</label>
+              <label class="form-label">Alamat Lengkap Toko & Gudang</label>
               <textarea id="settings-store-address" class="form-input" rows="2" style="resize:vertical;">${s.storeAddress}</textarea>
             </div>
-            <div class="form-group">
-              <label class="form-label">Nomor WhatsApp Kasir / Helpdesk</label>
-              <input id="settings-store-phone" type="tel" class="form-input" value="${s.storePhone}">
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">WhatsApp Resmi Toko</label>
+                <input id="settings-store-phone" type="tel" class="form-input" value="${s.storePhone}">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Kontak Bisnis</label>
+                <input id="settings-contact-email" type="email" class="form-input" value="${s.businessProfile?.contactEmail || 'kontak@berasjaya.com'}">
+              </div>
+            </div>
+
+            <div style="margin-top:10px; padding-top:10px; border-top:1px solid var(--border-color);">
+              <label class="form-label" style="font-weight:700;">🏦 Rekening Bank Resmi (Tercetak pada Faktur Grosir)</label>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div class="form-group">
+                  <label class="form-label">Nama Bank</label>
+                  <input id="settings-bank-name" type="text" class="form-input" value="${s.businessProfile?.bankAccount?.bank || 'BCA'}">
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Nomor Rekening</label>
+                  <input id="settings-bank-number" type="text" class="form-input" value="${s.businessProfile?.bankAccount?.accountNumber || '8492-019-283'}">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nama Pemilik Rekening (A/N)</label>
+                <input id="settings-bank-holder" type="text" class="form-input" value="${s.businessProfile?.bankAccount?.accountHolder || 'CV Beras Jaya Bersama'}">
+              </div>
             </div>
           </div>
 
@@ -186,8 +234,46 @@ const SettingsView = {
             </button>
           </div>
 
+          <!-- DANGER ZONE: TENANT DELETION -->
+          <div class="card" style="border: 2px solid #E11D48; background: rgba(225, 29, 72, 0.02);">
+            <div class="card-title" style="color:#E11D48; display:flex; justify-content:space-between; align-items:center;">
+              <span>🚨 Zona Berbahaya: Hapus Workspace Toko</span>
+              <span class="badge" style="background:#E11D48; color:#fff; font-size:10px;">KHUSUS OWNER</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-secondary); line-height:1.5; margin-bottom:12px;">
+              Menutup dan menghapus permanen toko ini, termasuk seluruh master SKU, catatan batch FIFO, riwayat faktur, dan buku kasbon. Aksi ini tidak dapat dibatalkan (Kepatuhan UU PDP Hak Penghapusan).
+            </p>
+            <button class="btn btn-outline" style="border-color:#E11D48; color:#E11D48; font-weight:700;" onclick="SettingsController.openDeleteTenantModal()">
+              🗑️ Hapus Permanen Workspace Toko Ini...
+            </button>
+          </div>
+
         </div>
 
+      </div>
+
+      <!-- MODAL: DELETE TENANT CONFIRMATION -->
+      <div id="modal-delete-tenant" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 480px; border: 2px solid #E11D48;">
+          <button class="modal-close-btn" onclick="SettingsController.closeDeleteTenantModal()">✕</button>
+          <div style="margin-bottom: 14px;">
+            <div style="font-size:24px; margin-bottom:6px;">⚠️</div>
+            <h3 style="font-size:1.15rem; font-weight:800; color:#E11D48; margin:0;">Konfirmasi Penghapusan Toko</h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:4px;">
+              Tindakan ini akan menghapus seluruh data toko <strong>"${s.storeName}"</strong> secara permanen.
+            </p>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ketik nama toko untuk mengonfirmasi: <code style="font-weight:700; color:#E11D48;">${s.storeName}</code></label>
+            <input id="delete-tenant-confirm-input" type="text" class="form-input" placeholder="Ketik nama toko persis">
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+            <button type="button" class="btn btn-outline" onclick="SettingsController.closeDeleteTenantModal()">Batal</button>
+            <button type="button" class="btn btn-primary" style="background:#E11D48; border-color:#E11D48;" onclick="SettingsController.handleDeleteTenantSubmit('${s.storeName}')">
+              Ya, Hapus Toko Sekarang
+            </button>
+          </div>
+        </div>
       </div>
     `;
   },
