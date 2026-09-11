@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     moduleManager.register('View:Daya', ['Store'], DayaView);
     moduleManager.register('Controller:Daya', ['Store'], DayaController);
+    moduleManager.register('Util:Audit', ['Store'], AuditEmitter);
 
     // Validate internal dependency graph integrity
     moduleManager.validateAll();
