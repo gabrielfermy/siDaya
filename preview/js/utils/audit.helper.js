@@ -25,8 +25,11 @@ const AuditEmitter = {
 
     const state = store.getState ? store.getState() : (store.state || {});
     const curUser = state?.auth?.merchantUser || {};
-    const actorName = curUser.name || 'Owner / Sistem';
-    const actorRole = curUser.role || 'OWNER';
+    const now = new Date();
+
+    const actorName = (typeof actor === 'object' && actor?.name) ? actor.name : (curUser.name || 'Owner / Sistem');
+    const actorRole = (typeof actor === 'object' && actor?.role) ? actor.role : (curUser.role || 'OWNER');
+    const actorEmail = (typeof actor === 'object' && actor?.email) ? actor.email : (curUser.email || '-');
 
     const targetDesc = typeof target === 'object' && target !== null
       ? (target.identifier || `${target.entityType || 'ENTITY'} #${target.entityId || ''}`)
@@ -34,9 +37,11 @@ const AuditEmitter = {
 
     const entry = {
       id: 'aud_t_' + Date.now(),
-      time: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
+      time: now.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' }), // Contoh: 11/09/2026, 12:51:18
+      isoTimestamp: now.toISOString(),
       actor: actorName,
       actorRole,
+      actorEmail,
       domain: (domain || 'GENERAL').toUpperCase(),
       action: (action || 'ACTION').toUpperCase(),
       target: targetDesc,
@@ -71,12 +76,17 @@ const AuditEmitter = {
     const state = store.getState ? store.getState() : (store.state || {});
     if (!state.operator) return null; // Strict plane defense: no operator state in merchant plane
 
-    const opEmail = state?.auth?.operatorUser?.email || 'operator@ashvinlabs.com';
+    const now = new Date();
+    const curOp = state?.auth?.operatorUser || {};
+    const opEmail = curOp.email || 'operator@ashvinlabs.com';
+    const opRole = curOp.role || state?.operator?.currentRole || 'SUPER_ADMIN';
 
     const entry = {
       id: 'aud_ops_' + Date.now(),
-      time: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
+      time: now.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' }), // Contoh: 11/09/2026, 12:51:18
+      isoTimestamp: now.toISOString(),
       operatorEmail: opEmail,
+      operatorRole: opRole,
       action: (action || 'OPERATOR_ACTION').toUpperCase(),
       target: String(target || 'Global System'),
       ticketRef: String(ticketRef).trim(),
