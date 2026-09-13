@@ -50,7 +50,7 @@ export class StaffCatalogStore {
     },
     {
       userId: 'a0000001-0001-0000-0000-000000000003',
-      fullName: 'Siti Rahma Kasir',
+      fullName: 'Siti Rahma',
       email: 'siti@berasjaya.com',
       phoneNumber: '081234567893',
       pin: '5566',

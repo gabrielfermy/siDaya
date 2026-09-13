@@ -115,3 +115,99 @@ function checkPasswordStrength(inputId, fillId, labelId) {
     label.style.color = 'var(--accent-green)';
   }
 }
+
+/**
+ * Toggles visibility for two password input fields simultaneously (Google-style single control)
+ * @param {HTMLInputElement} checkboxEl
+ * @param {string} id1
+ * @param {string} id2
+ */
+function toggleDualPasswordVisibility(checkboxEl, id1 = 'reg-owner-password', id2 = 'reg-owner-password-confirm') {
+  const isShow = checkboxEl ? !!checkboxEl.checked : false;
+  [id1, id2].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.type = isShow ? 'text' : 'password';
+  });
+}
+
+/**
+ * Evaluates password strength and tests confirmation equality in real-time
+ */
+function checkPasswordStrengthAndMatch() {
+  checkPasswordStrength('reg-owner-password', 'reg-strength-fill', 'reg-strength-label');
+  const p1 = document.getElementById('reg-owner-password')?.value || '';
+  const p2 = document.getElementById('reg-owner-password-confirm')?.value || '';
+  const indicator = document.getElementById('reg-password-match-indicator');
+  const confirmInput = document.getElementById('reg-owner-password-confirm');
+
+  if (!indicator) return;
+  if (!p2) {
+    indicator.textContent = '';
+    if (confirmInput) confirmInput.style.borderColor = '';
+    return;
+  }
+  if (p1 === p2) {
+    indicator.textContent = '✓ Sandi cocok';
+    indicator.style.color = 'var(--accent-green, #10b981)';
+    if (confirmInput) confirmInput.style.borderColor = 'var(--accent-green, #10b981)';
+  } else {
+    indicator.textContent = '⚠️ Sandi tidak cocok';
+    indicator.style.color = 'var(--accent-rose, #ef4444)';
+    if (confirmInput) confirmInput.style.borderColor = 'var(--accent-rose, #ef4444)';
+  }
+}
+
+/**
+ * Handles 6-digit OTP auto-advance on numeric input
+ */
+function handleOtpInput(index, input) {
+  input.value = input.value.replace(/[^0-9]/g, '');
+  if (input.value && index < 6) {
+    const next = document.getElementById(`otp-${index + 1}`);
+    if (next) next.focus();
+  }
+}
+
+/**
+ * Handles backspace navigation between OTP boxes
+ */
+function handleOtpKey(index, event) {
+  if (event.key === 'Backspace' && !event.target.value && index > 1) {
+    const prev = document.getElementById(`otp-${index - 1}`);
+    if (prev) prev.focus();
+  }
+}
+
+let resendTimerInterval = null;
+function startOtpCooldownTimer(seconds = 60) {
+  clearInterval(resendTimerInterval);
+  let remaining = seconds;
+  const btn = document.getElementById('btn-resend-otp');
+  const span = document.getElementById('resend-countdown');
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+  }
+
+  resendTimerInterval = setInterval(() => {
+    remaining--;
+    if (span) span.textContent = remaining;
+    if (remaining <= 0) {
+      clearInterval(resendTimerInterval);
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.innerHTML = '🔄 Kirim Ulang Kode';
+      }
+    }
+  }, 1000);
+}
+
+if (typeof window !== 'undefined') {
+  window.toggleDualPasswordVisibility = toggleDualPasswordVisibility;
+  window.checkPasswordStrengthAndMatch = checkPasswordStrengthAndMatch;
+  window.handleOtpInput = handleOtpInput;
+  window.handleOtpKey = handleOtpKey;
+  window.startOtpCooldownTimer = startOtpCooldownTimer;
+}
+

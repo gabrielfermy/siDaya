@@ -87,7 +87,7 @@ const OperatorView = {
                 return `
                   <tr>
                     <td><strong>${t.businessName}</strong></td>
-                    <td><code>${t.subdomain}.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'}</code></td>
+                    <td><code>${t.subdomain}.${(typeof getBaseDomain === 'function') ? getBaseDomain() : 'sidaya.biz.id'}</code></td>
                     <td>${displayOwner}</td>
                     <td>${displayPhone}</td>
                     <td><span class="tier-badge ${t.tier === 'GROSIR_PRO' ? 'tier-grosir-pro' : 'tier-starter-free'}">${t.tier}</span></td>

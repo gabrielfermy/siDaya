@@ -82,8 +82,8 @@ export class AuthTenantDomainService {
     return this.passwordResetSvc.confirmPasswordReset(payload);
   }
 
-  public verifyEmail(token: string) {
-    return this.ownerRegSvc.verifyEmail(token);
+  public verifyEmail(tokenOrOtp: string, email?: string) {
+    return this.ownerRegSvc.verifyEmail(tokenOrOtp, email);
   }
 
   public getStaffByTenantId(tenantId: string) {

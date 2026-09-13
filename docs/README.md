@@ -26,8 +26,13 @@ docs/
     ├── 05_API_SPECIFICATION.md              # REST/OpenAPI specs, PIN switch, shift lifecycle, module entitlements
     ├── 06_SECURITY_COMPLIANCE_AND_TENANCY.md# Supabase RLS isolation, cashier PINs, COGS masking, audit logs
     ├── 07_MODULAR_PAYLINK_AND_CHECKOUT.md   # Deep dive: Client PayLink lifecycle, checkout portal, auto-settlement
-    └── 08_AI_AGENT_DEVELOPMENT_GUIDE.md     # Feature flags, tenant entitlement guards, and AI coding instructions
+    ├── 08_AI_AGENT_DEVELOPMENT_GUIDE.md     # Feature flags, tenant entitlement guards, and AI coding instructions
+    ├── 09_DUAL_PATH_AND_PLUGGABLE_PAYMENT_ENGINE.md # Platform Subscription Billing vs Pluggable Merchant Rails (BYOK/OPAP)
+    ├── 10_SECURITY_BY_DESIGN_WORKFLOW.md    # The 7 Golden Security Invariants & DoD Security Checklist
+    ├── 11_SECURITY_ASSESSMENT_FRAMEWORK.md  # Continuous Security Assessment Framework (CSAF) & Automated VAPT
+    └── 12_PACKAGE_AND_MODULE_MANIFEST.md    # Complete @sidaya/* package inventory, exports, and dependency graph
 ```
+
 
 ---
 

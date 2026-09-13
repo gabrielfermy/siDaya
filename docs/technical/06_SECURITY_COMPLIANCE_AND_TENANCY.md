@@ -260,21 +260,20 @@ To prevent unauthorized access on shared POS cash registers and warehouse tablet
 
 ---
 
-## 9. Future Architectural Backlog: Multi-Store Cross-Tenant Access Controls
+## 10. Security-by-Design Governance & Automated VAPT Framework
 
-*(Roadmap Baseline - ADR-16)*
+For detailed operational guidance and technical specifications, refer to:
+* **Dual-Path & Pluggable Payment Architecture**: [09_DUAL_PATH_AND_PLUGGABLE_PAYMENT_ENGINE.md](file:///k:/Personal/bikin%20duit/ashvin-book/docs/technical/09_DUAL_PATH_AND_PLUGGABLE_PAYMENT_ENGINE.md)
+* **Security-by-Design Workflow & 7 Golden Invariants**: [10_SECURITY_BY_DESIGN_WORKFLOW.md](file:///k:/Personal/bikin%20duit/ashvin-book/docs/technical/10_SECURITY_BY_DESIGN_WORKFLOW.md)
+* **Continuous Security Assessment Framework (CSAF)**: [11_SECURITY_ASSESSMENT_FRAMEWORK.md](file:///k:/Personal/bikin%20duit/ashvin-book/docs/technical/11_SECURITY_ASSESSMENT_FRAMEWORK.md)
 
-In future expansion phases when a single business entity operates multiple physical stores (e.g. `berasjaya1.sidaya.biz.id` and `berasjaya2.sidaya.biz.id`):
-1. **Decoupled User Identity (`users`) & Store Memberships (`tenant_memberships`)**:
-   * Global identity (`users`: `id`, `email`, `password_hash`) represents physical persons.
-   * Store memberships (`tenant_memberships`: `user_id`, `tenant_id`, `role`, `status`, `permissions`) govern per-store authority.
-2. **Cross-Store Role Scoping**:
-   * A single user (`siti@berasjaya.com`) can hold `role: ADMIN` on Store 1 and `role: ADMIN` on Store 2.
-   * Warehouse staff (`agus@berasjaya.com`) hold `role: GUDANG` exclusively on Store 1.
-3. **Subdomain-Scoped Token Authorization Middleware**:
-   * Every API request to `https://[subdomain].sidaya.biz.id/api/*` verifies that the caller has an active `tenant_memberships` record for the `tenant_id` corresponding to that specific subdomain.
-   * If `agus@berasjaya.com` attempts an API request against `berasjaya2.sidaya.biz.id`, the middleware rejects the request with `403 Forbidden: You do not have membership in this store branch`.
-4. **Complete Store Data Isolation**:
-   * All operational entities (`products`, `inventory_batches`, `invoices`, `piutang_ledgers`) enforce strict `tenant_id` foreign keys, guaranteeing 100% data, stock, and financial separation between physical branch stores.
+### Automated VAPT Execution & Persistent Audit Reports:
+Run the comprehensive automated security audit at any time:
+```bash
+pnpm run test:security
+```
+All runs automatically generate timestamped, persistent audit reports in:
+`reports/security/vapt-report-YYYY-MM-DD_HH-mm-ss.md` and `reports/security/latest.md`.
+
 
 

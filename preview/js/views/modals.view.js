@@ -297,7 +297,7 @@ const ModalsView = {
             <div class="thermal-header">
               <div class="thermal-brand">TOKO GROSIR BERAS JAYA</div>
               <div class="thermal-sub">Pasar Induk Kramat Jati, Jakarta Timur</div>
-              <div class="thermal-sub">Telp: 0812-3456-7890 | berasjaya.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'}</div>
+              <div class="thermal-sub">Telp: 0812-3456-7890 | berasjaya.${(typeof getBaseDomain === 'function') ? getBaseDomain() : 'sidaya.biz.id'}</div>
               <div class="thermal-divider">================================</div>
             </div>
             <div class="thermal-meta">
@@ -336,17 +336,65 @@ const ModalsView = {
           </div>
         </div>
       </div>
+
+      <!-- MODAL: GOOGLE SIGN-IN PICKER -->
+      <div id="modal-google-auth" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 420px; border-radius: 16px; padding: 22px;">
+          <button class="modal-close-btn" onclick="closeModal()">✕</button>
+          <div style="text-align:center; margin-bottom: 16px;">
+            <svg style="width:34px; height:34px; margin: 0 auto 8px auto; display:block;" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <h3 style="font-size:1.1rem; font-weight:800; color:var(--text-primary);">Pilih Akun Google</h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:2px;">Simulasi Google OAuth 2.0 untuk SiDaya Workspace</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            ${(typeof GOOGLE_PRESET_ACCOUNTS !== 'undefined' ? GOOGLE_PRESET_ACCOUNTS : []).map(a => `
+              <div onclick="AuthController.selectGoogleAccount('${a.email}', '${a.name}', '${a.avatar}')" 
+                   style="display:flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid var(--border-color); border-radius:8px; cursor:pointer; text-align:left;"
+                   onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+                <div style="width:32px; height:32px; border-radius:50%; background:#2563EB; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">${a.avatar}</div>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-size:12.5px; font-weight:700; color:var(--text-primary);">${a.name}</div>
+                  <div style="font-size:11px; color:var(--text-secondary);">${a.googleEmail}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          <div style="margin-top:12px; padding-top:10px; border-top:1px solid var(--border-color); text-align:center;">
+            <button class="btn btn-outline btn-sm" onclick="AuthController.promptCustomGoogleAccount()" style="width:100%; font-size:11.5px;">
+              ➕ Gunakan Akun Google Lainnya...
+            </button>
+          </div>
+        </div>
+      </div>
     `;
   },
 };
 
 /**
- * Auto-generates subdomain slug from business name input
+ * Auto-generates subdomain slug from business name input and updates live preview
  */
 function handleRegNameChange(val) {
   const subInput = document.getElementById('reg-biz-subdomain');
+  const preview = document.getElementById('reg-subdomain-preview');
   if (subInput && val) {
-    const slug = val.toLowerCase().replace(/[^a-z0-9]/g, '');
-    subInput.value = slug.substring(0, 20);
+    const slug = val.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 20);
+    subInput.value = slug;
+    if (preview) preview.textContent = slug || 'subdomain';
+  }
+}
+
+/**
+ * Live updates subdomain preview when typing in subdomain field
+ */
+function handleRegSubdomainChange(val) {
+  const preview = document.getElementById('reg-subdomain-preview');
+  if (preview) {
+    const slug = (val || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
+    preview.textContent = slug || 'subdomain';
   }
 }

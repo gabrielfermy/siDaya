@@ -202,4 +202,22 @@ export class AuthController {
       });
     }
   }
+
+  public async verifyEmail(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+    const body = await parseRequestBody(req);
+    const email = body['email'] as string | undefined;
+    const token = (body['token'] || body['otp']) as string;
+
+    if (!token) {
+      sendJson(res, 400, { success: false, error: { message: 'Token atau kode OTP verifikasi wajib diisi.' } });
+      return;
+    }
+
+    try {
+      const result = this.authService.verifyEmail(token, email);
+      sendJson(res, 200, { success: true, data: result });
+    } catch (err: any) {
+      sendJson(res, 400, { success: false, error: { message: err.message || 'Verifikasi email gagal.' } });
+    }
+  }
 }

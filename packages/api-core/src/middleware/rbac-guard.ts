@@ -1,32 +1,28 @@
 import { PermissionKey } from '@sidaya/shared-types';
 import { HttpRequestLike, HttpResponseLike, NextFunctionLike } from './tenant-context.middleware';
 
-export interface AuthenticatedUserContext {
-  userId: string;
-  tenantId: string;
-  role: string;
-  permissions: string[];
-}
-
 export function requirePermission(requiredPermission: PermissionKey | string) {
   return async (req: HttpRequestLike, res: HttpResponseLike, next: NextFunctionLike): Promise<void> => {
-    // 1. Retrieve user context from auth middleware or headers
-    const user = (req as any).tenantUser as AuthenticatedUserContext | undefined;
-    const userRole = user?.role || (req.headers['x-user-role'] as string);
-    const rawPermissions = req.headers['x-user-permissions'];
-    let parsedPermissions: string[] = [];
-    if (typeof rawPermissions === 'string') {
-      try {
-        parsedPermissions = JSON.parse(rawPermissions);
-      } catch {
-        parsedPermissions = [];
-      }
-    } else if (Array.isArray(rawPermissions)) {
-      parsedPermissions = rawPermissions;
-    }
-    const userPermissions: string[] = user?.permissions || parsedPermissions;
+    // 1. Retrieve user context STRICTLY from verified authentication token or user session
+    // Never trust client-injected 'X-User-Role' or 'X-User-Permissions' headers
+    const user = req.tenantUser || req.user;
 
-    // 2. Owner bypass rule: Tenant Owner possesses all capabilities
+    if (!user) {
+      res.status(401).json({
+        success: false,
+        error: {
+          code: 'UNAUTHENTICATED',
+          message: 'Autentikasi diperlukan: Token Bearer tidak ditemukan atau tidak valid.',
+          status: 401,
+        },
+      });
+      return;
+    }
+
+    const userRole = user.role;
+    const userPermissions: string[] = (user.permissions || []) as string[];
+
+    // 2. Owner bypass rule: Authenticated Tenant Owner possesses all capabilities
     if (userRole === 'OWNER') {
       await next();
       return;
@@ -53,3 +49,4 @@ export function requirePermission(requiredPermission: PermissionKey | string) {
     });
   };
 }
+

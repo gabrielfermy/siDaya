@@ -13,6 +13,8 @@ import {
   XenditPaymentProvider,
   MidtransPaymentProvider,
   DuitkuPaymentProvider,
+  PlatformBillingService,
+  MerchantPaymentRouterService,
 } from '@sidaya/payment-core';
 import { AppRouter } from './routes/app-router';
 import { AuthController } from './controllers/auth.controller';
@@ -36,27 +38,29 @@ import { sendJson } from './middleware/cors.middleware';
 const PORT = parseInt(process.env['API_PORT'] || '4000', 10);
 
 // Setup Payment Gateways
+const midtransProvider = new MidtransPaymentProvider({
+  serverKey: process.env['MIDTRANS_SERVER_KEY'] || 'SB-Mid-server-DEV-TEST',
+  clientKey: process.env['MIDTRANS_CLIENT_KEY'] || 'SB-Mid-client-DEV-TEST',
+  isProduction: false,
+});
+const xenditProvider = new XenditPaymentProvider({
+  secretApiKey: process.env['XENDIT_SECRET_KEY'] || 'xnd_development_TEST',
+  webhookVerificationToken: process.env['XENDIT_WEBHOOK_TOKEN'] || 'wh_token_dev_test',
+});
+const duitkuProvider = new DuitkuPaymentProvider({
+  merchantCode: process.env['DUITKU_MERCHANT_CODE'] || 'D1000',
+  merchantKey: process.env['DUITKU_MERCHANT_KEY'] || 'merchant_key_dev',
+  isSandbox: true,
+});
+
 const gatewayRegistry = new PaymentGatewayRegistry();
-gatewayRegistry.register(
-  new MidtransPaymentProvider({
-    serverKey: process.env['MIDTRANS_SERVER_KEY'] || 'SB-Mid-server-DEV-TEST',
-    clientKey: process.env['MIDTRANS_CLIENT_KEY'] || 'SB-Mid-client-DEV-TEST',
-    isProduction: false,
-  }),
-);
-gatewayRegistry.register(
-  new XenditPaymentProvider({
-    secretApiKey: process.env['XENDIT_SECRET_KEY'] || 'xnd_development_TEST',
-    webhookVerificationToken: process.env['XENDIT_WEBHOOK_TOKEN'] || 'wh_token_dev_test',
-  }),
-);
-gatewayRegistry.register(
-  new DuitkuPaymentProvider({
-    merchantCode: process.env['DUITKU_MERCHANT_CODE'] || 'D1000',
-    merchantKey: process.env['DUITKU_MERCHANT_KEY'] || 'merchant_key_dev',
-    isSandbox: true,
-  }),
-);
+gatewayRegistry.register(midtransProvider);
+gatewayRegistry.register(xenditProvider);
+gatewayRegistry.register(duitkuProvider);
+
+// Setup Dual-Path Payment Services
+const platformBillingService = new PlatformBillingService(midtransProvider);
+const merchantPaymentRouter = new MerchantPaymentRouterService(midtransProvider);
 
 // Setup Domain Services
 const orderDomainService = new OrderDomainService(gatewayRegistry.get('MIDTRANS'));
@@ -65,7 +69,13 @@ const deliveryOrderDomainService = new DeliveryOrderDomainService();
 const authTenantDomainService = new AuthTenantDomainService();
 const inboundFifoDomainService = new InboundFifoDomainService();
 const platformAdminDomainService = new PlatformAdminDomainService();
-const webhookController = new PaymentWebhookController(gatewayRegistry);
+const webhookController = new PaymentWebhookController(
+  gatewayRegistry,
+  undefined,
+  platformBillingService,
+  merchantPaymentRouter,
+);
+
 
 // Setup Controllers
 const authController = new AuthController(authTenantDomainService, platformAdminDomainService);

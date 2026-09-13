@@ -133,7 +133,7 @@ const LayoutView = {
               <button class="mobile-menu-toggle" onclick="toggleMobileDrawer()">☰</button>
               <div>
                 <div class="breadcrumb-title" id="breadcrumb-current-page">Dashboard</div>
-                <div class="breadcrumb-sub" id="topbar-breadcrumb-sub">Toko Grosir Beras Jaya Bersama • Subdomain: <code id="topbar-subdomain-code">berasjaya.${(typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id'}</code></div>
+                <div class="breadcrumb-sub" id="topbar-breadcrumb-sub">Toko Grosir Beras Jaya Bersama • Subdomain: <code id="topbar-subdomain-code">berasjaya.${(typeof getBaseDomain === 'function') ? getBaseDomain() : 'sidaya.biz.id'}</code></div>
               </div>
             </div>
 

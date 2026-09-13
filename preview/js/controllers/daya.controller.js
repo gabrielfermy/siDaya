@@ -196,7 +196,8 @@ const DayaController = {
     // 4. Draft WhatsApp Reminder Template
     if (query.includes('wa') || query.includes('whatsapp') || query.includes('draft') || query.includes('pesan')) {
       const tenantName = state?.auth?.merchantUser?.tenant || 'Toko Grosir Beras Jaya';
-      return `📱 **Draft Pengingat Tagihan WhatsApp:**\n\n\`\`\`\nSalam hangat dari ${tenantName}.\n\nYth. Bpk/Ibu Toko Pelanggan,\nKami mengingatkan faktur tagihan belanja beras Anda sebesar Rp 4.200.000 telah mendekati jatuh tempo.\n\nPembayaran praktis via QRIS/VA dapat diakses di:\nhttps://pay.sidaya.biz.id/p/INV-9284\n\nTerima kasih atas kerja samanya! 🙏\n\`\`\`\n\nSalin pesan di atas dan kirimkan langsung via WhatsApp Web!`;
+      const payBase = (typeof getSubdomainUrl === 'function') ? getSubdomainUrl('pay') : 'https://pay.sidaya.biz.id';
+      return `📱 **Draft Pengingat Tagihan WhatsApp:**\n\n\`\`\`\nSalam hangat dari ${tenantName}.\n\nYth. Bpk/Ibu Toko Pelanggan,\nKami mengingatkan faktur tagihan belanja beras Anda sebesar Rp 4.200.000 telah mendekati jatuh tempo.\n\nPembayaran praktis via QRIS/VA dapat diakses di:\n${payBase}/p/INV-9284\n\nTerima kasih atas kerja samanya! 🙏\n\`\`\`\n\nSalin pesan di atas dan kirimkan langsung via WhatsApp Web!`;
     }
 
     // 5. POS & Stock Availability

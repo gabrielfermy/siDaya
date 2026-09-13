@@ -40,7 +40,8 @@ export class EmailDispatchService {
     const from = opts.from || this.fromEmail;
     const recordId = `email_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
-    if (this.resendApiKey && !process.env['MOCK_EMAIL_DISPATCH']) {
+    const isMock = process.env['MOCK_EMAIL_DISPATCH'] === 'true' || process.env['MOCK_EMAIL_DISPATCH'] === '1';
+    if (this.resendApiKey && !isMock) {
       try {
         const response = await fetch('https://api.resend.com/emails', {
           method: 'POST',
@@ -69,12 +70,14 @@ export class EmailDispatchService {
             status: 'SENT',
           };
           this.sentLog.unshift(record);
+          console.log(`[EmailDispatch] ✓ Email sent via Resend API to: ${opts.to} (ID: ${record.id})`);
           return record;
         } else {
-          console.warn(`Resend API returned status ${response.status}. Falling back to mock dispatch record.`);
+          const errBody = await response.text();
+          console.warn(`[EmailDispatch] ⚠️ Resend API error (${response.status}): ${errBody}. Falling back to mock record.`);
         }
       } catch (err) {
-        console.warn(`Error connecting to Resend API: ${err}. Falling back to mock dispatch record.`);
+        console.warn(`[EmailDispatch] ⚠️ Error connecting to Resend API: ${err}. Falling back to mock record.`);
       }
     }
 
@@ -90,13 +93,29 @@ export class EmailDispatchService {
       status: 'MOCKED',
     };
     this.sentLog.unshift(mockRecord);
+    console.log(`[EmailDispatch] ℹ️ Mock email dispatched to: ${opts.to} (Subject: "${opts.subject}")`);
     return mockRecord;
   }
 
   /**
-   * 1. Email Verification for Merchant Owner / Users
+   * 1. Email Verification for Merchant Owner / Users with 6-digit OTP
    */
-  async sendEmailVerification(to: string, fullName: string, verificationUrl: string): Promise<DispatchedEmailRecord> {
+  async sendEmailVerification(
+    to: string,
+    fullName: string,
+    verificationUrl: string,
+    otpCode?: string,
+  ): Promise<DispatchedEmailRecord> {
+    const otpSection = otpCode
+      ? `
+        <div style="margin: 24px 0; padding: 18px; background: #f8fafc; border: 2px dashed #0284c7; border-radius: 8px; text-align: center;">
+          <p style="margin: 0 0 6px 0; font-size: 13px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Kode OTP Verifikasi Anda:</p>
+          <div style="font-size: 34px; font-weight: 800; letter-spacing: 8px; color: #0284c7; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;">${otpCode}</div>
+          <p style="margin: 6px 0 0 0; font-size: 12px; color: #94a3b8;">Berlaku selama 15 menit. Masukkan 6 digit di atas pada layar verifikasi.</p>
+        </div>
+      `
+      : '';
+
     const html = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0;">
         <div style="margin-bottom: 24px;">
@@ -104,11 +123,12 @@ export class EmailDispatchService {
           <p style="color: #64748b; font-size: 15px; margin: 0;">Halo <strong>${fullName}</strong>, selamat datang di platform SiDaya.</p>
         </div>
         <p style="color: #334155; font-size: 14px; line-height: 1.6;">
-          Terima kasih telah mendaftarkan bisnis Anda di <strong>SiDaya</strong>. Silakan klik tombol di bawah untuk memverifikasi email Anda dan mengaktifkan akun pemilik:
+          Terima kasih telah mendaftarkan bisnis Anda di <strong>SiDaya</strong>. Gunakan kode verifikasi di bawah ini atau klik tombol aktivasi untuk mengaktifkan akun toko Anda:
         </p>
-        <div style="margin: 32px 0;">
-          <a href="${verificationUrl}" style="background-color: #0284c7; color: #ffffff; padding: 12px 24px; border-radius: 6px; font-weight: 600; text-decoration: none; display: inline-block; font-size: 14px;">
-            Verifikasi Email Saya
+        ${otpSection}
+        <div style="margin: 28px 0; text-align: center;">
+          <a href="${verificationUrl}" style="background-color: #0284c7; color: #ffffff; padding: 12px 28px; border-radius: 6px; font-weight: 600; text-decoration: none; display: inline-block; font-size: 14px;">
+            ✓ Verifikasi Email Saya
           </a>
         </div>
         <p style="color: #64748b; font-size: 12px;">Atau salin tautan berikut ke peramban Anda:<br><a href="${verificationUrl}" style="color: #0284c7;">${verificationUrl}</a></p>
@@ -119,7 +139,7 @@ export class EmailDispatchService {
 
     return this.sendEmail({
       to,
-      subject: 'Verifikasi Akun SiDaya Anda',
+      subject: `[SiDaya] Kode Verifikasi Akun: ${otpCode || 'Konfirmasi Email'}`,
       html,
     });
   }

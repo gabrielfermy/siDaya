@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   IPaymentGatewayProvider,
   CreatePaymentSessionDTO,
@@ -32,13 +33,29 @@ export class XenditPaymentProvider implements IPaymentGatewayProvider {
     };
   }
 
+  /**
+   * Verifies Xendit webhook verification token using constant-time comparison.
+   */
   verifyWebhookSignature(headers: Record<string, string>, _body: Record<string, unknown>): boolean {
-    const callbackToken = headers['x-callback-token'] ?? headers['X-CALLBACK-TOKEN'];
-    if (!callbackToken) {
+    const callbackToken = headers['x-callback-token'] ?? headers['X-CALLBACK-TOKEN'] ?? headers['x-callback-token'];
+    if (!callbackToken || !this.config.webhookVerificationToken) {
       return false;
     }
-    return callbackToken === this.config.webhookVerificationToken;
+
+    const expected = this.config.webhookVerificationToken.trim();
+    const received = callbackToken.trim();
+
+    if (expected.length !== received.length) {
+      return false;
+    }
+
+    try {
+      return crypto.timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(received, 'utf8'));
+    } catch {
+      return false;
+    }
   }
+
 
   parseWebhook(body: Record<string, unknown>): NormalizedWebhookResult {
     const orderId = String(body['external_id'] ?? '');

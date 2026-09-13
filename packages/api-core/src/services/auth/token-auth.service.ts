@@ -1,6 +1,13 @@
-import crypto from 'crypto';
 import { StaffCatalogStore } from './staff-catalog.store';
 import { AuthenticatedUserSession } from './auth-types';
+import {
+  verifyPassword,
+  hashPassword,
+  verifyPin,
+  hashPin,
+  signJwtToken,
+  timingSafeEqualStrings,
+} from '../../security/crypto-utils';
 
 export class TokenAuthService {
   constructor(private store: StaffCatalogStore = StaffCatalogStore.getInstance()) {}
@@ -19,10 +26,34 @@ export class TokenAuthService {
     }
 
     if (credential) {
-      const isPasswordMatch = user.password && user.password === credential;
-      const isPinMatch = user.pin && user.pin === credential;
+      let isMatch = false;
 
-      if (!isPasswordMatch && !isPinMatch) {
+      // 1. Check password
+      if (user.password) {
+        if (user.password.startsWith('scrypt$')) {
+          isMatch = await verifyPassword(credential, user.password);
+        } else {
+          // Backward compatibility check for seed data + auto-upgrade to scrypt
+          if (timingSafeEqualStrings(credential, user.password)) {
+            isMatch = true;
+            user.password = await hashPassword(credential);
+          }
+        }
+      }
+
+      // 2. Check PIN
+      if (!isMatch && user.pin) {
+        if (user.pin.startsWith('pin_pbkdf2$')) {
+          isMatch = verifyPin(credential, user.pin);
+        } else {
+          if (timingSafeEqualStrings(credential, user.pin)) {
+            isMatch = true;
+            user.pin = hashPin(credential);
+          }
+        }
+      }
+
+      if (!isMatch) {
         throw new Error('Kata sandi atau PIN salah.');
       }
     }
@@ -32,7 +63,16 @@ export class TokenAuthService {
     }
 
     const activeTenant = user.tenants[0]!;
-    const sessionToken = `jwt_mock_${crypto.randomBytes(24).toString('hex')}`;
+
+    // Generate real cryptographically signed JWT token embedding user identity, tenant binding, and permissions
+    const sessionToken = signJwtToken({
+      userId: user.userId,
+      tenantId: activeTenant.tenantId,
+      role: activeTenant.role,
+      permissions: (activeTenant.permissions || []) as string[],
+      email: user.email,
+      fullName: user.fullName,
+    });
 
     return {
       userId: user.userId,
@@ -71,7 +111,9 @@ export class TokenAuthService {
     if (!user) {
       throw new Error('Staf tidak ditemukan pada toko ini.');
     }
-    user.pin = pin;
+    // Store securely hashed PIN
+    user.pin = hashPin(pin);
     return { success: true, message: 'PIN staf berhasil diperbarui.' };
   }
 }
+

@@ -19,9 +19,54 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+// Live Reload SSE Hub
+const sseClients = new Set();
+
+function broadcastReload() {
+  for (const client of sseClients) {
+    try {
+      client.write('data: reload\n\n');
+    } catch (e) {
+      sseClients.delete(client);
+    }
+  }
+}
+
+// Watch STATIC_DIR for hot-reloading on save
+let reloadDebounce = null;
+try {
+  fs.watch(STATIC_DIR, { recursive: true }, (eventType, filename) => {
+    if (!filename) return;
+    const ext = path.extname(filename).toLowerCase();
+    if (['.html', '.css', '.js', '.json'].includes(ext)) {
+      clearTimeout(reloadDebounce);
+      reloadDebounce = setTimeout(() => {
+        console.log(`[HotReload] File changed: ${filename}. Refreshing ${sseClients.size} client(s)...`);
+        broadcastReload();
+      }, 150);
+    }
+  });
+} catch (err) {
+  console.warn('[HotReload] File watcher error:', err.message);
+}
+
 const server = http.createServer((req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = parsedUrl.pathname;
+
+  // Live Reload SSE Endpoint
+  if (pathname === '/__livereload') {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.write(': connected\n\n');
+    sseClients.add(res);
+    req.on('close', () => sseClients.delete(res));
+    return;
+  }
 
   // Normalize path
   if (pathname === '/') {

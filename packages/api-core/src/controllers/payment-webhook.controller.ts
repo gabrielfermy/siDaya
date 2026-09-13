@@ -1,4 +1,9 @@
-import { PaymentGatewayRegistry, NormalizedWebhookResult } from '@sidaya/payment-core';
+import {
+  PaymentGatewayRegistry,
+  NormalizedWebhookResult,
+  PlatformBillingService,
+  MerchantPaymentRouterService,
+} from '@sidaya/payment-core';
 import { OrderPaymentStatus } from '@sidaya/shared-types';
 
 export interface WebhookHandlingResult {
@@ -32,29 +37,82 @@ export interface PostPaymentDBClient {
 }
 
 export class PaymentWebhookController {
+  private processedTransactions = new Set<string>();
+
   constructor(
     private readonly gatewayRegistry: PaymentGatewayRegistry,
     private readonly db?: PostPaymentDBClient | undefined,
+    private readonly platformBillingService?: PlatformBillingService | undefined,
+    private readonly merchantPaymentRouter?: MerchantPaymentRouterService | undefined,
   ) {}
 
   /**
-   * Processes inbound webhook from payment gateway (Midtrans, Xendit, Duitku)
+   * Path 1: Platform Subscription & Add-On Billing Webhook Handler
+   * Handles SaaS tier payments from Tenant to Developer/Ashvin Labs
+   */
+  public async handlePlatformBillingWebhook(
+    headers: Record<string, string>,
+    body: Record<string, unknown>,
+  ): Promise<{ success: boolean; invoiceId: string; status: string; message: string }> {
+    if (!this.platformBillingService) {
+      // Fallback: verify using platform master provider in registry
+      const provider = this.gatewayRegistry.get('MIDTRANS');
+      if (!provider.verifyWebhookSignature(headers, body)) {
+        throw new Error('Platform billing webhook rejected: Invalid signature.');
+      }
+      const parsed = provider.parseWebhook(body);
+      return {
+        success: true,
+        invoiceId: parsed.orderId,
+        status: parsed.status,
+        message: `Platform billing processed with status ${parsed.status}.`,
+      };
+    }
+
+    const parsed = this.platformBillingService.verifyAndProcessPlatformWebhook(headers, body);
+    return {
+      success: true,
+      invoiceId: parsed.orderId,
+      status: parsed.status,
+      message: `Platform subscription for invoice ${parsed.orderId} is now ${parsed.status}.`,
+    };
+  }
+
+  /**
+   * Path 2: Commercial POS & PayLink Webhook Handler (End-Customer -> Tenant)
    */
   async handleWebhook(
     providerId: string,
     headers: Record<string, string>,
     body: Record<string, unknown>,
+    tenantId?: string,
   ): Promise<WebhookHandlingResult> {
-    const provider = this.gatewayRegistry.get(providerId);
+    let normalized: NormalizedWebhookResult;
 
-    // 1. Verify cryptographic HMAC / token signature
-    const isSignatureValid = provider.verifyWebhookSignature(headers, body);
-    if (!isSignatureValid) {
-      throw new Error(`Invalid signature received for payment gateway '${providerId}'. Webhook rejected.`);
+    if (tenantId && this.merchantPaymentRouter) {
+      normalized = this.merchantPaymentRouter.verifyAndParseCommercialWebhook(tenantId, headers, body);
+    } else {
+      const provider = this.gatewayRegistry.get(providerId);
+      const isSignatureValid = provider.verifyWebhookSignature(headers, body);
+      if (!isSignatureValid) {
+        throw new Error(`Invalid signature received for payment gateway '${providerId}'. Webhook rejected.`);
+      }
+      normalized = provider.parseWebhook(body);
     }
 
-    // 2. Parse and normalize gateway payload
-    const normalized: NormalizedWebhookResult = provider.parseWebhook(body);
+    // 2. Idempotency Check: Prevent duplicate inventory decrements
+    const idempotencyKey = `${providerId}_${normalized.gatewayTransactionId}_${normalized.orderId}`;
+    if (this.processedTransactions.has(idempotencyKey)) {
+      return {
+        success: true,
+        orderId: normalized.orderId,
+        gatewayTransactionId: normalized.gatewayTransactionId,
+        paymentStatus: OrderPaymentStatus.PAID,
+        amountPaid: normalized.amountPaid,
+        message: `Idempotent duplicate webhook ignored for transaction ${normalized.gatewayTransactionId}.`,
+        stockMovementLogged: false,
+      };
+    }
 
     let stockMovementLogged = false;
     let finalStatus = OrderPaymentStatus.UNPAID;
@@ -62,6 +120,7 @@ export class PaymentWebhookController {
     // 3. If payment is SETTLED, execute atomic post-payment orchestration
     if (normalized.status === 'SETTLED') {
       finalStatus = OrderPaymentStatus.PAID;
+      this.processedTransactions.add(idempotencyKey);
 
       if (this.db) {
         const order = await this.db.findOrderById(normalized.orderId);
@@ -102,3 +161,4 @@ export class PaymentWebhookController {
     };
   }
 }
+

@@ -30,13 +30,19 @@ const MERCHANT_ACCOUNTS = {
 };
 
 const OPERATOR_ACCOUNTS = {
-  'gabriel@ashvinlabs.com': { email: 'gabriel@ashvinlabs.com', password: 'SuperSecret123!', name: 'Gabriel (CEO)', role: 'SUPER_ADMIN', roleName: 'Super Admin', badgeClass: 'role-super-admin' },
-  'alex@ashvinlabs.com': { email: 'alex@ashvinlabs.com', password: 'SuperSecret123!', name: 'Alex (Lead Developer)', role: 'DEV_ENGINEER', roleName: 'Dev Engineer', badgeClass: 'role-dev-engineer' },
-  'dina@ashvinlabs.com': { email: 'dina@ashvinlabs.com', password: 'SuperSecret123!', name: 'Dina (Customer Ops)', role: 'OPS_SUPPORT', roleName: 'Ops Support', badgeClass: 'role-ops-support' },
+  'gabriel@ashvinlabs.com': { email: 'gabriel@ashvinlabs.com', password: 'Password123!', name: 'Gabriel (CEO)', role: 'SUPER_ADMIN', roleName: 'Super Admin', badgeClass: 'role-super-admin' },
+  'alex@ashvinlabs.com': { email: 'alex@ashvinlabs.com', password: 'Password123!', name: 'Alex (Lead Developer)', role: 'DEV_ENGINEER', roleName: 'Dev Engineer', badgeClass: 'role-dev-engineer' },
+  'dina@ashvinlabs.com': { email: 'dina@ashvinlabs.com', password: 'Password123!', name: 'Dina (Customer Ops)', role: 'OPS_SUPPORT', roleName: 'Ops Support', badgeClass: 'role-ops-support' },
 };
 
 const MERCHANT_PRESETS = MERCHANT_ACCOUNTS;
 const OPERATOR_PRESETS = OPERATOR_ACCOUNTS;
+
+const GOOGLE_PRESET_ACCOUNTS = [
+  { name: 'Budi Santoso', email: 'budi@berasjaya.com', avatar: 'B', googleEmail: 'budi.santoso@gmail.com', desc: 'Pemilik Toko Grosir Beras Jaya (Terdaftar)' },
+  { name: 'Siti Rahma', email: 'siti@berasjaya.com', avatar: 'S', googleEmail: 'siti.rahma99@gmail.com', desc: 'Kasir Beras Jaya (Terdaftar)' },
+  { name: 'Hendro Purnomo', email: 'hendro@berasmakmur.com', avatar: 'H', googleEmail: 'hendro.purnomo@gmail.com', desc: 'Calon Mitra Baru (Belum Terdaftar)' },
+];
 
 const STAFF_CAPABILITIES = [
   { group: 'Kasir & Transaksi POS', key: 'pos:checkout', label: 'Eksekusi Checkout Kasir POS', desc: 'Membuka transaksi penjualan dan menerima kasir' },

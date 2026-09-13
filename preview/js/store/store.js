@@ -96,23 +96,20 @@ class SiDayaStateStore {
   _loadSession(key) {
     try {
       const p = JSON.parse(localStorage.getItem(key) || 'null');
-      if (p && p.expiresAt && p.expiresAt > Date.now()) return p;
+      if (p && p.expiresAt && p.expiresAt > Date.now()) {
+        if (p.name === 'Pengguna Toko' || !p.email) { localStorage.removeItem(key); return null; }
+        return p;
+      }
       localStorage.removeItem(key);
     } catch (e) { localStorage.removeItem(key); }
     return null;
   }
 
-  /**
-   * Internal recursive deep merge helper
-   * @private
-   */
   _deepMergeDefaults(target, source) {
     if (!target || typeof target !== 'object') return JSON.parse(JSON.stringify(source));
     for (const key of Object.keys(source)) {
       if (source[key] instanceof Object && !Array.isArray(source[key])) {
-        if (!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) {
-          target[key] = {};
-        }
+        if (!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) target[key] = {};
         this._deepMergeDefaults(target[key], source[key]);
       } else if (target[key] === undefined || target[key] === null) {
         target[key] = JSON.parse(JSON.stringify(source[key]));
@@ -121,46 +118,24 @@ class SiDayaStateStore {
     return target;
   }
 
-  /**
-   * Persists current state tree with strict plane-partitioned storage keys
-   */
   saveState() {
     try {
       const isOpsHost = this.getInitialPortalMode() === 'OPS';
       const key = this.getStorageKey(isOpsHost ? 'OPS' : 'MERCHANT');
-
-      // Strict Plane Defense: Tenant plane must NEVER serialize operator data
-      if (!isOpsHost) {
-        delete this.state.operator;
-        if (this.state.auth) this.state.auth.operatorUser = null;
-      }
-
+      if (!isOpsHost) { delete this.state.operator; if (this.state.auth) this.state.auth.operatorUser = null; }
       this.state.version = 6;
       localStorage.setItem(key, JSON.stringify(this.state));
-      localStorage.setItem('sidaya_theme', this.state.ui.theme);
-
-      if (this.state.auth?.merchantUser) localStorage.setItem('sidaya_merchant_session', JSON.stringify(this.state.auth.merchantUser));
-      else localStorage.removeItem('sidaya_merchant_session');
+      if (!isOpsHost && this.state.auth?.merchantUser) localStorage.setItem('sidaya_merchant_session', JSON.stringify(this.state.auth.merchantUser));
+      else if (!isOpsHost) localStorage.removeItem('sidaya_merchant_session');
       if (isOpsHost && this.state.auth?.operatorUser) localStorage.setItem('sidaya_operator_session', JSON.stringify(this.state.auth.operatorUser));
       else localStorage.removeItem('sidaya_operator_session');
-    } catch (e) {
-      console.warn('[Store] LocalStorage write error:', e);
-    }
+    } catch (e) { console.warn('[Store] LocalStorage write error:', e); }
   }
 
-  /**
-   * Returns current state snapshot
-   * @returns {Object}
-   */
   getState() { return this.state; }
   subscribe(fn) { this.subscribers.add(fn); return () => this.subscribers.delete(fn); }
   notify() { this.saveState(); this.subscribers.forEach((sub) => sub(this.state)); }
 
-  /**
-   * Dispatches an action to mutate state
-   * @param {string} action - Action type
-   * @param {*} [payload] - Action payload
-   */
   dispatch(action, payload) {
     switch (action) {
       case 'NAVIGATE': {
@@ -301,19 +276,19 @@ class SiDayaStateStore {
         const staff = this.state.pilar8?.staff?.find((s) => s.email === payload.email || (payload.id && s.id === payload.id));
         if (staff && !staff.isOwner && Array.isArray(this.state.pilar8?.staff)) {
           this.state.pilar8.staff = this.state.pilar8.staff.filter((s) => s.email !== staff.email && s.id !== staff.id);
-          this._logTenantAudit('STAFF_DELETED', staff.name + ' (' + staff.email + ')', payload.reason || 'Pencabutan akun staf');
+          this._logTenantAudit('STAFF_DELETED', `${staff.name} (${staff.email})`, payload.reason || 'Pencabutan akun staf');
         }
         break;
       }
       case 'RESET_STAFF_PIN': {
         const staff = this.state.pilar8?.staff?.find((s) => s.email === payload.email || (payload.id && s.id === payload.id));
-        if (staff) { staff.pinConfigured = true; staff.lastPinResetAt = new Date().toISOString(); staff.pinResetAt = staff.lastPinResetAt; this._logTenantAudit('PIN_RESET', staff.name, 'Reset PIN kasir'); }
+        if (staff) { staff.pinConfigured = true; staff.lastPinResetAt = staff.pinResetAt = new Date().toISOString(); this._logTenantAudit('PIN_RESET', staff.name, 'Reset PIN kasir'); }
         break;
       }
       case 'SEND_STAFF_PASSWORD_RESET': {
         const staff = this.state.pilar8?.staff?.find((s) => s.email === payload.email || (payload.id && s.id === payload.id));
         if (staff) {
-          staff.lastPasswordResetSentAt = new Date().toISOString(); staff.passwordResetSentAt = staff.lastPasswordResetSentAt;
+          staff.lastPasswordResetSentAt = staff.passwordResetSentAt = new Date().toISOString();
           staff.passwordResetLink = `https://${this.state.pilar9?.settings?.subdomain || 'berasjaya'}.sidaya.id/reset-password?token=rst_${Date.now()}`;
           this._logTenantAudit('PASSWORD_RESET_DISPATCHED', staff.email, 'Pengiriman tautan atur ulang sandi');
         }
@@ -361,14 +336,30 @@ class SiDayaStateStore {
         break;
       }
       case 'REGISTER_OWNER': {
-        const { bizName, subdomain, ownerName, email, phone } = payload;
+        const { bizName, subdomain, ownerName, email, phone, password, legalEntity, isVerified = false } = payload;
+        const curDomain = payload.baseDomain || (typeof getBaseDomain === 'function' ? getBaseDomain() : 'sidaya.biz.id');
         this.state = JSON.parse(JSON.stringify(INITIAL_TENANT_STATE));
-        this.state.pilar9.settings.storeName = bizName; this.state.pilar9.settings.subdomain = subdomain; this.state.pilar9.settings.storePhone = phone;
-        this.state.pilar8.staff = [{ id: 'stf_owner_' + Date.now(), name: ownerName, email, phone, role: 'Owner / Direktur Utama', isOwner: true, status: 'VERIFIED', pinConfigured: false, permissions: (typeof STAFF_CAPABILITIES !== 'undefined' ? STAFF_CAPABILITIES.map(c => c.key) : []) }];
-        const session = { name: ownerName, email, role: 'Owner', tenantName: bizName, subdomain, expiresAt: Date.now() + 1800000 };
+        this.state.pilar9.settings.storeName = bizName; this.state.pilar9.settings.subdomain = subdomain; this.state.pilar9.settings.baseDomain = curDomain; this.state.pilar9.settings.storePhone = phone;
+        if (legalEntity && this.state.pilar9.settings.businessProfile) this.state.pilar9.settings.businessProfile.legalEntity = legalEntity;
+        this.state.pilar8.staff = [{ id: 'stf_owner_' + Date.now(), name: ownerName, email, phone, password: password || 'Password123!', role: 'Owner / Direktur Utama', isOwner: true, status: isVerified ? 'VERIFIED' : 'UNVERIFIED', isEmailVerified: !!isVerified, pinConfigured: false, permissions: (typeof STAFF_CAPABILITIES !== 'undefined' ? STAFF_CAPABILITIES.map(c => c.key) : []) }];
+        const session = { name: ownerName, email, role: 'Owner', tenantName: bizName, subdomain, baseDomain: curDomain, isEmailVerified: !!isVerified, expiresAt: Date.now() + 1800000 };
         this.state.auth.merchantUser = session; localStorage.setItem('sidaya_merchant_session', JSON.stringify(session));
-        this._logTenantAudit('WORKSPACE_INITIALIZED', bizName, 'Pendaftaran dan inisialisasi toko baru');
-        this._logOperatorAudit('TENANT_REGISTERED', `${bizName} (${subdomain})`, '#REG-SELF', 'Pendaftaran mandiri owner');
+        this._logTenantAudit('WORKSPACE_INITIALIZED', bizName, `Inisialisasi toko baru (${subdomain}.${curDomain})`);
+        this._logOperatorAudit('TENANT_REGISTERED', `${bizName} (${subdomain}.${curDomain})`, '#REG-SELF', 'Pendaftaran mandiri owner');
+        break;
+      }
+      case 'VERIFY_EMAIL': {
+        const em = payload?.email || this.state.auth?.merchantUser?.email;
+        if (this.state.pilar8?.staff) {
+          const o = this.state.pilar8.staff.find((s) => s.email === em || s.isOwner);
+          if (o) { o.status = 'VERIFIED'; o.isEmailVerified = true; }
+        }
+        if (this.state.auth?.merchantUser) {
+          this.state.auth.merchantUser.isEmailVerified = true; this.state.auth.merchantUser.status = 'VERIFIED';
+          localStorage.setItem('sidaya_merchant_session', JSON.stringify(this.state.auth.merchantUser));
+        }
+        this._logTenantAudit('EMAIL_VERIFIED', em || 'Owner', 'Verifikasi kode OTP email berhasil');
+        this._logOperatorAudit('TENANT_EMAIL_VERIFIED', em || 'Owner', '#VERIFY-EMAIL', 'Email owner terverifikasi');
         break;
       }
 
@@ -398,8 +389,6 @@ class SiDayaStateStore {
         }
         break;
       }
-
-      /* Reset State */
       case 'RESET_STATE': {
         const isOps = this.getInitialPortalMode() === 'OPS';
         this.state = JSON.parse(JSON.stringify(isOps ? INITIAL_OPERATOR_STATE : INITIAL_TENANT_STATE));

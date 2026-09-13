@@ -15,11 +15,13 @@
 </p>
 
 [Explore Documentation](docs/README.md) •
-[System Architecture](docs/technical/01_SYSTEM_ARCHITECTURE.md) •
-[API Specification](docs/technical/05_API_SPECIFICATION.md) •
-[Security & Tenancy](docs/technical/06_SECURITY_COMPLIANCE_AND_TENANCY.md)
+[Package Manifest](docs/technical/12_PACKAGE_AND_MODULE_MANIFEST.md) •
+[Security & VAPT](docs/technical/11_SECURITY_ASSESSMENT_FRAMEWORK.md) •
+[Dual Payment Engine](docs/technical/09_DUAL_PATH_AND_PLUGGABLE_PAYMENT_ENGINE.md) •
+[API Specification](docs/technical/05_API_SPECIFICATION.md)
 
 </div>
+
 
 ---
 

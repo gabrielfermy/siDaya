@@ -9,7 +9,8 @@
     "typecheck": "tsc --noEmit",
     "clean": "rimraf dist",
     "dev": "tsx watch src/server.ts",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test:email": "tsx scripts/test-email.ts"
   },
   "dependencies": {
     "@sidaya/database": "workspace:*",
