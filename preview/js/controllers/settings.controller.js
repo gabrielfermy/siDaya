@@ -78,7 +78,8 @@ const SettingsController = {
 
     // Dispatch update
     store.dispatch('UPDATE_SUBDOMAIN', { newSubdomain });
-    Toast.show(`✓ Subdomain berhasil diubah ke: ${newSubdomain}.sidaya.biz.id (Alias 30 hari aktif untuk ${currentSubdomain})`, 'success');
+    const baseDomain = (typeof getBaseDomain === 'function') ? getBaseDomain() : 'sidaya.biz.id';
+    Toast.show(`✓ Subdomain berhasil diubah ke: ${newSubdomain}.${baseDomain} (Alias 30 hari aktif untuk ${currentSubdomain})`, 'success');
   },
 
   /**
@@ -191,8 +192,7 @@ const SettingsController = {
    * @param {string} subdomain
    */
   copyStoreUrl(subdomain) {
-    const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
-    const url = `https://${subdomain}.${baseDomain}`;
+    const url = (typeof getSubdomainUrl === 'function') ? getSubdomainUrl(subdomain) : `https://${subdomain}.sidaya.biz.id`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url).then(() => {
         Toast.show(`📋 URL ${url} disalin ke clipboard!`, 'success');

@@ -35,6 +35,7 @@ export interface EmailVerificationRecord {
   email: string;
   userType: 'TENANT_USER' | 'PLATFORM_OPERATOR';
   token: string;
+  otpCode?: string;
   expiresAt: Date;
   verifiedAt?: Date;
 }

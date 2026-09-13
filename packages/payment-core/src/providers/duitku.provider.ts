@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   IPaymentGatewayProvider,
   CreatePaymentSessionDTO,
@@ -36,17 +37,37 @@ export class DuitkuPaymentProvider implements IPaymentGatewayProvider {
     };
   }
 
+  /**
+   * Verifies Duitku MD5 signature:
+   * MD5(merchantCode + amount + merchantOrderId + merchantKey)
+   * Uses constant-time comparison to prevent timing attacks.
+   */
   verifyWebhookSignature(_headers: Record<string, string>, body: Record<string, unknown>): boolean {
     const signature = body['signature'] as string | undefined;
     const merchantCode = body['merchantCode'] as string | undefined;
-    const amount = body['amount'] as string | undefined;
+    const amount = body['amount'] as string | number | undefined;
     const merchantOrderId = body['merchantOrderId'] as string | undefined;
 
-    if (!signature || !merchantCode || !amount || !merchantOrderId) {
+    if (!signature || !merchantCode || amount === undefined || !merchantOrderId) {
       return false;
     }
-    // Duitku signature formula: MD5(merchantCode + amount + merchantOrderId + merchantKey)
-    return signature.length > 0;
+
+    const payload = `${merchantCode}${amount}${merchantOrderId}${this.config.merchantKey}`;
+    const expectedSignature = crypto.createHash('md5').update(payload).digest('hex').toLowerCase();
+    const receivedSignature = signature.toLowerCase().trim();
+
+    if (expectedSignature.length !== receivedSignature.length) {
+      return false;
+    }
+
+    try {
+      return crypto.timingSafeEqual(
+        Buffer.from(expectedSignature, 'utf8'),
+        Buffer.from(receivedSignature, 'utf8'),
+      );
+    } catch {
+      return false;
+    }
   }
 
   parseWebhook(body: Record<string, unknown>): NormalizedWebhookResult {
@@ -81,3 +102,4 @@ export class DuitkuPaymentProvider implements IPaymentGatewayProvider {
     return 'PENDING';
   }
 }
+

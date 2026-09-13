@@ -181,7 +181,7 @@ const Router = {
     const userName = document.getElementById('sidebar-user-name');
     const userRole = document.getElementById('sidebar-user-role');
     const topbarSub = document.getElementById('topbar-breadcrumb-sub');
-    const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
+    const baseDomain = (typeof getBaseDomain === 'function') ? getBaseDomain() : 'sidaya.biz.id';
 
     if (isOps) {
       if (navContent && typeof LayoutView !== 'undefined' && LayoutView.renderOperatorNav) {
@@ -199,12 +199,14 @@ const Router = {
       }
       const mUser = state?.auth?.merchantUser;
       const imp = state?.auth?.impersonation;
+      const currentSub = state?.pilar9?.settings?.subdomain || mUser?.subdomain || 'berasjaya';
+      const storeName = imp?.active ? (imp.targetTenant?.businessName || 'Toko Grosir Beras Jaya') : (state?.pilar9?.settings?.storeName || mUser?.tenantName || 'Toko Grosir Beras Jaya Bersama');
       if (badgeLabel) badgeLabel.textContent = 'Active Workspace';
-      if (tenantName) tenantName.textContent = imp?.active ? (imp.targetTenant?.businessName || 'Toko Grosir Beras Jaya') : (mUser?.tenantName || 'Toko Grosir Beras Jaya');
+      if (tenantName) tenantName.textContent = storeName;
       if (userAvatar) userAvatar.textContent = imp?.active ? (imp.targetUser?.avatar || 'S') : (mUser?.avatar || (mUser?.name ? mUser.name.charAt(0) : '—'));
       if (userName) userName.textContent = imp?.active ? (imp.targetUser?.name || 'Staf') : (mUser?.name || 'Belum Masuk');
       if (userRole) userRole.textContent = imp?.active ? (imp.targetUser?.role || 'Staff') : (mUser?.role || 'Tamu');
-      if (topbarSub) topbarSub.innerHTML = `Toko Grosir Beras Jaya Bersama • Subdomain: <code id="topbar-subdomain-code">berasjaya.${baseDomain}</code>`;
+      if (topbarSub) topbarSub.innerHTML = `${storeName} • Subdomain: <code id="topbar-subdomain-code">${currentSub}.${baseDomain}</code>`;
 
       // Strictly purge any floating operator remnants from tenant DOM
       const floatingDocks = document.querySelectorAll('#app-shell > .error-tester-dock, body > .error-tester-dock');
@@ -240,7 +242,7 @@ const Router = {
     const subEl = document.getElementById('topbar-subdomain-code');
     if (subEl) {
       const isOps = this.isOpsHost();
-      const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
+      const baseDomain = (typeof getBaseDomain === 'function') ? getBaseDomain() : 'sidaya.biz.id';
       if (isOps) {
         subEl.textContent = `ops.${baseDomain}`;
       } else {

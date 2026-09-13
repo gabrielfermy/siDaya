@@ -54,6 +54,14 @@ export class AppRouter {
   }
 
   public async handleRequest(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
+    // 1. Inject Financial-Grade HTTP Security Headers
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; frame-ancestors 'none';");
+
     if (handleCors(req, res)) {
       return;
     }
@@ -63,6 +71,21 @@ export class AppRouter {
     const pathname: string = parts[0] || '/';
     const queryString: string | undefined = parts[1];
     const method = (req.method || 'GET').toUpperCase();
+
+    // 2. Sliding-Window Rate Limiter for Authentication & Sensitive Endpoints
+    if (pathname.startsWith('/api/v1/auth/login') || pathname.includes('/set-pin')) {
+      const clientIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || 'unknown-ip';
+      if (!this.checkRateLimit(clientIp, 10, 60000)) {
+        sendJson(res, 429, {
+          success: false,
+          error: {
+            code: 'RATE_LIMIT_EXCEEDED',
+            message: 'Terlalu banyak percobaan autentikasi. Silakan tunggu 1 menit.',
+          },
+        });
+        return;
+      }
+    }
 
     const query: Record<string, string> = {};
     if (queryString) {
@@ -103,4 +126,24 @@ export class AppRouter {
       error: { message: `Endpoint not found: ${method} ${pathname}`, code: 'NOT_FOUND' },
     });
   }
+
+  private rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+  private checkRateLimit(ip: string, maxAttempts: number, windowMs: number): boolean {
+    const now = Date.now();
+    const record = this.rateLimitMap.get(ip);
+
+    if (!record || now > record.resetAt) {
+      this.rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
+      return true;
+    }
+
+    if (record.count >= maxAttempts) {
+      return false;
+    }
+
+    record.count += 1;
+    return true;
+  }
 }
+

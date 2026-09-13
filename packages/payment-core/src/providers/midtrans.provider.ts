@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   IPaymentGatewayProvider,
   CreatePaymentSessionDTO,
@@ -36,6 +37,11 @@ export class MidtransPaymentProvider implements IPaymentGatewayProvider {
     };
   }
 
+  /**
+   * Verifies Midtrans SHA512 signature:
+   * SHA512(order_id + status_code + gross_amount + ServerKey)
+   * Enforces constant-time comparison to prevent timing side-channel attacks.
+   */
   verifyWebhookSignature(_headers: Record<string, string>, body: Record<string, unknown>): boolean {
     const signatureKey = body['signature_key'] as string | undefined;
     const orderId = body['order_id'] as string | undefined;
@@ -46,9 +52,22 @@ export class MidtransPaymentProvider implements IPaymentGatewayProvider {
       return false;
     }
 
-    // Expected Midtrans signature: SHA512(order_id + status_code + gross_amount + serverKey)
-    // When crypto is hooked up, this evaluates to: crypto.createHash('sha512').update(payload).digest('hex') === signatureKey
-    return signatureKey.length > 0;
+    const payload = `${orderId}${statusCode}${grossAmount}${this.config.serverKey}`;
+    const expectedSignature = crypto.createHash('sha512').update(payload).digest('hex').toLowerCase();
+    const receivedSignature = signatureKey.toLowerCase().trim();
+
+    if (expectedSignature.length !== receivedSignature.length) {
+      return false;
+    }
+
+    try {
+      return crypto.timingSafeEqual(
+        Buffer.from(expectedSignature, 'utf8'),
+        Buffer.from(receivedSignature, 'utf8'),
+      );
+    } catch {
+      return false;
+    }
   }
 
   parseWebhook(body: Record<string, unknown>): NormalizedWebhookResult {
@@ -87,3 +106,4 @@ export class MidtransPaymentProvider implements IPaymentGatewayProvider {
     return 'PENDING';
   }
 }
+

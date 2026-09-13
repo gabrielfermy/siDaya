@@ -162,7 +162,8 @@ const PosController = {
   shareWhatsAppPayLink() {
     const total = this.lastCheckoutSnapshot?.total || 0;
     const inv = this.lastCheckoutSnapshot?.invNum || 'INV-001';
-    const text = `Halo Pelanggan Toko Beras Jaya,\nBerikut tagihan resmi transaksi #${inv} senilai ${formatRupiah(total)}.\nSilakan bayar via QRIS di tautan resmi:\nhttps://pay.sidaya.biz.id/p/${Date.now().toString(36)}\n\nTerima kasih!`;
+    const payBase = (typeof getSubdomainUrl === 'function') ? getSubdomainUrl('pay') : 'https://pay.sidaya.biz.id';
+    const text = `Halo Pelanggan Toko Beras Jaya,\nBerikut tagihan resmi transaksi #${inv} senilai ${formatRupiah(total)}.\nSilakan bayar via QRIS di tautan resmi:\n${payBase}/p/${Date.now().toString(36)}\n\nTerima kasih!`;
     const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
   },

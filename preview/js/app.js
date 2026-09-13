@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2. Mount Auth Overlays
   const authRoot = document.getElementById('auth-root');
   if (authRoot) {
-    authRoot.innerHTML = AuthView.renderMerchantLogin() + AuthView.renderMerchantRegister() + AuthView.renderOperatorLogin();
+    authRoot.innerHTML = AuthView.renderMerchantLogin() + AuthView.renderMerchantRegister() + AuthView.renderEmailVerification() + AuthView.renderOperatorLogin();
     if (window.location.pathname === '/register' && typeof AuthController !== 'undefined') {
       setTimeout(() => AuthController.showRegisterScreen(), 0);
     }
@@ -156,3 +156,16 @@ function viewReceipt(orderNo) { showToast(`Mencetak struk kasir thermal untuk ${
 function viewInvoiceReceipt(invNo) { showToast(`Mencetak struk faktur untuk ${invNo} 🧾`); }
 function editProduct(id) { showToast(`Mengedit master SKU produk ${id}`); }
 function viewPodSignature(sjNo) { showToast(`Membuka berkas tanda tangan digital POD untuk ${sjNo} ✍️`); }
+
+// Live Reload Client for Local Development (Automatic hot-reload on save)
+if (typeof window !== 'undefined' && window.EventSource && (window.location.hostname === 'localhost' || window.location.hostname.endsWith('.localhost') || window.location.hostname === '127.0.0.1')) {
+  try {
+    const es = new EventSource('/__livereload');
+    es.onmessage = (e) => {
+      if (e.data === 'reload') {
+        console.log('[LiveReload] File change detected, reloading page...');
+        window.location.reload();
+      }
+    };
+  } catch (err) {}
+}

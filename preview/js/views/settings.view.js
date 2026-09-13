@@ -29,7 +29,8 @@ const SettingsView = {
 
     const currentSubdomain = s.subdomain || 'berasjaya';
     const aliases = Array.isArray(s.subdomainAliases) ? s.subdomainAliases : [];
-    const baseDomain = (typeof window !== 'undefined' && window.location.hostname.endsWith('sidaya.my.id')) ? 'sidaya.my.id' : 'sidaya.biz.id';
+    const baseDomain = (typeof getBaseDomain === 'function') ? getBaseDomain() : 'sidaya.biz.id';
+    const proto = (typeof getAppProtocol === 'function') ? getAppProtocol() : 'https:';
 
     return `
       <div class="view-header">
@@ -61,7 +62,7 @@ const SettingsView = {
               <div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px; font-weight:600;">URL UTAMA AKTIF:</div>
               <div style="display:flex; align-items:center; justify-content:space-between;">
                 <span style="font-family:var(--font-mono, monospace); font-size:15px; font-weight:700; color:var(--color-primary, #6366f1);">
-                  https://<span id="current-subdomain-display">${currentSubdomain}</span>.${baseDomain}
+                  ${proto}//<span id="current-subdomain-display">${currentSubdomain}</span>.${baseDomain}
                 </span>
                 <button class="btn btn-sm btn-outline" onclick="SettingsController.copyStoreUrl('${currentSubdomain}')" title="Salin URL">
                   📋 Salin
@@ -103,7 +104,7 @@ const SettingsView = {
                   </div>
                   ${aliases.length > 0 ? `
                     <div style="margin-top:8px; font-size:11px; font-family:var(--font-mono, monospace); background:rgba(0,0,0,0.03); padding:6px 8px; border-radius:6px;">
-                      <strong>Alias Aktif:</strong> ${aliases.map(a => `<span class="badge badge-warning" style="margin-left:4px;">${a.alias}.sidaya.biz.id (s/d ${a.expiresAt})</span>`).join('')}
+                      <strong>Alias Aktif:</strong> ${aliases.map(a => `<span class="badge badge-warning" style="margin-left:4px;">${a.alias}.${baseDomain} (s/d ${a.expiresAt})</span>`).join('')}
                     </div>
                   ` : ''}
                 </div>
