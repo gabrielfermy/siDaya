@@ -1,0 +1,4 @@
+# Cloudflare Pages Single Page Application (SPA) Client Routing
+# Rewrites all application routes to /index.html with HTTP 200 OK
+
+/*    /index.html   200

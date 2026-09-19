@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/css/modals.css">
   <link rel="stylesheet" href="/css/modules.css">
   <link rel="stylesheet" href="/css/daya.css">
+  <link rel="stylesheet" href="/css/legal.css">
 
   <script>
     /* Synchronous Pre-Paint Auth State & Session Expiry Resolver (Zero FOUC Flash) */
@@ -62,14 +63,18 @@
 
         // 3. Preserve User's Intended Destination Route upon session expiry/unauthenticated landing
         var fullPath = window.location.pathname;
-        if (fullPath && fullPath !== '/' && fullPath !== '/dashboard' && !fullPath.includes('404')) {
+        var isLegalPath = ['/faq', '/terms', '/terms-and-conditions', '/refund', '/refund-policy', '/privacy', '/privacy-policy', '/contact', '/kontak', '/legal'].includes(fullPath);
+
+        if (fullPath && fullPath !== '/' && fullPath !== '/dashboard' && !fullPath.includes('404') && !isLegalPath) {
           if ((isOps && !hasOpsSession) || (!isOps && !hasMerchantSession)) {
             sessionStorage.setItem('sidaya_intended_path', fullPath);
           }
         }
 
         // 4. Set Pre-paint Declarative State Classes
-        if (isOps) {
+        if (isLegalPath) {
+          document.documentElement.classList.add('is-legal-portal-page');
+        } else if (isOps) {
           document.documentElement.className = hasOpsSession ? 'state-auth-ops' : 'state-unauth-ops';
         } else {
           document.documentElement.className = hasMerchantSession ? 'state-auth-merchant' : 'state-unauth-merchant';
@@ -125,6 +130,7 @@
   <script src="/js/views/roadmap.view.js"></script>
   <script src="/js/views/error.view.js"></script>
   <script src="/js/views/daya.view.js"></script>
+  <script src="/js/views/legal.view.js"></script>
 
   <!-- 4. Components & Helpers -->
   <script src="/js/components/toast.js"></script>
@@ -141,6 +147,7 @@
   <script src="/js/controllers/settings.controller.js"></script>
   <script src="/js/controllers/invoices.controller.js"></script>
   <script src="/js/controllers/daya.controller.js"></script>
+  <script src="/js/controllers/legal.controller.js"></script>
 
   <!-- 6. SPA Router & App Bootstrapper -->
   <script src="/js/router.js"></script>
