@@ -13,6 +13,7 @@ import {
   XenditPaymentProvider,
   MidtransPaymentProvider,
   DuitkuPaymentProvider,
+  IpaymuPaymentProvider,
   PlatformBillingService,
   MerchantPaymentRouterService,
 } from '@sidaya/payment-core';
@@ -52,11 +53,17 @@ const duitkuProvider = new DuitkuPaymentProvider({
   merchantKey: process.env['DUITKU_MERCHANT_KEY'] || 'merchant_key_dev',
   isSandbox: true,
 });
+const ipaymuProvider = new IpaymuPaymentProvider({
+  va: process.env['IPAYMU_VA'] || '1179008214154585',
+  apiKey: process.env['IPAYMU_API_KEY'] || '6FF0178B-A610-4CC8-857A-4AAA272A1931',
+  isProduction: process.env['IPAYMU_IS_PRODUCTION'] === 'true' || true,
+});
 
 const gatewayRegistry = new PaymentGatewayRegistry();
 gatewayRegistry.register(midtransProvider);
 gatewayRegistry.register(xenditProvider);
 gatewayRegistry.register(duitkuProvider);
+gatewayRegistry.register(ipaymuProvider);
 
 // Setup Dual-Path Payment Services
 const platformBillingService = new PlatformBillingService(midtransProvider);

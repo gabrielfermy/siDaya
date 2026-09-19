@@ -65,6 +65,17 @@ export function registerWebhookRoutes(
     }
   });
 
+  router.post('/api/v1/webhooks/payment/ipaymu', async (req, res) => {
+    try {
+      const body = await parseRequestBody(req);
+      const headers = normalizeHeaders(req.headers);
+      const result = await webhookController.handleWebhook('IPAYMU', headers, body);
+      sendJson(res, 200, { success: true, data: result });
+    } catch (err: any) {
+      sendJson(res, 400, { success: false, error: { message: err.message || 'Webhook failed' } });
+    }
+  });
+
   // Path 2 (Tier 3): Open Payment Adapter Protocol (OPAP) for custom tenant payment systems
   router.post('/api/v1/webhooks/payment/custom/:tenantId', async (req, res, params) => {
     try {
