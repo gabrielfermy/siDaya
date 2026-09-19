@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SiDaya - Enterprise OS (Multi-Tenant, FIFO & Role Matrix)</title>
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Modular Stylesheets (Zero God CSS) -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/modals.css">
+  <link rel="stylesheet" href="/css/modules.css">
+  <link rel="stylesheet" href="/css/daya.css">
+  <link rel="stylesheet" href="/css/legal.css">
+
+  <script>
+    /* Synchronous Pre-Paint Auth State & Session Expiry Resolver (Zero FOUC Flash) */
+    (function() {
+      try {
+        var hostname = window.location.hostname.toLowerCase();
+        var isOps = hostname.startsWith('ops.') || hostname === 'ops.localhost';
+        
+        var theme = localStorage.getItem('sidaya_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+
+        var now = Date.now();
+        var hasOpsSession = false;
+        var hasMerchantSession = false;
+
+        // 1. Validate Operator Session Expiry
+        var rawOps = localStorage.getItem('sidaya_operator_session');
+        if (rawOps) {
+          try {
+            var opsObj = JSON.parse(rawOps);
+            if (opsObj && opsObj.expiresAt && opsObj.expiresAt > now) {
+              hasOpsSession = true;
+            } else {
+              localStorage.removeItem('sidaya_operator_session');
+              sessionStorage.setItem('sidaya_session_expired_flag', '1');
+            }
+          } catch(e) { localStorage.removeItem('sidaya_operator_session'); }
+        }
+
+        // 2. Validate Merchant Session Expiry
+        var rawMerchant = localStorage.getItem('sidaya_merchant_session');
+        if (rawMerchant) {
+          try {
+            var merchObj = JSON.parse(rawMerchant);
+            if (merchObj && merchObj.expiresAt && merchObj.expiresAt > now) {
+              hasMerchantSession = true;
+            } else {
+              localStorage.removeItem('sidaya_merchant_session');
+              sessionStorage.setItem('sidaya_session_expired_flag', '1');
+            }
+          } catch(e) { localStorage.removeItem('sidaya_merchant_session'); }
+        }
+
+        // 3. Preserve User's Intended Destination Route upon session expiry/unauthenticated landing
+        var fullPath = window.location.pathname;
+        var isLegalPath = ['/faq', '/terms', '/terms-and-conditions', '/refund', '/refund-policy', '/privacy', '/privacy-policy', '/contact', '/kontak', '/legal'].includes(fullPath);
+
+        if (fullPath && fullPath !== '/' && fullPath !== '/dashboard' && !fullPath.includes('404') && !isLegalPath) {
+          if ((isOps && !hasOpsSession) || (!isOps && !hasMerchantSession)) {
+            sessionStorage.setItem('sidaya_intended_path', fullPath);
+          }
+        }
+
+        // 4. Set Pre-paint Declarative State Classes
+        if (isLegalPath) {
+          document.documentElement.classList.add('is-legal-portal-page');
+        } else if (isOps) {
+          document.documentElement.className = hasOpsSession ? 'state-auth-ops' : 'state-unauth-ops';
+        } else {
+          document.documentElement.className = hasMerchantSession ? 'state-auth-merchant' : 'state-unauth-merchant';
+          if (!hasMerchantSession && fullPath === '/register') {
+            document.documentElement.classList.add('is-register-page');
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Dynamic Mounting Roots -->
+  <div id="impersonation-banner-root"></div>
+  <div id="auth-root"></div>
+  <div id="modal-root"></div>
+  <div id="toast-container" class="toast-container"></div>
+  <div id="app-root"></div>
+  <div id="daya-root"></div>
+
+  <!-- 0. Modulith Core & Internal Dependency Manager -->
+  <script src="/js/core/dependency-manager.js"></script>
+
+  <!-- 1. Config & Data Entities -->
+  <script src="/js/config/constants.js"></script>
+  <script src="/js/config/roadmap.js"></script>
+  <script src="/js/config/errors.js"></script>
+
+  <!-- 2. Models & Reactive State Store -->
+  <script src="/js/store/state.js"></script>
+  <script src="/js/store/store.js"></script>
+  <script src="/js/utils/formatters.js"></script>
+  <script src="/js/utils/audit.helper.js"></script>
+
+  <!-- 3. Views Layer (Declarative MVC Renderers) -->
+  <script src="/js/views/layout.view.js"></script>
+  <script src="/js/views/auth.view.js"></script>
+  <script src="/js/views/modals.view.js"></script>
+  <script src="/js/views/dashboard.view.js"></script>
+  <script src="/js/views/katalog.view.js"></script>
+  <script src="/js/views/fifo.view.js"></script>
+  <script src="/js/views/customers.view.js"></script>
+  <script src="/js/views/pos.view.js"></script>
+  <script src="/js/views/invoices.view.js"></script>
+  <script src="/js/views/sj.view.js"></script>
+  <script src="/js/views/piutang.view.js"></script>
+  <script src="/js/views/users.view.js"></script>
+  <script src="/js/views/roles.view.js"></script>
+  <script src="/js/views/profile.view.js"></script>
+  <script src="/js/views/settings.view.js"></script>
+  <script src="/js/views/operator.view.js"></script>
+  <script src="/js/views/roadmap.view.js"></script>
+  <script src="/js/views/error.view.js"></script>
+  <script src="/js/views/daya.view.js"></script>
+  <script src="/js/views/legal.view.js"></script>
+
+  <!-- 4. Components & Helpers -->
+  <script src="/js/components/toast.js"></script>
+  <script src="/js/components/modals.js"></script>
+
+  <!-- 5. Controllers Layer (Event Handlers & Action Dispatchers) -->
+  <script src="/js/controllers/auth.controller.js"></script>
+  <script src="/js/controllers/katalog.controller.js"></script>
+  <script src="/js/controllers/pos.controller.js"></script>
+  <script src="/js/controllers/fifo.controller.js"></script>
+  <script src="/js/controllers/customers.controller.js"></script>
+  <script src="/js/controllers/users.controller.js"></script>
+  <script src="/js/controllers/operator.controller.js"></script>
+  <script src="/js/controllers/settings.controller.js"></script>
+  <script src="/js/controllers/invoices.controller.js"></script>
+  <script src="/js/controllers/daya.controller.js"></script>
+  <script src="/js/controllers/legal.controller.js"></script>
+
+  <!-- 6. SPA Router & App Bootstrapper -->
+  <script src="/js/router.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light" class="is-legal-portal-page">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SiDaya - Kebijakan Privasi & UU PDP</title>
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Modular Stylesheets -->
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/modals.css">
+  <link rel="stylesheet" href="/css/modules.css">
+  <link rel="stylesheet" href="/css/daya.css">
+  <link rel="stylesheet" href="/css/legal.css">
+
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('sidaya_theme') || 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.classList.add('is-legal-portal-page');
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Dynamic Mounting Roots -->
+  <div id="impersonation-banner-root"></div>
+  <div id="auth-root"></div>
+  <div id="modal-root"></div>
+  <div id="toast-container" class="toast-container"></div>
+  <div id="app-root"></div>
+  <div id="daya-root"></div>
+
+  <!-- 0. Modulith Core & Internal Dependency Manager -->
+  <script src="/js/core/dependency-manager.js"></script>
+
+  <!-- 1. Config & Data Entities -->
+  <script src="/js/config/constants.js"></script>
+  <script src="/js/config/roadmap.js"></script>
+  <script src="/js/config/errors.js"></script>
+
+  <!-- 2. Models & Reactive State Store -->
+  <script src="/js/store/state.js"></script>
+  <script src="/js/store/store.js"></script>
+  <script src="/js/utils/formatters.js"></script>
+  <script src="/js/utils/audit.helper.js"></script>
+
+  <!-- 3. Views Layer -->
+  <script src="/js/views/layout.view.js"></script>
+  <script src="/js/views/auth.view.js"></script>
+  <script src="/js/views/modals.view.js"></script>
+  <script src="/js/views/dashboard.view.js"></script>
+  <script src="/js/views/katalog.view.js"></script>
+  <script src="/js/views/fifo.view.js"></script>
+  <script src="/js/views/customers.view.js"></script>
+  <script src="/js/views/pos.view.js"></script>
+  <script src="/js/views/invoices.view.js"></script>
+  <script src="/js/views/sj.view.js"></script>
+  <script src="/js/views/piutang.view.js"></script>
+  <script src="/js/views/users.view.js"></script>
+  <script src="/js/views/roles.view.js"></script>
+  <script src="/js/views/profile.view.js"></script>
+  <script src="/js/views/settings.view.js"></script>
+  <script src="/js/views/operator.view.js"></script>
+  <script src="/js/views/roadmap.view.js"></script>
+  <script src="/js/views/error.view.js"></script>
+  <script src="/js/views/daya.view.js"></script>
+  <script src="/js/views/legal.view.js"></script>
+
+  <!-- 4. Components & Helpers -->
+  <script src="/js/components/toast.js"></script>
+  <script src="/js/components/modals.js"></script>
+
+  <!-- 5. Controllers Layer -->
+  <script src="/js/controllers/auth.controller.js"></script>
+  <script src="/js/controllers/katalog.controller.js"></script>
+  <script src="/js/controllers/pos.controller.js"></script>
+  <script src="/js/controllers/fifo.controller.js"></script>
+  <script src="/js/controllers/customers.controller.js"></script>
+  <script src="/js/controllers/users.controller.js"></script>
+  <script src="/js/controllers/operator.controller.js"></script>
+  <script src="/js/controllers/settings.controller.js"></script>
+  <script src="/js/controllers/invoices.controller.js"></script>
+  <script src="/js/controllers/daya.controller.js"></script>
+  <script src="/js/controllers/legal.controller.js"></script>
+
+  <!-- 6. SPA Router & App Bootstrapper -->
+  <script src="/js/router.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
