@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     moduleManager.register('View:Profile', ['Store'], ProfileView);
     moduleManager.register('View:Settings', ['Store'], SettingsView);
     moduleManager.register('View:Operator', ['Store'], OperatorView);
+    moduleManager.register('View:Legal', ['Store'], LegalView);
 
     moduleManager.register('Controller:Auth', ['Store'], AuthController);
     moduleManager.register('Controller:POS', ['Store', 'View:POS'], PosController);
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     moduleManager.register('Controller:Users', ['Store'], UsersController);
     moduleManager.register('Controller:Operator', ['Store'], OperatorController);
     moduleManager.register('Controller:Invoices', ['Store'], InvoicesController);
+    moduleManager.register('Controller:Legal', ['Store'], LegalController);
 
     moduleManager.register('View:Daya', ['Store'], DayaView);
     moduleManager.register('Controller:Daya', ['Store'], DayaController);

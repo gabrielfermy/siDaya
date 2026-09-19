@@ -62,6 +62,21 @@ const LayoutView = {
         <span class="nav-icon">⚙️</span>
         <span class="nav-label">Konfigurasi Hardware</span>
       </a>
+
+      <!-- INFORMASI RESMI & LEGALITAS -->
+      <div class="nav-section-label">BANTUAN & LEGALITAS</div>
+      <a class="nav-item" data-route="/faq" onclick="navigate('/faq')">
+        <span class="nav-icon">❓</span>
+        <span class="nav-label">FAQ & Bantuan</span>
+      </a>
+      <a class="nav-item" data-route="/terms-and-conditions" onclick="navigate('/terms-and-conditions')">
+        <span class="nav-icon">📜</span>
+        <span class="nav-label">Syarat & Kebijakan</span>
+      </a>
+      <a class="nav-item" data-route="/contact" onclick="navigate('/contact')">
+        <span class="nav-icon">📞</span>
+        <span class="nav-label">Kontak Resmi Usaha</span>
+      </a>
     `;
   },
 

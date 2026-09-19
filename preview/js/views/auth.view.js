@@ -77,8 +77,19 @@ const AuthView = {
             <a class="login-action-link" onclick="openForgotPasswordModal()">Lupa Kata Sandi?</a>
             <a class="login-action-link" onclick="showRegisterScreen()">Daftar Toko Baru (Owner) →</a>
           </div>
-          <div class="login-footer-meta">
-            Subdomain routing otomatis mendeteksi tenant workspace secara transparan.
+          <div class="login-footer-meta" style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-color); display:flex; flex-direction:column; gap:8px;">
+            <div>Subdomain routing otomatis mendeteksi tenant workspace secara transparan.</div>
+            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; font-size:11px; margin-top:2px;">
+              <a onclick="navigate('/faq')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">FAQ</a>
+              <span style="color:var(--text-muted);">•</span>
+              <a onclick="navigate('/terms-and-conditions')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">Syarat & Ketentuan</a>
+              <span style="color:var(--text-muted);">•</span>
+              <a onclick="navigate('/refund-policy')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">Kebijakan Refund</a>
+              <span style="color:var(--text-muted);">•</span>
+              <a onclick="navigate('/privacy-policy')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">Privasi (UU PDP)</a>
+              <span style="color:var(--text-muted);">•</span>
+              <a onclick="navigate('/contact')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">Kontak Usaha</a>
+            </div>
           </div>
         </div>
       </div>
@@ -224,6 +235,18 @@ const AuthView = {
             <a href="javascript:void(0)" onclick="showLoginScreen()" style="color:var(--color-primary, #6366f1); font-weight:700; text-decoration:underline;">
               Masuk ke Workspace (Login) →
             </a>
+          </div>
+
+          <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-color); display:flex; justify-content:center; gap:10px; flex-wrap:wrap; font-size:11px; color:var(--text-muted);">
+            <a onclick="navigate('/faq')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">FAQ</a>
+            <span>•</span>
+            <a onclick="navigate('/terms-and-conditions')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">Syarat & Ketentuan</a>
+            <span>•</span>
+            <a onclick="navigate('/refund-policy')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">Kebijakan Refund</a>
+            <span>•</span>
+            <a onclick="navigate('/privacy-policy')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">Privasi</a>
+            <span>•</span>
+            <a onclick="navigate('/contact')" style="color:var(--primary-color, #059669); cursor:pointer; font-weight:600;">Kontak Usaha</a>
           </div>
 
         </div>

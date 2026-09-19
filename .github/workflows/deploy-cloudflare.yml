@@ -1,0 +1,84 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main, master, staging, develop]
+    paths:
+      - 'preview/**'
+      - 'apps/paylink-web/**'
+      - 'packages/**'
+      - 'wrangler.toml'
+  pull_request:
+    branches: [main, master, staging]
+    paths:
+      - 'preview/**'
+      - 'apps/paylink-web/**'
+      - 'packages/**'
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: 'Deployment Target Environment (staging | production)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy-cloudflare:
+    name: Build & Deploy to Cloudflare Pages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.4.0
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Monorepo Dependencies
+        run: pnpm --filter @sidaya/shared-types --filter @sidaya/paylink-web run build
+
+      - name: Determine Environment & Project Name
+        id: env-detect
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            TARGET="${{ github.event.inputs.target_env }}"
+          elif [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/master" ]]; then
+            TARGET="production"
+          else
+            TARGET="staging"
+          fi
+          
+          if [[ "$TARGET" == "production" ]]; then
+            echo "PROJECT_NAME=sidaya-production" >> $GITHUB_OUTPUT
+            echo "CLOUDFLARE_ENV=production" >> $GITHUB_OUTPUT
+            echo "BRANCH=main" >> $GITHUB_OUTPUT
+          else
+            echo "PROJECT_NAME=sidaya-staging" >> $GITHUB_OUTPUT
+            echo "CLOUDFLARE_ENV=staging" >> $GITHUB_OUTPUT
+            echo "BRANCH=staging" >> $GITHUB_OUTPUT
+          fi
+          echo "TARGET_ENV=$TARGET" >> $GITHUB_OUTPUT
+
+      - name: Deploy Portal (preview/) to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy preview --project-name=${{ steps.env-detect.outputs.PROJECT_NAME }} --branch=${{ steps.env-detect.outputs.BRANCH }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

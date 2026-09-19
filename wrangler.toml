@@ -1,0 +1,31 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "sidaya-portal"
+compatibility_date = "2024-09-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "preview"
+
+# Default (Local / Staging preview)
+[vars]
+ENVIRONMENT = "staging"
+PUBLIC_API_URL = "https://api.sidaya.my.id"
+SUPABASE_URL = "https://staging.supabase.sidaya.my.id"
+
+# Staging Environment (sidaya.my.id)
+[env.staging]
+name = "sidaya-staging"
+pages_build_output_dir = "preview"
+[env.staging.vars]
+ENVIRONMENT = "staging"
+PUBLIC_API_URL = "https://api.sidaya.my.id"
+PRIMARY_DOMAIN = "sidaya.my.id"
+OPS_DOMAIN = "ops.sidaya.my.id"
+
+# Production Environment (sidaya.biz.id)
+[env.production]
+name = "sidaya-production"
+pages_build_output_dir = "preview"
+[env.production.vars]
+ENVIRONMENT = "production"
+PUBLIC_API_URL = "https://api.sidaya.biz.id"
+PRIMARY_DOMAIN = "sidaya.biz.id"
+OPS_DOMAIN = "ops.sidaya.biz.id"

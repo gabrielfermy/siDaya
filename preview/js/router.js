@@ -42,6 +42,20 @@ const Router = {
     '/fleet': { title: 'Operator Fleet Directory', render: (s) => OperatorView.render(s) },
   },
 
+  // Public Legal, Compliance & Merchant Payment Gateway Verification Routes (Bypass Auth)
+  publicLegalRoutes: {
+    '/faq': { title: 'Pusat Bantuan & FAQ', tab: 'faq' },
+    '/terms': { title: 'Syarat & Ketentuan Layanan', tab: 'terms' },
+    '/terms-and-conditions': { title: 'Syarat & Ketentuan Layanan', tab: 'terms' },
+    '/refund': { title: 'Kebijakan Pengembalian Dana', tab: 'refund' },
+    '/refund-policy': { title: 'Kebijakan Pengembalian Dana (Refund)', tab: 'refund' },
+    '/privacy': { title: 'Kebijakan Privasi & UU PDP', tab: 'privacy' },
+    '/privacy-policy': { title: 'Kebijakan Privasi & Perlindungan Data', tab: 'privacy' },
+    '/contact': { title: 'Kontak Resmi & Informasi Usaha', tab: 'contact' },
+    '/kontak': { title: 'Kontak Resmi & Informasi Usaha', tab: 'contact' },
+    '/legal': { title: 'Pusat Informasi Legalitas', tab: 'faq' },
+  },
+
   /**
    * Toggles standalone error full-screen layout mode
    * @param {boolean} active
@@ -51,6 +65,23 @@ const Router = {
     if (appShell) {
       if (active) appShell.classList.add('is-error-page');
       else appShell.classList.remove('is-error-page');
+    }
+  },
+
+  /**
+   * Toggles standalone legal portal full-width layout mode
+   * @param {boolean} active
+   */
+  setLegalMode(active) {
+    const appShell = document.getElementById('app-shell');
+    if (appShell) {
+      if (active) {
+        appShell.classList.add('is-legal-portal');
+        document.documentElement.classList.add('is-legal-portal-page');
+      } else {
+        appShell.classList.remove('is-legal-portal');
+        document.documentElement.classList.remove('is-legal-portal-page');
+      }
     }
   },
 
@@ -67,6 +98,34 @@ const Router = {
     if (pushState && window.location.pathname !== cleanPath) {
       window.history.pushState({}, '', cleanPath);
     }
+
+    // 0. PUBLIC LEGAL & COMPLIANCE BYPASS (Always accessible publicly)
+    if (this.publicLegalRoutes[cleanPath]) {
+      const legalSpec = this.publicLegalRoutes[cleanPath];
+      this.setErrorMode(false);
+      this.setLegalMode(true);
+      
+      // Hide any active auth overlays
+      document.querySelectorAll('.login-overlay').forEach(el => el.style.display = 'none');
+      
+      if (typeof LegalView !== 'undefined' && LegalView.renderPortal) {
+        container.innerHTML = LegalView.renderPortal(legalSpec.tab);
+      }
+      document.title = `SiDaya - ${legalSpec.title}`;
+      this.updateBreadcrumb(legalSpec.title);
+      
+      // Close mobile drawer if open
+      const sidebar = document.getElementById('sidebar-nav');
+      const backdrop = document.getElementById('sidebar-backdrop');
+      if (sidebar) sidebar.classList.remove('open');
+      if (backdrop) backdrop.classList.remove('active');
+      
+      window.scrollTo(0, 0);
+      return;
+    }
+
+    // Reset legal portal full-width state for standard workspace routes
+    this.setLegalMode(false);
 
     const state = store.getState();
     const isOps = this.isOpsHost();
