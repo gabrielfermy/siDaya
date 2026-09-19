@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import {
   MidtransPaymentProvider,
   DuitkuPaymentProvider,
+  IpaymuPaymentProvider,
   CustomWebhookPaymentProvider,
   PlatformBillingService,
   MerchantPaymentRouterService,
@@ -53,6 +54,7 @@ export class ContinuousSecurityAssessmentFramework {
     // 1. Payment Webhook Cryptography & Forgery Probing
     await this.probeMidtransSignatureVerification();
     await this.probeDuitkuSignatureVerification();
+    await this.probeIpaymuSignatureVerification();
     await this.probeCustomOpapHmacVerification();
     await this.probeDualPathPaymentSegregation();
 
@@ -169,6 +171,94 @@ export class ContinuousSecurityAssessmentFramework {
       adversarialPayload: 'POST webhook with arbitrary MD5 signature',
       observedResult: passed ? 'Forged MD5 rejected; Authentic MD5 verified.' : 'Vulnerable to MD5 bypass.',
       remediation: 'Calculate MD5(merchantCode + amount + merchantOrderId + merchantKey) and compare with timingSafeEqual.',
+    });
+  }
+
+  private async probeIpaymuSignatureVerification() {
+    const va = '1179008214154585';
+    const apiKey = '6FF0178B-A610-4CC8-857A-4AAA272A1931';
+    const provider = new IpaymuPaymentProvider({
+      va,
+      apiKey,
+      isProduction: true,
+    });
+
+    const payload: Record<string, unknown> = {
+      trx_id: 12345678,
+      sid: 'SESSION_IPAYMU_99',
+      reference_id: 'ORD-IPAYMU-9988',
+      status: 'berhasil',
+      status_code: 1,
+      amount: '350000',
+      total: '350000',
+      paid_off: 350000,
+      channel: 'qris',
+      via: 'qris',
+      paid_at: '2026-09-19 11:00:00',
+      is_escrow: '0',
+    };
+
+    // A. Forged Signature Attack
+    const forgedSignature = 'abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890';
+    const isForgedAccepted = provider.verifyWebhookSignature(
+      { 'x-signature': forgedSignature },
+      payload,
+    );
+
+    // B. Authentic Signature Generation (using Merchant VA as Secret Key per iPaymu v2 Spec)
+    // Normalized & sorted payload
+    const normalized: Record<string, unknown> = {
+      trx_id: 12345678,
+      sid: 'SESSION_IPAYMU_99',
+      reference_id: 'ORD-IPAYMU-9988',
+      status: 'berhasil',
+      status_code: 1,
+      amount: '350000',
+      total: '350000',
+      paid_off: 350000,
+      channel: 'qris',
+      via: 'qris',
+      paid_at: '2026-09-19 11:00:00',
+      is_escrow: false,
+      additional_info: [],
+    };
+
+    const sorted = Object.keys(normalized)
+      .sort((a, b) => a.localeCompare(b))
+      .reduce((obj: Record<string, unknown>, k) => {
+        obj[k] = normalized[k];
+        return obj;
+      }, {});
+
+    let jsonStr = JSON.stringify(sorted);
+    jsonStr = jsonStr.replace(/\//g, '\\/');
+    const validSignature = crypto.createHmac('sha256', va).update(jsonStr).digest('hex');
+
+    const isValidAccepted = provider.verifyWebhookSignature(
+      { 'x-signature': validSignature },
+      payload,
+    );
+
+    const parsed = provider.parseWebhook(payload);
+    const isParsedCorrect =
+      parsed.status === 'SETTLED' &&
+      parsed.orderId === 'ORD-IPAYMU-9988' &&
+      parsed.amountPaid === 350000;
+
+    const passed = !isForgedAccepted && isValidAccepted && isParsedCorrect;
+    this.results.push({
+      id: 'SEC-PAY-05',
+      category: 'PAYMENT_INTEGRITY',
+      standardMapping: 'OWASP API2:2023 (Broken Authentication) & PCI-DSS Section 6.5',
+      title: 'iPaymu API v2 HMAC-SHA256 Webhook Signature Verification & Normalization',
+      description: 'Asserts that incoming iPaymu payment callbacks require authentic HMAC-SHA256 signatures and correctly normalize status.',
+      status: passed ? 'PASSED' : 'FAILED',
+      severity: 'CRITICAL',
+      adversarialPayload: 'POST webhook with forged X-Signature header',
+      observedResult: passed
+        ? 'Forged signature rejected (false); authentic HMAC-SHA256 verified (true); status canonicalized to SETTLED.'
+        : `Forged accepted: ${isForgedAccepted}, Valid accepted: ${isValidAccepted}, Parsed: ${JSON.stringify(parsed)}`,
+      remediation: 'Verify X-Signature header using HMAC-SHA256 with VA as secret key over sorted, normalized JSON body.',
     });
   }
 
