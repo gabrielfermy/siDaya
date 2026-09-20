@@ -275,6 +275,10 @@ const Router = {
    * @param {Object} state
    */
   syncPlaneShell(isOps, state) {
+    document.documentElement.classList.remove('is-auth-page', 'is-register-page', 'is-landing-page');
+    const appShell = document.getElementById('app-shell');
+    if (appShell) appShell.style.removeProperty('display');
+
     const navContent = document.getElementById('sidebar-nav-content');
     const badgeLabel = document.getElementById('sidebar-tenant-badge-label');
     const tenantName = document.getElementById('sidebar-tenant-name');

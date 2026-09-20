@@ -7,10 +7,8 @@
 .login-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  z-index: 80;
+  background: #070a14;
+  z-index: 9999;
   display: none;
   flex-direction: column;
   align-items: center;
@@ -20,20 +18,33 @@
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
 }
+
+html[data-theme="light"] .login-overlay {
+  background: #f8fafc;
+}
+
 .app-shell, .operator-shell {
   display: none;
   min-height: 100vh;
   width: 100%;
 }
+
+html.is-auth-page #app-shell,
+html.is-register-page #app-shell,
+html.state-unauth-merchant:not(.is-landing-page) #app-shell,
+html.state-unauth-ops #app-shell {
+  display: none !important;
+}
+
 html.state-unauth-merchant #merchant-login-screen { display: flex !important; }
 html.state-unauth-merchant.is-landing-page #merchant-login-screen { display: none !important; }
 html.state-unauth-merchant.is-landing-page #app-shell { display: flex !important; }
 html.state-unauth-merchant.is-register-page #merchant-login-screen { display: none !important; }
 html.state-unauth-merchant.is-register-page #merchant-register-screen { display: flex !important; }
 html.state-unauth-ops #operator-login-screen { display: flex !important; }
-html.state-auth-merchant #app-shell { display: flex !important; }
-html.state-auth-ops #operator-shell,
-html.state-auth-ops #app-shell { display: flex !important; }
+html.state-auth-merchant:not(.is-auth-page):not(.is-register-page) #app-shell { display: flex !important; }
+html.state-auth-ops:not(.is-auth-page) #operator-shell,
+html.state-auth-ops:not(.is-auth-page) #app-shell { display: flex !important; }
 
 /* --- FULL-SCREEN STANDALONE LANDING PAGE MODE --- */
 .app-shell.is-landing-page {
