@@ -43,7 +43,8 @@ const LandingView = {
           <div class="landing-nav-inner">
             <!-- Brand Logo (Affinity Designer Bespoke Vector Lockup) -->
             <div class="landing-brand" onclick="navigate('/')" role="button" aria-label="siDaya by Ashvin Labs IDN">
-              <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal" style="height:38px; width:auto; max-width:200px; object-fit:contain; display:block;">
+              <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal dark-theme-logo" style="height:38px; width:auto; max-width:200px; object-fit:contain;">
+              <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal light-theme-logo" style="height:38px; width:auto; max-width:200px; object-fit:contain;">
             </div>
 
             <!-- Desktop Menu Links -->
@@ -55,8 +56,9 @@ const LandingView = {
               <a class="landing-nav-link" href="#faq" onclick="event.preventDefault(); document.getElementById('faq')?.scrollIntoView({behavior:'smooth'});">FAQ</a>
             </nav>
 
-            <!-- Desktop Action Buttons -->
+            <!-- Desktop Action Buttons & Theme Dropdown -->
             <div class="landing-nav-actions">
+              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'landing-nav-theme-dropdown', showLabel: false }) : ''}
               <button type="button" class="btn-nav-login" onclick="navigate('/login')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -92,7 +94,8 @@ const LandingView = {
             <!-- Drawer Header -->
             <div class="drawer-top-header">
               <div class="landing-brand" onclick="LandingView.toggleMobileMenu(false); navigate('/');" role="button" aria-label="siDaya by Ashvin Labs IDN">
-                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="34" class="brand-logo-horizontal" style="height:34px; width:auto; max-width:180px; object-fit:contain; display:block;">
+                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="34" class="brand-logo-horizontal dark-theme-logo" style="height:34px; width:auto; max-width:180px; object-fit:contain;">
+                <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="34" class="brand-logo-horizontal light-theme-logo" style="height:34px; width:auto; max-width:180px; object-fit:contain;">
               </div>
 
               <button type="button" class="drawer-close-btn" onclick="LandingView.toggleMobileMenu(false)" aria-label="Tutup Menu">
@@ -728,7 +731,8 @@ const LandingView = {
           <div class="footer-main-grid">
             <div>
               <div class="landing-brand" style="margin-bottom:14px;" onclick="navigate('/')" role="button" aria-label="siDaya by Ashvin Labs IDN">
-                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal" style="height:38px; width:auto; max-width:200px; object-fit:contain; display:block;">
+                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal dark-theme-logo" style="height:38px; width:auto; max-width:200px; object-fit:contain;">
+                <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal light-theme-logo" style="height:38px; width:auto; max-width:200px; object-fit:contain;">
               </div>
               <p class="footer-brand-desc">
                 Platform SaaS terpadu untuk pedagang grosir komoditas, manajemen muatan FIFO, surat jalan digital, dan otomasi penagihan pembayaran di Indonesia.

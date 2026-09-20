@@ -256,6 +256,11 @@ const Router = {
     void container.offsetWidth; // reflow
     container.classList.add('view-enter');
 
+    // Synchronize Theme Controls on newly rendered views
+    if (typeof ThemeManager !== 'undefined' && ThemeManager.updateControls) {
+      ThemeManager.updateControls();
+    }
+
     // Synchronize Daya AI Operational Screen Context
     if (!isOps && typeof DayaController !== 'undefined' && DayaController.onRouteChanged) {
       DayaController.onRouteChanged(cleanPath);
