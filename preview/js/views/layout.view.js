@@ -150,7 +150,7 @@ const LayoutView = {
             </div>
 
             <div class="topbar-controls">
-              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderSwitcher({ className: 'theme-switcher-segmented' }) : ''}
+              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'app-topbar-theme-dropdown', showLabel: false }) : ''}
             </div>
           </header>
 

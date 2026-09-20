@@ -57,7 +57,7 @@ const LegalView = {
           </div>
 
           <div class="legal-header-actions">
-            <button class="theme-toggle-btn" onclick="toggleDarkMode()" title="Ganti Tema">🌓</button>
+            ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'legal-theme-dropdown', showLabel: false }) : ''}
             <button class="btn btn-primary btn-sm" onclick="navigate('/dashboard')" style="font-weight:700;">
               <span>🚀</span> Buka Aplikasi SiDaya
             </button>

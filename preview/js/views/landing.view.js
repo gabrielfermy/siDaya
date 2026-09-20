@@ -55,9 +55,9 @@ const LandingView = {
               <a class="landing-nav-link" href="#faq" onclick="event.preventDefault(); document.getElementById('faq')?.scrollIntoView({behavior:'smooth'});">FAQ</a>
             </nav>
 
-            <!-- Desktop Action Buttons & Theme Switcher -->
+            <!-- Desktop Action Buttons & Theme Dropdown -->
             <div class="landing-nav-actions">
-              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderSwitcher({ className: 'theme-switcher-segmented theme-switcher-compact' }) : ''}
+              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'landing-nav-theme-dropdown', showLabel: false }) : ''}
               <button type="button" class="btn-nav-login" onclick="navigate('/login')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
