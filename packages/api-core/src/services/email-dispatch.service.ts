@@ -29,7 +29,9 @@ export class EmailDispatchService {
       process.env['RESEND_PROD_API_KEY'] ||
       '';
 
-    const defaultDomain = process.env['NODE_ENV'] === 'production' ? 'sidaya.biz.id' : 'sidaya.my.id';
+    const env = (process.env['NODE_ENV'] || '').toLowerCase();
+    const defaultDomain =
+      env === 'production' ? 'sidaya.biz.id' : env === 'staging' ? 'sidaya.my.id' : 'sidaya.test';
     this.fromEmail = options?.fromEmail || process.env['RESEND_FROM_EMAIL'] || `SiDaya Platform <no-reply@${defaultDomain}>`;
   }
 

@@ -79,8 +79,19 @@ export class TenantController {
     }
 
     try {
-      const baseUrl = req.headers.host || 'sidaya.biz.id';
-      const result = this.subdomainService.updateSubdomain(tenantId, newSubdomain, baseUrl);
+      const host = ((req.headers['host'] as string) || '').toLowerCase();
+      let baseDomain = 'sidaya.biz.id';
+      if (host.includes('sidaya.test')) {
+        baseDomain = 'sidaya.test';
+      } else if (host.includes('sidaya.my.id')) {
+        baseDomain = 'sidaya.my.id';
+      } else if (host.includes('sidaya.biz.id')) {
+        baseDomain = 'sidaya.biz.id';
+      } else if (host.includes('localhost')) {
+        baseDomain = host;
+      }
+
+      const result = this.subdomainService.updateSubdomain(tenantId, newSubdomain, baseDomain);
       sendJson(res, 200, { success: true, data: result });
     } catch (err: any) {
       sendJson(res, 400, {

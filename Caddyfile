@@ -1,0 +1,34 @@
+# SiDaya Local Development HTTPS Reverse Proxy (Port 443 with Zero Port in URL)
+# Usage:
+# 1. Add entries to hosts file (C:\Windows\System32\drivers\etc\hosts or /etc/hosts):
+#    127.0.0.1  sidaya.test ops.sidaya.test pay.sidaya.test api.sidaya.test berasjaya.sidaya.test sembakonusantara.sidaya.test
+# 2. Run: caddy run
+
+{
+    admin off
+    local_certs
+}
+
+# 1. Merchant Plane & Dynamic Tenant Workspaces
+sidaya.test, *.sidaya.test {
+    tls internal
+    reverse_proxy localhost:3333
+}
+
+# 2. Platform Operator Control Plane
+ops.sidaya.test {
+    tls internal
+    reverse_proxy localhost:3333
+}
+
+# 3. PayLink Public Checkout Portal
+pay.sidaya.test {
+    tls internal
+    reverse_proxy localhost:3000
+}
+
+# 4. Core Backend API
+api.sidaya.test {
+    tls internal
+    reverse_proxy localhost:4000
+}

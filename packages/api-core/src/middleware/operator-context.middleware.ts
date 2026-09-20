@@ -35,7 +35,21 @@ export function getOperatorContext(req: http.IncomingMessage): OperatorContext {
 }
 
 export function getBaseUrl(req: http.IncomingMessage, defaultPort = 3333): string {
-  const host = req.headers['host'] || `localhost:${defaultPort}`;
-  const proto = req.headers['x-forwarded-proto'] || 'http';
+  const host = (req.headers['host'] as string) || `localhost:${defaultPort}`;
+  const forwardedProto = req.headers['x-forwarded-proto'];
+  let proto = Array.isArray(forwardedProto) ? forwardedProto[0] : forwardedProto;
+
+  if (!proto) {
+    if (
+      host.includes('sidaya.biz.id') ||
+      host.includes('sidaya.my.id') ||
+      host.includes('sidaya.test')
+    ) {
+      proto = 'https';
+    } else {
+      proto = 'http';
+    }
+  }
   return `${proto}://${host}`;
 }
+
