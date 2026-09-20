@@ -32,20 +32,27 @@ function broadcastReload() {
   }
 }
 
-// Watch STATIC_DIR for hot-reloading on save
+const ROOT_ASSETS_DIR = path.join(__dirname, '..', 'assets');
+
+// Watch STATIC_DIR & ROOT_ASSETS_DIR for hot-reloading on save
 let reloadDebounce = null;
+function handleHotReload(filename) {
+  if (!filename) return;
+  const ext = path.extname(filename).toLowerCase();
+  if (['.html', '.css', '.js', '.json', '.svg', '.png'].includes(ext)) {
+    clearTimeout(reloadDebounce);
+    reloadDebounce = setTimeout(() => {
+      console.log(`[HotReload] File changed: ${filename}. Refreshing ${sseClients.size} client(s)...`);
+      broadcastReload();
+    }, 150);
+  }
+}
+
 try {
-  fs.watch(STATIC_DIR, { recursive: true }, (eventType, filename) => {
-    if (!filename) return;
-    const ext = path.extname(filename).toLowerCase();
-    if (['.html', '.css', '.js', '.json'].includes(ext)) {
-      clearTimeout(reloadDebounce);
-      reloadDebounce = setTimeout(() => {
-        console.log(`[HotReload] File changed: ${filename}. Refreshing ${sseClients.size} client(s)...`);
-        broadcastReload();
-      }, 150);
-    }
-  });
+  fs.watch(STATIC_DIR, { recursive: true }, (eventType, filename) => handleHotReload(filename));
+  if (fs.existsSync(ROOT_ASSETS_DIR)) {
+    fs.watch(ROOT_ASSETS_DIR, { recursive: true }, (eventType, filename) => handleHotReload(filename));
+  }
 } catch (err) {
   console.warn('[HotReload] File watcher error:', err.message);
 }
@@ -68,18 +75,19 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Normalize path
-  if (pathname === '/') {
-    pathname = '/index.html';
+  // Check if requesting from centralized root /assets/
+  let requestedFile = path.join(STATIC_DIR, pathname);
+  if (pathname.startsWith('/assets/')) {
+    const rootCandidate = path.join(ROOT_ASSETS_DIR, pathname.replace(/^\/assets\//, ''));
+    if (fs.existsSync(rootCandidate) && fs.statSync(rootCandidate).isFile()) {
+      requestedFile = rootCandidate;
+    }
   }
 
-  const requestedFile = path.join(STATIC_DIR, pathname);
-
-  // Security check: ensure path is within STATIC_DIR
-  if (!requestedFile.startsWith(STATIC_DIR)) {
-    res.writeHead(403, { 'Content-Type': 'text/plain' });
-    res.end('Forbidden');
-    return;
+  // Normalize root path
+  if (pathname === '/') {
+    pathname = '/index.html';
+    requestedFile = INDEX_FILE;
   }
 
   // Check if static file exists

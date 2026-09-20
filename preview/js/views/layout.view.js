@@ -110,10 +110,12 @@ const LayoutView = {
         <aside class="sidebar" id="sidebar-nav">
           <div class="sidebar-top">
             <a class="sidebar-brand" onclick="navigate('/dashboard')">
-              <div class="sidebar-logo">S</div>
+              <div class="sidebar-logo" style="background:#090D1B; border:1.5px solid #262E4B; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:3px;">
+                <img src="/assets/brand/icon-transparent.svg" alt="siDaya Icon" width="26" height="26" style="display:block; object-fit:contain;">
+              </div>
               <div class="brand-title-wrap">
-                <span class="sidebar-brand-name">SiDaya</span>
-                <span class="sidebar-brand-sub">Enterprise OS</span>
+                <span class="sidebar-brand-name" style="font-weight:900;">s<span style="color:#10B77F;">i</span><span style="color:#5048E5;">D</span>aya</span>
+                <span class="sidebar-brand-sub" style="font-weight:800;"><span style="color:#10B77F;">By</span> <span style="color:#CBD5E1;">Ashvin Labs Idn</span></span>
               </div>
             </a>
             <div class="sidebar-tenant-badge">
@@ -153,7 +155,7 @@ const LayoutView = {
             </div>
 
             <div class="topbar-controls">
-              <button class="theme-toggle-btn" onclick="toggleDarkMode()" title="Ganti Tema (Gelap/Terang)">🌓</button>
+              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderSwitcher({ className: 'theme-switcher-segmented' }) : ''}
             </div>
           </header>
 

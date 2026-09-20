@@ -86,6 +86,23 @@ const Router = {
   },
 
   /**
+   * Toggles standalone landing page full-width layout mode
+   * @param {boolean} active
+   */
+  setLandingMode(active) {
+    const appShell = document.getElementById('app-shell');
+    if (appShell) {
+      if (active) {
+        appShell.classList.add('is-landing-page');
+        document.documentElement.classList.add('is-landing-page');
+      } else {
+        appShell.classList.remove('is-landing-page');
+        document.documentElement.classList.remove('is-landing-page');
+      }
+    }
+  },
+
+  /**
    * Navigates to a specific path, rendering the appropriate MVC view into #main-content
    * @param {string} path - Target route path
    * @param {boolean} [pushState=true] - Whether to push to browser history
@@ -99,14 +116,34 @@ const Router = {
       window.history.pushState({}, '', cleanPath);
     }
 
-    // 0. PUBLIC LEGAL & COMPLIANCE BYPASS (Always accessible publicly)
+    const isOps = this.isOpsHost();
+
+    // 0. PUBLIC LANDING PAGE (Main domain root unauthenticated visit)
+    if (!isOps && cleanPath === '/') {
+      const hasSession = typeof AuthController !== 'undefined' && AuthController.getSession('merchant');
+      if (!hasSession) {
+        this.setErrorMode(false);
+        this.setLegalMode(false);
+        this.setLandingMode(true);
+        document.querySelectorAll('.login-overlay').forEach(el => el.style.setProperty('display', 'none', 'important'));
+        if (typeof LandingView !== 'undefined') {
+          container.innerHTML = LandingView.render();
+        }
+        document.title = 'SiDaya - Platform Operasional & POS Grosir #1 di Indonesia';
+        window.scrollTo(0, 0);
+        return;
+      }
+    }
+    this.setLandingMode(false);
+
+    // 0.1 PUBLIC LEGAL & COMPLIANCE BYPASS (Always accessible publicly)
     if (this.publicLegalRoutes[cleanPath]) {
       const legalSpec = this.publicLegalRoutes[cleanPath];
       this.setErrorMode(false);
       this.setLegalMode(true);
       
       // Hide any active auth overlays
-      document.querySelectorAll('.login-overlay').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.login-overlay').forEach(el => el.style.setProperty('display', 'none', 'important'));
       
       if (typeof LegalView !== 'undefined' && LegalView.renderPortal) {
         container.innerHTML = LegalView.renderPortal(legalSpec.tab);
@@ -128,7 +165,6 @@ const Router = {
     this.setLegalMode(false);
 
     const state = store.getState();
-    const isOps = this.isOpsHost();
     const isError = typeof ERROR_PAGES !== 'undefined' && !!ERROR_PAGES[cleanPath];
 
     // STRICT SUBDOMAIN BARRIER:
@@ -164,6 +200,7 @@ const Router = {
       const isValid = AuthController.validateSession(sessionType, cleanPath);
       if (!isValid) return;
     }
+
 
     // Synchronize Plane Isolation (Sidebar, Branding, Breadcrumbs)
     this.syncPlaneShell(isOps, state);

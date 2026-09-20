@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SiDaya - Enterprise OS (Multi-Tenant, FIFO & Role Matrix)</title>
   
+  <!-- Favicon & Touch Icons -->
+  <link rel="icon" type="image/svg+xml" href="/assets/brand/icon-transparent.svg">
+  <link rel="apple-touch-icon" href="/assets/brand/icon-dark.png">
+  
   <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,6 +22,7 @@
   <link rel="stylesheet" href="/css/modules.css">
   <link rel="stylesheet" href="/css/daya.css">
   <link rel="stylesheet" href="/css/legal.css">
+  <link rel="stylesheet" href="/css/landing.css">
 
   <script>
     /* Synchronous Pre-Paint Auth State & Session Expiry Resolver (Zero FOUC Flash) */
@@ -26,8 +31,13 @@
         var hostname = window.location.hostname.toLowerCase();
         var isOps = hostname.startsWith('ops.') || hostname === 'ops.localhost';
         
-        var theme = localStorage.getItem('sidaya_theme') || 'light';
-        document.documentElement.setAttribute('data-theme', theme);
+        var mode = localStorage.getItem('sidaya_theme_mode') || 'system';
+        var resolvedTheme = mode;
+        if (mode === 'system') {
+          resolvedTheme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', resolvedTheme);
+        document.documentElement.setAttribute('data-theme-mode', mode);
 
         var now = Date.now();
         var hasOpsSession = false;
@@ -78,8 +88,12 @@
           document.documentElement.className = hasOpsSession ? 'state-auth-ops' : 'state-unauth-ops';
         } else {
           document.documentElement.className = hasMerchantSession ? 'state-auth-merchant' : 'state-unauth-merchant';
-          if (!hasMerchantSession && fullPath === '/register') {
-            document.documentElement.classList.add('is-register-page');
+          if (!hasMerchantSession) {
+            if (fullPath === '/' || fullPath === '') {
+              document.documentElement.classList.add('is-landing-page');
+            } else if (fullPath === '/register') {
+              document.documentElement.classList.add('is-register-page');
+            }
           }
         }
       } catch (e) {}
@@ -112,6 +126,7 @@
 
   <!-- 3. Views Layer (Declarative MVC Renderers) -->
   <script src="/js/views/layout.view.js"></script>
+  <script src="/js/views/landing.view.js"></script>
   <script src="/js/views/auth.view.js"></script>
   <script src="/js/views/modals.view.js"></script>
   <script src="/js/views/dashboard.view.js"></script>

@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.moduleManager) {
     moduleManager.register('Store', [], store);
     moduleManager.register('View:Layout', ['Store'], LayoutView);
+    moduleManager.register('View:Landing', ['Store'], LandingView);
     moduleManager.register('View:Auth', ['Store'], AuthView);
     moduleManager.register('View:Modals', ['Store'], ModalsView);
     moduleManager.register('View:Dashboard', ['Store'], DashboardView);
@@ -91,14 +92,143 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Toggles dark/light executive themes with local storage persistence
+ * Executive Theme Manager
+ * Supports 3 options: 'system' (default), 'light', 'dark'
+ */
+const ThemeManager = {
+  getMode() {
+    return localStorage.getItem('sidaya_theme_mode') || 'system';
+  },
+
+  getSystemTheme() {
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  },
+
+  getEffectiveTheme(mode) {
+    const targetMode = mode || this.getMode();
+    return targetMode === 'system' ? this.getSystemTheme() : targetMode;
+  },
+
+  setTheme(mode, notify = true) {
+    if (!['system', 'light', 'dark'].includes(mode)) mode = 'system';
+    localStorage.setItem('sidaya_theme_mode', mode);
+    
+    const effective = this.getEffectiveTheme(mode);
+    document.documentElement.setAttribute('data-theme', effective);
+    document.documentElement.setAttribute('data-theme-mode', mode);
+
+    this.updateControls(mode);
+
+    if (notify && typeof showToast === 'function') {
+      const labels = {
+        system: `Tema Sistem (${effective === 'dark' ? 'Gelap 🌙' : 'Terang ☀️'})`,
+        light: 'Tema Terang ☀️',
+        dark: 'Tema Gelap 🌙'
+      };
+      showToast(`Tema diatur ke: ${labels[mode]}`);
+    }
+  },
+
+  init() {
+    const mode = this.getMode();
+    this.setTheme(mode, false);
+
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (this.getMode() === 'system') {
+          const effective = e.matches ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', effective);
+          this.updateControls('system');
+        }
+      });
+    }
+  },
+
+  updateControls(mode) {
+    const activeMode = mode || this.getMode();
+    document.querySelectorAll('[data-theme-option]').forEach(btn => {
+      const option = btn.getAttribute('data-theme-option');
+      if (option === activeMode) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+      } else {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
+      }
+    });
+  },
+
+  /**
+   * Renders the 3-option Segmented Theme Switcher Control
+   * @param {Object} [options]
+   * @param {string} [options.id]
+   * @param {string} [options.className]
+   * @returns {string} HTML string
+   */
+  renderSwitcher(options = {}) {
+    const currentMode = this.getMode();
+    const idAttr = options.id ? `id="${options.id}"` : '';
+    const classAttr = options.className || 'theme-switcher-segmented';
+
+    return `
+      <div class="${classAttr}" ${idAttr} role="radiogroup" aria-label="Pilihan Tema Tampilan">
+        <button type="button" 
+                class="theme-btn ${currentMode === 'light' ? 'active' : ''}" 
+                data-theme-option="light" 
+                onclick="ThemeManager.setTheme('light')" 
+                title="Mode Terang (Light)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <span class="theme-btn-label">Terang</span>
+        </button>
+
+        <button type="button" 
+                class="theme-btn ${currentMode === 'dark' ? 'active' : ''}" 
+                data-theme-option="dark" 
+                onclick="ThemeManager.setTheme('dark')" 
+                title="Mode Gelap (Dark)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <span class="theme-btn-label">Gelap</span>
+        </button>
+
+        <button type="button" 
+                class="theme-btn ${currentMode === 'system' ? 'active' : ''}" 
+                data-theme-option="system" 
+                onclick="ThemeManager.setTheme('system')" 
+                title="Ikuti Tema Sistem Operasi (Default)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <span class="theme-btn-label">Sistem</span>
+        </button>
+      </div>
+    `;
+  }
+};
+
+// Initialize ThemeManager immediately
+ThemeManager.init();
+
+/**
+ * Toggles dark/light/system executive themes
  */
 function toggleDarkMode() {
-  const current = document.documentElement.getAttribute('data-theme') || 'light';
-  const next = current === 'light' ? 'dark' : 'light';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('sidaya_theme', next);
-  showToast(`Tema beralih ke mode ${next === 'dark' ? 'gelap 🌙' : 'terang ☀️'}`);
+  const current = ThemeManager.getMode();
+  const next = current === 'light' ? 'dark' : (current === 'dark' ? 'system' : 'light');
+  ThemeManager.setTheme(next);
 }
 
 /**

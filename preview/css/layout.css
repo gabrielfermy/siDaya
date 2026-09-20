@@ -23,12 +23,44 @@
   width: 100%;
 }
 html.state-unauth-merchant #merchant-login-screen { display: flex !important; }
+html.state-unauth-merchant.is-landing-page #merchant-login-screen { display: none !important; }
+html.state-unauth-merchant.is-landing-page #app-shell { display: flex !important; }
 html.state-unauth-merchant.is-register-page #merchant-login-screen { display: none !important; }
 html.state-unauth-merchant.is-register-page #merchant-register-screen { display: flex !important; }
 html.state-unauth-ops #operator-login-screen { display: flex !important; }
 html.state-auth-merchant #app-shell { display: flex !important; }
 html.state-auth-ops #operator-shell,
 html.state-auth-ops #app-shell { display: flex !important; }
+
+/* --- FULL-SCREEN STANDALONE LANDING PAGE MODE --- */
+.app-shell.is-landing-page {
+  display: flex !important;
+  min-height: 100vh !important;
+  width: 100% !important;
+  background: #070a14 !important;
+}
+.app-shell.is-landing-page .sidebar,
+.app-shell.is-landing-page .topbar,
+.app-shell.is-landing-page .sidebar-backdrop,
+.app-shell.is-landing-page #impersonation-banner-root {
+  display: none !important;
+}
+.app-shell.is-landing-page .main-viewport {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 100vh !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: #070a14 !important;
+}
+.app-shell.is-landing-page .content-container {
+  padding: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  background: #070a14 !important;
+}
+
 
 /* --- FULL-SCREEN STANDALONE ERROR PAGE MODE --- */
 .app-shell.is-error-page {

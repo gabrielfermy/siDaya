@@ -210,6 +210,24 @@ const SettingsView = {
             </div>
           </div>
 
+          <!-- Card: Theme & Appearance Preference -->
+          <div class="card">
+            <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>🎨 Preferensi Tema & Tampilan Antarmuka</span>
+              <span class="badge badge-info">Multi-Theme</span>
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:14px; line-height:1.5;">
+              Pilih mode tampilan workspace sesuai preferensi pencahayaan atau ikuti pengaturan sistem operasi perangkat Anda.
+            </p>
+            <div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg-surface-elevated); border:1px solid var(--border-subtle); border-radius:10px; padding:12px 14px;">
+              <div>
+                <div style="font-size:13px; font-weight:700; color:var(--text-primary);">Mode Tema Saat Ini</div>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Default mengikuti pengaturan sistem operasi (System)</div>
+              </div>
+              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderSwitcher({ className: 'theme-switcher-segmented' }) : ''}
+            </div>
+          </div>
+
           <div class="card">
             <div class="card-title">🖨️ Printer Thermal Kasir (ESC/POS)</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
