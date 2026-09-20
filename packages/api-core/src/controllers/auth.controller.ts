@@ -178,7 +178,7 @@ export class AuthController {
   }
 
   public async resolveTenant(
-    _req: http.IncomingMessage,
+    req: http.IncomingMessage,
     res: http.ServerResponse,
     _params: Record<string, string>,
     query: Record<string, string>,
@@ -193,7 +193,19 @@ export class AuthController {
     }
 
     try {
-      const result = SubdomainDomainService.getInstance().resolveTenantByEmail(email);
+      const host = ((req.headers['host'] as string) || '').toLowerCase();
+      let baseDomain = 'sidaya.biz.id';
+      if (host.includes('sidaya.test')) {
+        baseDomain = 'sidaya.test';
+      } else if (host.includes('sidaya.my.id')) {
+        baseDomain = 'sidaya.my.id';
+      } else if (host.includes('sidaya.biz.id')) {
+        baseDomain = 'sidaya.biz.id';
+      } else if (host.includes('localhost')) {
+        baseDomain = host;
+      }
+
+      const result = SubdomainDomainService.getInstance().resolveTenantByEmail(email, baseDomain);
       sendJson(res, 200, { success: true, data: result });
     } catch (err: any) {
       sendJson(res, 404, {

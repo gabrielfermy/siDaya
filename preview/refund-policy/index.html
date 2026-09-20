@@ -22,8 +22,13 @@
   <script>
     (function() {
       try {
-        var theme = localStorage.getItem('sidaya_theme') || 'light';
-        document.documentElement.setAttribute('data-theme', theme);
+        var mode = localStorage.getItem('sidaya_theme_mode') || 'system';
+        var resolved = mode;
+        if (mode === 'system') {
+          resolved = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', resolved);
+        document.documentElement.setAttribute('data-theme-mode', mode);
         document.documentElement.classList.add('is-legal-portal-page');
       } catch (e) {}
     })();

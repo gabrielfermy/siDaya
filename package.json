@@ -15,11 +15,13 @@
     "dev:api": "pnpm --filter @sidaya/api-core run dev",
     "dev:web": "pnpm --filter @sidaya/paylink-web run dev",
     "dev:preview": "node preview/serve.js",
+    "dev:https": "node preview/serve-local-https.js",
     "dev:mobile": "pnpm --filter @sidaya/mobile start",
     "dev": "docker compose up -d && pnpm --filter @sidaya/api-core --filter @sidaya/paylink-web --parallel run dev",
     "test:phase2": "npx tsx packages/api-core/test/verify-phase2.ts",
     "test:security": "npx tsx packages/api-core/test/security-assessment-framework.ts",
-    "audit:security": "pnpm run test:security"
+    "audit:security": "pnpm run test:security",
+    "sync:assets": "node scripts/sync-assets.js"
   },
 
   "devDependencies": {

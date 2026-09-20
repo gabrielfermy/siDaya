@@ -262,7 +262,10 @@ const AuthController = {
   showRegisterScreen() {
     ['merchant-login-screen', 'email-verification-screen'].forEach(id => document.getElementById(id)?.style.setProperty('display', 'none', 'important'));
     document.getElementById('merchant-register-screen')?.style.setProperty('display', 'flex', 'important');
-    document.documentElement.classList.add('is-register-page');
+    document.documentElement.classList.add('is-register-page', 'is-auth-page');
+    document.documentElement.classList.remove('is-landing-page');
+    const appShell = document.getElementById('app-shell');
+    if (appShell) appShell.style.setProperty('display', 'none', 'important');
     if (window.location.pathname !== '/register') window.history.pushState({}, '', '/register');
     document.title = 'SiDaya - Pendaftaran Toko Grosir Baru';
   },
@@ -270,7 +273,10 @@ const AuthController = {
   showLoginScreen() {
     ['merchant-register-screen', 'email-verification-screen'].forEach(id => document.getElementById(id)?.style.setProperty('display', 'none', 'important'));
     document.getElementById('merchant-login-screen')?.style.setProperty('display', 'flex', 'important');
-    document.documentElement.classList.remove('is-register-page');
+    document.documentElement.classList.add('is-auth-page');
+    document.documentElement.classList.remove('is-register-page', 'is-landing-page');
+    const appShell = document.getElementById('app-shell');
+    if (appShell) appShell.style.setProperty('display', 'none', 'important');
     if (window.location.pathname !== '/login' && window.location.pathname !== '/') window.history.pushState({}, '', '/login');
     document.title = 'SiDaya - Workspace Login';
   },
