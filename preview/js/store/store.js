@@ -76,8 +76,10 @@ class SiDayaStateStore {
     stored.version = 6;
     stored.ui = stored.ui || {};
     stored.ui.portalMode = portalMode;
-    stored.ui.activePath = activePath;
-    stored.ui.theme = localStorage.getItem('sidaya_theme') || stored.ui.theme || 'light';
+    const themeMode = localStorage.getItem('sidaya_theme_mode') || 'system';
+    const isSysDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    stored.ui.themeMode = themeMode;
+    stored.ui.theme = themeMode === 'system' ? (isSysDark ? 'dark' : 'light') : themeMode;
     stored.ui.sidebarOpen = false;
     stored.ui.activeModal = null;
 

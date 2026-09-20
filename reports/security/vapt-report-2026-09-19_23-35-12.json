@@ -1,0 +1,182 @@
+{
+  "assessmentTimestamp": "2026-09-19T23:35:12.578Z",
+  "grade": "A+",
+  "passed": 14,
+  "total": 14,
+  "passPercentage": 100,
+  "standards": {
+    "owaspApiTop10_2023": "COMPLIANT",
+    "indonesiaUuPdpLaw": "COMPLIANT",
+    "pciDssScopeMinimization": "OUT_OF_SCOPE_LEVEL1"
+  },
+  "results": [
+    {
+      "id": "SEC-PAY-01",
+      "category": "PAYMENT_INTEGRITY",
+      "standardMapping": "OWASP API2:2023 (Broken Authentication) & PCI-DSS Section 6.5",
+      "title": "Midtrans Payment Webhook Cryptographic HMAC-SHA512 Verification",
+      "description": "Asserts that forged webhook signatures are rejected and valid SHA512 signatures pass in constant time.",
+      "status": "PASSED",
+      "severity": "CRITICAL",
+      "adversarialPayload": "POST webhook with forged signature '1234567890abcdef...'",
+      "observedResult": "Forged signature rejected (false); authentic SHA512 signature verified (true).",
+      "remediation": "Ensure Midtrans SHA512 hashing is calculated with ServerKey and verified using crypto.timingSafeEqual."
+    },
+    {
+      "id": "SEC-PAY-02",
+      "category": "PAYMENT_INTEGRITY",
+      "standardMapping": "OWASP API2:2023 (Broken Authentication)",
+      "title": "Duitku MD5 Signature & Timing-Safe Verification",
+      "description": "Asserts that incoming Duitku payment notifications require authentic MD5 hashing.",
+      "status": "PASSED",
+      "severity": "CRITICAL",
+      "adversarialPayload": "POST webhook with arbitrary MD5 signature",
+      "observedResult": "Forged MD5 rejected; Authentic MD5 verified.",
+      "remediation": "Calculate MD5(merchantCode + amount + merchantOrderId + merchantKey) and compare with timingSafeEqual."
+    },
+    {
+      "id": "SEC-PAY-05",
+      "category": "PAYMENT_INTEGRITY",
+      "standardMapping": "OWASP API2:2023 (Broken Authentication) & PCI-DSS Section 6.5",
+      "title": "iPaymu API v2 HMAC-SHA256 Webhook Signature Verification & Normalization",
+      "description": "Asserts that incoming iPaymu payment callbacks require authentic HMAC-SHA256 signatures and correctly normalize status.",
+      "status": "PASSED",
+      "severity": "CRITICAL",
+      "adversarialPayload": "POST webhook with forged X-Signature header",
+      "observedResult": "Forged signature rejected (false); authentic HMAC-SHA256 verified (true); status canonicalized to SETTLED.",
+      "remediation": "Verify X-Signature header using HMAC-SHA256 with VA as secret key over sorted, normalized JSON body."
+    },
+    {
+      "id": "SEC-PAY-03",
+      "category": "PAYMENT_INTEGRITY",
+      "standardMapping": "OWASP API2:2023 (Open Payment Adapter Protocol)",
+      "title": "Open Payment Adapter Protocol (OPAP) Tenant HMAC-SHA256 Verification",
+      "description": "Validates that custom external tenant payment gateways require valid HMAC-SHA256 signature.",
+      "status": "PASSED",
+      "severity": "HIGH",
+      "adversarialPayload": "POST /api/v1/webhooks/payment/custom/:tenantId with forged HMAC",
+      "observedResult": "Custom webhook signature enforced strictly.",
+      "remediation": "Enforce HMAC-SHA256 signature verification on external webhook payloads."
+    },
+    {
+      "id": "SEC-PAY-04",
+      "category": "PAYMENT_INTEGRITY",
+      "standardMapping": "Financial Architecture (Path 1 vs Path 2 Dual Topology)",
+      "title": "Dual-Topology Payment Separation (Platform Billing vs Commercial Checkout)",
+      "description": "Verifies that SaaS subscription billing is isolated on dedicated platform rails without ledger cross-talk.",
+      "status": "PASSED",
+      "severity": "HIGH",
+      "adversarialPayload": "Platform billing webhook simulated via /api/v1/webhooks/billing/platform",
+      "observedResult": "Subscription invoice SUB-BERASJAYA-912644 settled independently.",
+      "remediation": "Maintain separate webhook routing and master gateway credentials for platform billing."
+    },
+    {
+      "id": "SEC-TENANT-01",
+      "category": "AUTHORIZATION",
+      "standardMapping": "OWASP API1:2023 (Broken Object Level Authorization - BOLA / IDOR)",
+      "title": "Tenant Isolation & Header Spoofing Resistance (Anti-IDOR)",
+      "description": "Asserts that a user from Tenant A cannot supply X-Tenant-ID for Tenant B to access their database.",
+      "status": "PASSED",
+      "severity": "CRITICAL",
+      "adversarialPayload": "Bearer token (Tenant A) + Header 'X-Tenant-ID: c4b8e219-9831-482a-bc91-23a9cf8e12d4' (Tenant B)",
+      "observedResult": "Blocked with HTTP 403 403 Forbidden.",
+      "remediation": "Ensure middleware asserts that header X-Tenant-ID strictly matches verified JWT claims."
+    },
+    {
+      "id": "SEC-RBAC-01",
+      "category": "AUTHORIZATION",
+      "standardMapping": "OWASP API5:2023 (Broken Function Level Authorization - BFLA)",
+      "title": "Zero-Trust RBAC: Unverified Header Injection Resistance",
+      "description": "Asserts that injecting X-User-Role: OWNER does not bypass authorization guards without a verified token.",
+      "status": "PASSED",
+      "severity": "CRITICAL",
+      "adversarialPayload": "X-User-Role: OWNER & X-User-Permissions: [\"*\"] with no JWT",
+      "observedResult": "Rejected with HTTP 401 (Unauthenticated).",
+      "remediation": "Do not read role or permissions from raw request headers; derive strictly from verified JWT."
+    },
+    {
+      "id": "SEC-DB-01",
+      "category": "DATABASE_RLS",
+      "standardMapping": "OWASP API8:2023 (Security Misconfiguration / SQL Injection) & CWE-89",
+      "title": "Database RLS Session Context UUID Sanitization & SQLi Resistance",
+      "description": "Asserts that tenant and user identifiers are validated against strict UUID regex before SET LOCAL generation.",
+      "status": "PASSED",
+      "severity": "CRITICAL",
+      "adversarialPayload": "tenantId = \"c4b8e219-9831-482a-bc91-23a9cf8e12d4'; DROP TABLE users; --\"",
+      "observedResult": "SQL injection attempt blocked before execution.",
+      "remediation": "Enforce UUIDv4 regex validation and parameter escaping on all RLS session variables."
+    },
+    {
+      "id": "SEC-AUTH-01",
+      "category": "AUTHENTICATION",
+      "standardMapping": "OWASP API2:2023 & NIST SP 800-63B (Password Storage)",
+      "title": "Salted Scrypt Password Hashing & Verification",
+      "description": "Asserts that passwords are never stored in plaintext and use salted scrypt CPU/memory-hard hashing.",
+      "status": "PASSED",
+      "severity": "CRITICAL",
+      "adversarialPayload": "Testing password hash verification and wrong password rejection",
+      "observedResult": "Salted scrypt hash validated with constant-time verification.",
+      "remediation": "Use crypto.scrypt with a 32-byte cryptographically secure random salt for password storage."
+    },
+    {
+      "id": "SEC-AUTH-02",
+      "category": "AUTHENTICATION",
+      "standardMapping": "OWASP API2:2023 (Station PIN Security)",
+      "title": "High-Speed Cashier Station PIN Cryptographic Hashing",
+      "description": "Asserts that shared counter station PINs are hashed using salted PBKDF2 with constant-time equality.",
+      "status": "PASSED",
+      "severity": "HIGH",
+      "adversarialPayload": "Testing 4-digit PIN verification and timing resistance",
+      "observedResult": "Station PIN hashed and verified in constant time.",
+      "remediation": "Hash numeric PINs with unique salts and enforce rate limiting on PIN switch attempts."
+    },
+    {
+      "id": "SEC-AUTH-03",
+      "category": "AUTHENTICATION",
+      "standardMapping": "OWASP API2:2023 & RFC 7519 (JWT Security)",
+      "title": "Cryptographic JWT Signing & Payload Tampering Detection",
+      "description": "Asserts that modifying claims inside a JWT invalidates the HMAC signature and is rejected.",
+      "status": "PASSED",
+      "severity": "CRITICAL",
+      "adversarialPayload": "Modifying JWT payload claim \"role: CASHIER\" -> \"role: OWNER\"",
+      "observedResult": "Tampered JWT signature mismatch caught.",
+      "remediation": "Verify JWT HMAC-SHA256 signature using constant-time comparison before trusting claims."
+    },
+    {
+      "id": "SEC-FIN-01",
+      "category": "FINANCIAL_BOUNDS",
+      "standardMapping": "OWASP API3:2023 (Broken Object Property Level Authorization) & CWE-208",
+      "title": "Constant-Time Cryptographic Comparison & Side-Channel Mitigation",
+      "description": "Asserts that all cryptographic tokens, signatures, and PINs are compared with timingSafeEqual.",
+      "status": "PASSED",
+      "severity": "HIGH",
+      "adversarialPayload": "Timing analysis on key comparison strings",
+      "observedResult": "Constant-time comparison active.",
+      "remediation": "Always use crypto.timingSafeEqual on buffer representations of secrets."
+    },
+    {
+      "id": "SEC-CRYPTO-01",
+      "category": "CRYPTOGRAPHY",
+      "standardMapping": "PCI-DSS Requirement 3.4 & UU PDP Art. 35 (Encryption at Rest)",
+      "title": "Tenant BYOK Payment Gateway Key Encryption at Rest (AES-256-GCM)",
+      "description": "Asserts that merchant-provided gateway credentials (BYOK) are encrypted with AES-256-GCM before storage.",
+      "status": "PASSED",
+      "severity": "HIGH",
+      "adversarialPayload": "Attempting to read raw API credentials from database payload",
+      "observedResult": "Encrypted with AES-256-GCM (Auth Tag verified).",
+      "remediation": "Encrypt merchant API keys with AES-256-GCM and store authentication tags alongside ciphertext."
+    },
+    {
+      "id": "SEC-PRIVACY-01",
+      "category": "DATA_PRIVACY",
+      "standardMapping": "UU PDP Data Minimization & Commercial Margin Shielding (Surat Jalan Security)",
+      "title": "Logistics Driver Manifest (Surat Jalan) Commercial Margin Shielding",
+      "description": "Asserts that delivery orders and working permits physically strip all unit prices, discounts, and order subtotals.",
+      "status": "PASSED",
+      "severity": "HIGH",
+      "adversarialPayload": "Driver querying GET /delivery/manifest/:id to inspect merchant profit margin",
+      "observedResult": "Zero monetary amounts leaked in driver manifest.",
+      "remediation": "Segregate delivery_orders and delivery_order_items to omit unit_price, subtotal, and grand_total columns."
+    }
+  ]
+}

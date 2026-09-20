@@ -1,9 +1,12 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const { exec } = require('child_process');
 
 const PORT = 3333;
 const STATIC_DIR = __dirname;
+const ROOT_DIR = path.resolve(__dirname, '..');
+const ROOT_ASSETS_DIR = path.join(ROOT_DIR, 'assets');
 const INDEX_FILE = path.join(STATIC_DIR, 'index.html');
 
 const MIME_TYPES = {
@@ -22,32 +25,71 @@ const MIME_TYPES = {
 // Live Reload SSE Hub
 const sseClients = new Set();
 
-function broadcastReload() {
+function broadcastHMR(eventData) {
+  const payload = typeof eventData === 'string' ? eventData : JSON.stringify(eventData);
   for (const client of sseClients) {
     try {
-      client.write('data: reload\n\n');
+      client.write(`data: ${payload}\n\n`);
     } catch (e) {
       sseClients.delete(client);
     }
   }
 }
 
-// Watch STATIC_DIR for hot-reloading on save
+// Watch STATIC_DIR & ROOT_ASSETS_DIR for hot-reloading on save
 let reloadDebounce = null;
+function handleHotReload(filename, baseDir) {
+  if (!filename) return;
+  const ext = path.extname(filename).toLowerCase();
+  
+  if (['.html', '.css', '.js', '.json', '.svg', '.png', '.jpg', '.webp'].includes(ext)) {
+    clearTimeout(reloadDebounce);
+    reloadDebounce = setTimeout(() => {
+      const normalizedPath = filename.replace(/\\/g, '/');
+      let hmrType = 'reload';
+      
+      if (ext === '.css') {
+        hmrType = 'css';
+      } else if (['.svg', '.png', '.jpg', '.webp'].includes(ext)) {
+        hmrType = 'asset';
+      }
+
+      console.log(`[HMR Server] ⚡ ${hmrType.toUpperCase()} modified: ${normalizedPath} (${sseClients.size} client(s) connected)`);
+
+      // Auto-sync brand assets if root assets/brand changed
+      if (baseDir === ROOT_ASSETS_DIR && normalizedPath.includes('brand')) {
+        exec('node scripts/sync-assets.js', { cwd: ROOT_DIR }, () => {
+          broadcastHMR({ type: 'asset', file: normalizedPath, timestamp: Date.now() });
+        });
+        return;
+      }
+
+      broadcastHMR({ type: hmrType, file: normalizedPath, timestamp: Date.now() });
+    }, 100);
+  }
+}
+
 try {
-  fs.watch(STATIC_DIR, { recursive: true }, (eventType, filename) => {
-    if (!filename) return;
-    const ext = path.extname(filename).toLowerCase();
-    if (['.html', '.css', '.js', '.json'].includes(ext)) {
-      clearTimeout(reloadDebounce);
-      reloadDebounce = setTimeout(() => {
-        console.log(`[HotReload] File changed: ${filename}. Refreshing ${sseClients.size} client(s)...`);
-        broadcastReload();
-      }, 150);
-    }
-  });
+  fs.watch(STATIC_DIR, { recursive: true }, (eventType, filename) => handleHotReload(filename, STATIC_DIR));
+  if (fs.existsSync(ROOT_ASSETS_DIR)) {
+    fs.watch(ROOT_ASSETS_DIR, { recursive: true }, (eventType, filename) => handleHotReload(filename, ROOT_ASSETS_DIR));
+  }
+  console.log('[HMR Server] File watchers active for preview/ and assets/');
 } catch (err) {
-  console.warn('[HotReload] File watcher error:', err.message);
+  console.warn('[HMR Server] File watcher error:', err.message);
+}
+
+// Injects HMR client script into HTML responses
+function injectHMRScript(htmlContent) {
+  if (typeof htmlContent !== 'string') htmlContent = htmlContent.toString('utf-8');
+  if (htmlContent.includes('/js/core/hmr-client.js')) {
+    return htmlContent;
+  }
+  const hmrTag = '\n  <!-- SiDaya HMR Engine -->\n  <script src="/js/core/hmr-client.js"></script>\n</body>';
+  if (htmlContent.includes('</body>')) {
+    return htmlContent.replace('</body>', hmrTag);
+  }
+  return htmlContent + '\n<script src="/js/core/hmr-client.js"></script>';
 }
 
 const server = http.createServer((req, res) => {
@@ -68,18 +110,19 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Normalize path
-  if (pathname === '/') {
-    pathname = '/index.html';
+  // Check if requesting from centralized root /assets/
+  let requestedFile = path.join(STATIC_DIR, pathname);
+  if (pathname.startsWith('/assets/')) {
+    const rootCandidate = path.join(ROOT_ASSETS_DIR, pathname.replace(/^\/assets\//, ''));
+    if (fs.existsSync(rootCandidate) && fs.statSync(rootCandidate).isFile()) {
+      requestedFile = rootCandidate;
+    }
   }
 
-  const requestedFile = path.join(STATIC_DIR, pathname);
-
-  // Security check: ensure path is within STATIC_DIR
-  if (!requestedFile.startsWith(STATIC_DIR)) {
-    res.writeHead(403, { 'Content-Type': 'text/plain' });
-    res.end('Forbidden');
-    return;
+  // Normalize root path
+  if (pathname === '/') {
+    pathname = '/index.html';
+    requestedFile = INDEX_FILE;
   }
 
   // Check if static file exists
@@ -88,26 +131,57 @@ const server = http.createServer((req, res) => {
       const ext = path.extname(requestedFile).toLowerCase();
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
-      res.writeHead(200, { 'Content-Type': contentType });
+      // For HTML files, inject HMR client and disable caching
+      if (ext === '.html') {
+        fs.readFile(requestedFile, 'utf-8', (errHtml, content) => {
+          if (errHtml) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Error reading HTML file');
+            return;
+          }
+          const injected = injectHMRScript(content);
+          res.writeHead(200, {
+            'Content-Type': 'text/html; charset=utf-8',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          });
+          res.end(injected);
+        });
+        return;
+      }
+
+      // For JS, CSS, JSON, images
+      res.writeHead(200, {
+        'Content-Type': contentType,
+        'Cache-Control': ext === '.js' || ext === '.css' ? 'no-cache, must-revalidate' : 'public, max-age=3600'
+      });
       fs.createReadStream(requestedFile).pipe(res);
     } else {
-      // SPA Fallback: serve index.html for application routes (e.g. /dashboard, /pos, /customers)
-      fs.readFile(INDEX_FILE, (errIndex, data) => {
+      // SPA Fallback: serve index.html with HMR injection
+      fs.readFile(INDEX_FILE, 'utf-8', (errIndex, data) => {
         if (errIndex) {
           res.writeHead(500, { 'Content-Type': 'text/plain' });
           res.end('Error loading index.html');
           return;
         }
-        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(data);
+        const injected = injectHMRScript(data);
+        res.writeHead(200, {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-cache, no-store, must-revalidate'
+        });
+        res.end(injected);
       });
     }
   });
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`SiDaya Modular Prototype Server running at http://localhost:${PORT}`);
+  console.log(`\n========================================================`);
+  console.log(`⚡ SiDaya Prototype Server + HMR Engine active on :${PORT}`);
   console.log(` - Merchant Plane: http://localhost:${PORT}`);
   console.log(` - Operator Control Plane: http://ops.localhost:${PORT}`);
   console.log(` - PayLink Portal: http://pay.localhost:${PORT}`);
+  console.log(` - HMR SSE Stream: http://localhost:${PORT}/__livereload`);
+  console.log(`========================================================\n`);
 });

@@ -2,14 +2,39 @@ import http from 'http';
 import { PayLinkClientService } from './services/paylink-client.service';
 import { PayLinkCheckoutRenderer } from './components/paylink-checkout';
 
+import fs from 'fs';
+import path from 'path';
+
 const PORT = parseInt(process.env['WEB_PORT'] || '3000', 10);
 const clientService = new PayLinkClientService(
   process.env['API_URL'] || 'http://localhost:4000/api/v1/public/paylink',
 );
 
+const MIME_MAP: Record<string, string> = {
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+  '.css': 'text/css',
+  '.js': 'application/javascript',
+};
+
 const server = http.createServer(async (req: http.IncomingMessage, res: http.ServerResponse) => {
   const url = req.url || '';
   const method = req.method || 'GET';
+
+  // Static brand assets
+  if (url.startsWith('/brand/') || url.startsWith('/assets/brand/')) {
+    const filename = (url.replace(/^\/(assets\/)?brand\//, '').split('?')[0]) || '';
+    if (filename) {
+      const filePath = path.join(__dirname, '..', 'public', 'brand', filename);
+      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        const ext = path.extname(filePath).toLowerCase();
+        res.writeHead(200, { 'Content-Type': MIME_MAP[ext] || 'application/octet-stream', 'Cache-Control': 'public, max-age=86400' });
+        fs.createReadStream(filePath).pipe(res);
+        return;
+      }
+    }
+  }
 
   if (url === '/' && method === 'GET') {
     res.writeHead(302, { Location: '/p/tok_demo_01' });

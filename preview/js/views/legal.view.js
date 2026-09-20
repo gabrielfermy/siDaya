@@ -51,16 +51,13 @@ const LegalView = {
       <div class="legal-portal-wrapper">
         <!-- STANDALONE PORTAL HEADER -->
         <header class="legal-portal-header">
-          <div class="legal-brand-block" onclick="navigate('/dashboard')">
-            <div class="legal-logo-box">S</div>
-            <div>
-              <div class="legal-brand-title">SiDaya</div>
-              <div class="legal-brand-sub">by Ashvin Labs • Enterprise OS</div>
-            </div>
+          <div class="legal-brand-block" onclick="navigate('/dashboard')" role="button" aria-label="siDaya by Ashvin Labs IDN" style="cursor:pointer; display:flex; align-items:center;">
+            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="44" class="brand-logo-horizontal dark-theme-logo" style="height:44px; width:auto; max-width:220px; object-fit:contain;">
+            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="44" class="brand-logo-horizontal light-theme-logo" style="height:44px; width:auto; max-width:220px; object-fit:contain;">
           </div>
 
           <div class="legal-header-actions">
-            <button class="theme-toggle-btn" onclick="toggleDarkMode()" title="Ganti Tema">🌓</button>
+            ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'legal-theme-dropdown', showLabel: false }) : ''}
             <button class="btn btn-primary btn-sm" onclick="navigate('/dashboard')" style="font-weight:700;">
               <span>🚀</span> Buka Aplikasi SiDaya
             </button>

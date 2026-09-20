@@ -97,11 +97,18 @@ const tenantController = new TenantController();
 const router = new AppRouter();
 
 router.get('/health', (_req, res) => {
+  const env = (process.env['NODE_ENV'] || 'development').toLowerCase();
+  const baseDomain = env === 'production' ? 'sidaya.biz.id' : env === 'staging' ? 'sidaya.my.id' : 'sidaya.test';
   sendJson(res, 200, {
     status: 'UP',
-    service: 'SiDaya Core API (Phase 2 & Subdomain Auth)',
+    service: 'SiDaya Core API & Payment Engine',
+    environment: env,
+    baseDomain,
+    merchantPlaneUrl: `https://${baseDomain}`,
+    operatorPlaneUrl: `https://ops.${baseDomain}`,
+    paylinkPlaneUrl: `https://pay.${baseDomain}`,
     timestamp: new Date().toISOString(),
-    database: process.env['DATABASE_URL'] || 'postgresql://postgres:postgrespassword@localhost:54350/sidaya_dev',
+    database: process.env['DATABASE_URL'] ? 'CONNECTED' : 'LOCAL_POSTGRES_54350',
     registeredPaymentGateways: gatewayRegistry.listRegistered(),
   });
 });
@@ -120,7 +127,8 @@ const server = http.createServer((req, res) => router.handleRequest(req, res));
 
 if (process.env['NODE_ENV'] !== 'test') {
   server.listen(PORT, () => {
-    console.log(`SiDaya Core API running on http://localhost:${PORT}`);
+    const env = process.env['NODE_ENV'] || 'development';
+    console.log(`[SiDaya Core API] Running on port ${PORT} [Env: ${env}]`);
   });
 }
 

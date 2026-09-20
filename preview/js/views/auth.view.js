@@ -6,65 +6,26 @@ const AuthView = {
     return `
       <div id="merchant-login-screen" class="login-overlay">
         <div class="login-card">
-          <div class="login-brand">
-            <div class="login-logo">S</div>
-            <h2 class="login-title">SiDaya Workspace Login</h2>
-            <p class="login-desc">Sistem Operasi Multi-Tenant Distribusi Grosir & Komoditas</p>
-            <div class="login-security-badge">
+          <div class="login-brand" style="display:flex; flex-direction:column; align-items:center; margin-bottom:18px;">
+            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="200" class="brand-logo-horizontal dark-theme-logo" style="height:200px; width:auto; max-width:400px; object-fit:contain; margin-bottom:8px;">
+            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="200" class="brand-logo-horizontal light-theme-logo" style="height:200px; width:auto; max-width:400px; object-fit:contain; margin-bottom:8px;">
+            <p class="login-desc" style="margin-top:2px;">Sistem Operasi Grosir Multi-Tenant & POS</p>
+            <div class="login-security-badge" style="margin-top:8px;">
               <span>🔒</span>
               <span>Keamanan Terisolasi Multi-Tenant & RBAC</span>
             </div>
-          </div>
-
-          <div class="preset-section-title">Pilih Akun Cepat Simulasi Peran:</div>
-          <div class="preset-pill-grid">
-            <button class="preset-pill-btn" onclick="quickLoginPreset('budi@berasjaya.com')">
-              <span>👑 Budi Santoso</span>
-              <span class="preset-role-badge">Owner / Billing POC</span>
-            </button>
-            <button class="preset-pill-btn" onclick="quickLoginPreset('siti@berasjaya.com')">
-              <span>💳 Siti Rahma</span>
-              <span class="preset-role-badge">Kasir Grosir (POS)</span>
-            </button>
-            <button class="preset-pill-btn" onclick="quickLoginPreset('agus@berasjaya.com')">
-              <span>📦 Agus Santoso</span>
-              <span class="preset-role-badge">Gudang & Batch FIFO</span>
-            </button>
-            <button class="preset-pill-btn" onclick="quickLoginPreset('joko@berasjaya.com')">
-              <span>🚚 Joko Supir</span>
-              <span class="preset-role-badge">Driver Logistik (POD)</span>
-            </button>
-          </div>
-
-          <!-- Google 1-Click Login Button -->
-          <button type="button" class="btn btn-google-auth" onclick="AuthController.openGoogleLoginPicker()" 
-                  style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; background:#fff; color:#374151; border:1px solid #D1D5DB; border-radius:10px; padding:10px; font-weight:700; font-size:13.5px; box-shadow:0 1px 2px rgba(0,0,0,0.05); cursor:pointer; margin-bottom:14px; transition:all 0.2s;"
-                  onmouseover="this.style.background='#F9FAFB'; this.style.borderColor='#9CA3AF'" onmouseout="this.style.background='#fff'; this.style.borderColor='#D1D5DB'">
-            <svg style="width:18px; height:18px;" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-            </svg>
-            <span>Masuk Cepat dengan Google</span>
-          </button>
-
-          <div style="display:flex; align-items:center; margin-bottom:14px; gap:10px;">
-            <div style="flex:1; height:1px; background:var(--border-color);"></div>
-            <span style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase;">atau via kredensial</span>
-            <div style="flex:1; height:1px; background:var(--border-color);"></div>
           </div>
 
           <form id="merchant-login-form" onsubmit="event.preventDefault(); handleMerchantLoginSubmit();">
             <div id="merchant-login-error" class="login-error-alert" style="display:none;"></div>
             <div class="form-group">
               <label class="form-label">Email Terdaftar / Nomor WhatsApp</label>
-              <input id="merchant-login-identifier" type="text" class="form-input" required value="budi@berasjaya.com">
+              <input id="merchant-login-identifier" type="text" class="form-input" required placeholder="nama@toko.com atau 081234567890" autocomplete="username">
             </div>
             <div class="form-group">
               <label class="form-label">Kata Sandi / PIN Cepat</label>
               <div class="password-input-wrap">
-                <input id="merchant-login-password" type="password" class="form-input" required value="Password123!">
+                <input id="merchant-login-password" type="password" class="form-input" required placeholder="Masukkan kata sandi akun Anda" autocomplete="current-password">
                 <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('merchant-login-password', this)">👁️</button>
               </div>
             </div>
@@ -101,7 +62,7 @@ const AuthView = {
     const proto = (typeof getAppProtocol === 'function') ? getAppProtocol() : 'https:';
     return `
       <div id="merchant-register-screen" class="login-overlay" style="display:none;">
-        <div class="login-card register-card" style="max-width: 580px; width:100%; margin: 24px auto;">
+        <div class="login-card register-card" style="max-width: 580px; width:100%; margin: auto;">
           
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
             <button type="button" class="btn btn-outline btn-sm" onclick="showLoginScreen()" style="gap:5px; padding:6px 12px; font-size:12px; font-weight:700;">
@@ -112,30 +73,10 @@ const AuthView = {
             </div>
           </div>
 
-          <div class="login-brand" style="margin-bottom: 18px;">
-            <div class="login-logo" style="background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);">🏪</div>
-            <h2 class="login-title">Pendaftaran Toko Grosir Baru</h2>
-            <p class="login-desc">Inisialisasi workspace mandiri, isolasi database, dan subdomain resmi toko Anda.</p>
-          </div>
-
-          <!-- Fast Signup with Google -->
-          <div style="margin-bottom: 14px;">
-            <button type="button" onclick="AuthController.openGoogleRegisterPicker()" 
-                    style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; background:#fff; color:#374151; border:1px solid #D1D5DB; border-radius:10px; padding:10px; font-weight:700; font-size:13.5px; box-shadow:0 1px 2px rgba(0,0,0,0.05); cursor:pointer;"
-                    onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='#fff'">
-              <svg style="width:18px; height:18px;" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-              </svg>
-              <span>Daftar Cepat dengan Akun Google</span>
-            </button>
-            <div style="display:flex; align-items:center; margin-top:12px; gap:10px;">
-              <div style="flex:1; height:1px; background:var(--border-color);"></div>
-              <span style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase;">atau isi manual</span>
-              <div style="flex:1; height:1px; background:var(--border-color);"></div>
-            </div>
+          <div class="login-brand" style="display:flex; flex-direction:column; align-items:center; margin-bottom: 18px;">
+            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="200" class="brand-logo-horizontal dark-theme-logo" style="height:200px; width:auto; max-width:400px; object-fit:contain; margin-bottom:8px;">
+            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="200" class="brand-logo-horizontal light-theme-logo" style="height:200px; width:auto; max-width:400px; object-fit:contain; margin-bottom:8px;">
+            <p class="login-desc" style="margin-top:2px;">Registrasi Toko Baru & Inisialisasi Workspace</p>
           </div>
 
           <form id="owner-registration-form" onsubmit="handleOwnerRegistrationSubmit(event)">
@@ -199,7 +140,7 @@ const AuthView = {
               </div>
               <div class="form-group" style="margin-bottom:10px;">
                 <label class="form-label">Kata Sandi*</label>
-                <input id="reg-owner-password" type="password" class="form-input" required placeholder="Minimal 8 karakter" oninput="checkPasswordStrengthAndMatch()">
+                <input id="reg-owner-password" type="password" class="form-input" required placeholder="Minimal 8 karakter (huruf & angka)" oninput="checkPasswordStrengthAndMatch()">
               </div>
               <div class="form-group" style="margin-bottom:8px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
@@ -209,7 +150,7 @@ const AuthView = {
                 <input id="reg-owner-password-confirm" type="password" class="form-input" required placeholder="Ulangi kata sandi" oninput="checkPasswordStrengthAndMatch()">
               </div>
 
-              <!-- Google-style Single Unmask Checkbox -->
+              <!-- Single Unmask Checkbox -->
               <div style="margin-top:6px; margin-bottom:8px;">
                 <label style="display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:12px; font-weight:600; color:var(--text-secondary); user-select:none;">
                   <input type="checkbox" id="reg-show-passwords-check" onchange="toggleDualPasswordVisibility(this, 'reg-owner-password', 'reg-owner-password-confirm')" style="width:15px; height:15px; cursor:pointer; accent-color:var(--color-primary, #2563EB);">
@@ -264,32 +205,16 @@ const AuthView = {
             <p class="login-desc">Platform Operations & Tenant Fleet Infrastructure</p>
           </div>
 
-          <div class="preset-section-title">Pilih Akun Operator Simulasi:</div>
-          <div class="preset-pill-grid">
-            <button class="preset-pill-btn" onclick="quickLoginOperator('gabriel@ashvinlabs.com', 'SUPER_ADMIN')">
-              <span>⚡ Gabriel (CEO)</span>
-              <span class="preset-role-badge" style="color:#7C3AED;">Super Admin</span>
-            </button>
-            <button class="preset-pill-btn" onclick="quickLoginOperator('alex@ashvinlabs.com', 'DEV_ENGINEER')">
-              <span>🛠️ Alex (Lead Dev)</span>
-              <span class="preset-role-badge" style="color:#0284C7;">Dev Engineer</span>
-            </button>
-            <button class="preset-pill-btn" onclick="quickLoginOperator('dina@ashvinlabs.com', 'OPS_SUPPORT')">
-              <span>🎧 Dina (Customer Ops)</span>
-              <span class="preset-role-badge" style="color:#059669;">Ops Support</span>
-            </button>
-          </div>
-
           <form id="operator-login-form" onsubmit="event.preventDefault(); handleOperatorLoginSubmit();">
             <div id="operator-login-error" class="login-error-alert" style="display:none;"></div>
             <div class="form-group">
               <label class="form-label">Email Korporat (@ashvinlabs.com)</label>
-              <input id="operator-login-email" type="email" class="form-input" required value="gabriel@ashvinlabs.com">
+              <input id="operator-login-email" type="email" class="form-input" required placeholder="operator@ashvinlabs.com" autocomplete="username">
             </div>
             <div class="form-group">
               <label class="form-label">Kata Sandi Platform</label>
               <div class="password-input-wrap">
-                <input id="operator-login-password" type="password" class="form-input" required value="Password123!">
+                <input id="operator-login-password" type="password" class="form-input" required placeholder="Masukkan kata sandi platform" autocomplete="current-password">
                 <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('operator-login-password', this)">👁️</button>
               </div>
             </div>
@@ -305,18 +230,19 @@ const AuthView = {
   renderEmailVerification() {
     return `
       <div id="email-verification-screen" class="login-overlay" style="display:none;">
-        <div class="login-card" style="max-width: 480px; width:100%; margin: 24px auto; text-align:center;">
+        <div class="login-card" style="max-width: 480px; width:100%; margin: auto; text-align:center;">
           <div style="width:54px; height:54px; margin:0 auto 14px auto; border-radius:50%; background:rgba(37,99,235,0.1); color:var(--color-primary, #2563EB); display:flex; align-items:center; justify-content:center; font-size:26px;">
             ✉️
           </div>
           <h2 class="login-title" style="font-size:1.35rem;">Verifikasi Email Anda</h2>
-          <p class="login-desc" style="margin-bottom:12px;">
-            Kode OTP verifikasi telah dikirimkan ke alamat:
+          <p class="login-desc" style="margin-bottom:14px;">
+            Kode OTP verifikasi telah dikirimkan ke alamat email Anda:
             <br><strong id="verify-target-email" style="color:var(--text-primary); font-size:13px;">owner@toko.com</strong>
           </p>
-          
-          <div id="verify-simulator-pill" style="display:inline-flex; align-items:center; gap:8px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:6px 14px; border-radius:20px; font-size:11.5px; color:var(--accent-green, #10b981); margin-bottom:16px; cursor:pointer;" onclick="AuthController.quickFillOtp()" title="Klik untuk mengisi otomatis kode OTP simulasi">
-            <span>📩 Simulasi Inbox: Kode OTP Anda adalah <strong id="verify-sample-code">749201</strong> (Klik Isi)</span>
+
+          <div class="dev-otp-helper" style="margin-bottom:16px; background:rgba(54,96,255,0.08); border:1px dashed rgba(54,96,255,0.3); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center;">
+            <span>🛠️ Sandbox / Dev OTP: <strong id="verify-sample-code" style="color:#38bdf8; font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:800;">123456</strong></span>
+            <button type="button" class="btn btn-outline btn-xs" onclick="AuthController.quickFillOtp(document.getElementById('verify-sample-code')?.textContent || '123456')" style="padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;">Isi Otomatis</button>
           </div>
 
           <div id="verify-error-alert" class="login-error-alert" style="display:none; margin-bottom:14px;"></div>
@@ -349,3 +275,4 @@ const AuthView = {
     `;
   },
 };
+
