@@ -57,7 +57,7 @@ const LandingView = {
 
             <!-- Desktop Action Buttons & Theme Switcher -->
             <div class="landing-nav-actions">
-              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderSwitcher({ className: 'theme-switcher-segmented' }) : ''}
+              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderSwitcher({ className: 'theme-switcher-segmented theme-switcher-compact' }) : ''}
               <button type="button" class="btn-nav-login" onclick="navigate('/login')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
