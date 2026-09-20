@@ -230,15 +230,20 @@ const AuthView = {
   renderEmailVerification() {
     return `
       <div id="email-verification-screen" class="login-overlay" style="display:none;">
-        <div class="login-card" style="max-width: 480px; width:100%; margin: 24px auto; text-align:center;">
+        <div class="login-card" style="max-width: 480px; width:100%; margin: auto; text-align:center;">
           <div style="width:54px; height:54px; margin:0 auto 14px auto; border-radius:50%; background:rgba(37,99,235,0.1); color:var(--color-primary, #2563EB); display:flex; align-items:center; justify-content:center; font-size:26px;">
             ✉️
           </div>
           <h2 class="login-title" style="font-size:1.35rem;">Verifikasi Email Anda</h2>
-          <p class="login-desc" style="margin-bottom:16px;">
+          <p class="login-desc" style="margin-bottom:14px;">
             Kode OTP verifikasi telah dikirimkan ke alamat email Anda:
             <br><strong id="verify-target-email" style="color:var(--text-primary); font-size:13px;">owner@toko.com</strong>
           </p>
+
+          <div class="dev-otp-helper" style="margin-bottom:16px; background:rgba(54,96,255,0.08); border:1px dashed rgba(54,96,255,0.3); border-radius:10px; padding:10px 14px; font-size:12px; color:var(--text-secondary); display:flex; justify-content:space-between; align-items:center;">
+            <span>🛠️ Sandbox / Dev OTP: <strong id="verify-sample-code" style="color:#38bdf8; font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:800;">123456</strong></span>
+            <button type="button" class="btn btn-outline btn-xs" onclick="AuthController.quickFillOtp(document.getElementById('verify-sample-code')?.textContent || '123456')" style="padding:4px 10px; font-size:11px; font-weight:700; cursor:pointer;">Isi Otomatis</button>
+          </div>
 
           <div id="verify-error-alert" class="login-error-alert" style="display:none; margin-bottom:14px;"></div>
 
