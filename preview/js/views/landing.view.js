@@ -43,8 +43,8 @@ const LandingView = {
           <div class="landing-nav-inner">
             <!-- Brand Logo (Affinity Designer Bespoke Vector Lockup) -->
             <div class="landing-brand" onclick="navigate('/')" role="button" aria-label="siDaya by Ashvin Labs IDN">
-              <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="40" class="brand-logo-horizontal dark-theme-logo" style="height:40px; width:auto; max-width:210px; object-fit:contain;">
-              <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="40" class="brand-logo-horizontal light-theme-logo" style="height:40px; width:auto; max-width:210px; object-fit:contain;">
+              <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="46" class="brand-logo-horizontal dark-theme-logo" style="height:46px; width:auto; max-width:240px; object-fit:contain;">
+              <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="46" class="brand-logo-horizontal light-theme-logo" style="height:46px; width:auto; max-width:240px; object-fit:contain;">
             </div>
 
             <!-- Desktop Menu Links -->
@@ -94,8 +94,8 @@ const LandingView = {
             <!-- Drawer Header -->
             <div class="drawer-top-header">
               <div class="landing-brand" onclick="LandingView.toggleMobileMenu(false); navigate('/');" role="button" aria-label="siDaya by Ashvin Labs IDN">
-                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal dark-theme-logo" style="height:38px; width:auto; max-width:200px; object-fit:contain;">
-                <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal light-theme-logo" style="height:38px; width:auto; max-width:200px; object-fit:contain;">
+                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal dark-theme-logo" style="height:42px; width:auto; max-width:220px; object-fit:contain;">
+                <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal light-theme-logo" style="height:42px; width:auto; max-width:220px; object-fit:contain;">
               </div>
 
               <button type="button" class="drawer-close-btn" onclick="LandingView.toggleMobileMenu(false)" aria-label="Tutup Menu">
@@ -845,8 +845,8 @@ const LandingView = {
           <div class="footer-main-grid">
             <div>
               <div class="landing-brand" style="margin-bottom:14px;" onclick="navigate('/')" role="button" aria-label="siDaya by Ashvin Labs IDN">
-                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal dark-theme-logo" style="height:42px; width:auto; max-width:220px; object-fit:contain;">
-                <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal light-theme-logo" style="height:42px; width:auto; max-width:220px; object-fit:contain;">
+                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="48" class="brand-logo-horizontal dark-theme-logo" style="height:48px; width:auto; max-width:250px; object-fit:contain;">
+                <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="48" class="brand-logo-horizontal light-theme-logo" style="height:48px; width:auto; max-width:250px; object-fit:contain;">
               </div>
               <p class="footer-brand-desc">
                 Platform SaaS terpadu untuk pedagang grosir komoditas, manajemen muatan FIFO, surat jalan digital, dan otomasi penagihan pembayaran di Indonesia.

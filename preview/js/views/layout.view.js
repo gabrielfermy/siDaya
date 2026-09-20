@@ -110,8 +110,8 @@ const LayoutView = {
         <aside class="sidebar" id="sidebar-nav">
           <div class="sidebar-top">
             <a class="sidebar-brand" onclick="navigate('/dashboard')" role="button" aria-label="siDaya by Ashvin Labs IDN" style="cursor:pointer; display:flex; align-items:center;">
-              <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal dark-theme-logo" style="height:38px; width:auto; max-width:190px; object-fit:contain;">
-              <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal light-theme-logo" style="height:38px; width:auto; max-width:190px; object-fit:contain;">
+              <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="44" class="brand-logo-horizontal dark-theme-logo" style="height:44px; width:auto; max-width:220px; object-fit:contain;">
+              <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="44" class="brand-logo-horizontal light-theme-logo" style="height:44px; width:auto; max-width:220px; object-fit:contain;">
             </a>
             <div class="sidebar-tenant-badge">
               <span class="tenant-badge-label" id="sidebar-tenant-badge-label">Active Workspace</span>

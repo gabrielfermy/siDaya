@@ -7,8 +7,8 @@ const AuthView = {
       <div id="merchant-login-screen" class="login-overlay">
         <div class="login-card">
           <div class="login-brand" style="display:flex; flex-direction:column; align-items:center; margin-bottom:18px;">
-            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal dark-theme-logo" style="height:42px; width:auto; max-width:200px; object-fit:contain; margin-bottom:6px;">
-            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal light-theme-logo" style="height:42px; width:auto; max-width:200px; object-fit:contain; margin-bottom:6px;">
+            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="56" class="brand-logo-horizontal dark-theme-logo" style="height:56px; width:auto; max-width:270px; object-fit:contain; margin-bottom:8px;">
+            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="56" class="brand-logo-horizontal light-theme-logo" style="height:56px; width:auto; max-width:270px; object-fit:contain; margin-bottom:8px;">
             <p class="login-desc" style="margin-top:2px;">Sistem Operasi Grosir Multi-Tenant & POS</p>
             <div class="login-security-badge" style="margin-top:8px;">
               <span>🔒</span>
@@ -74,8 +74,8 @@ const AuthView = {
           </div>
 
           <div class="login-brand" style="display:flex; flex-direction:column; align-items:center; margin-bottom: 18px;">
-            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal dark-theme-logo" style="height:42px; width:auto; max-width:200px; object-fit:contain; margin-bottom:6px;">
-            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal light-theme-logo" style="height:42px; width:auto; max-width:200px; object-fit:contain; margin-bottom:6px;">
+            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="56" class="brand-logo-horizontal dark-theme-logo" style="height:56px; width:auto; max-width:270px; object-fit:contain; margin-bottom:8px;">
+            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="56" class="brand-logo-horizontal light-theme-logo" style="height:56px; width:auto; max-width:270px; object-fit:contain; margin-bottom:8px;">
             <p class="login-desc" style="margin-top:2px;">Registrasi Toko Baru & Inisialisasi Workspace</p>
           </div>
 
