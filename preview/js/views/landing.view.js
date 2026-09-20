@@ -437,6 +437,7 @@ const LandingView = {
             <p class="section-sub">Perbandingan langsung antara metode pembukuan konvensional dengan ekosistem SiDaya.</p>
           </div>
 
+          <!-- Desktop Comparison Table (Hidden on Mobile) -->
           <div class="comparison-card-wrapper">
             <table class="comparison-table">
               <thead>
@@ -448,47 +449,160 @@ const LandingView = {
               </thead>
               <tbody>
                 <tr>
-                  <td style="color:#ffffff; font-weight:700;">Konversi Satuan & Harga Grosir</td>
-                  <td class="cell-bad">Manual di kalkulator, sering salah hitung antar satuan dus/renceng</td>
+                  <td class="cell-aspect">Konversi Satuan & Harga Grosir</td>
+                  <td class="cell-bad">
+                    <span class="cell-icon-bad">✕</span>
+                    <span>Manual di kalkulator, sering salah hitung antar satuan dus/renceng</span>
+                  </td>
                   <td class="cell-good">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Otomatis bertingkat per tier pelanggan dalam 1 detik
+                    <span>Otomatis bertingkat per tier pelanggan dalam 1 detik</span>
                   </td>
                 </tr>
                 <tr>
-                  <td style="color:#ffffff; font-weight:700;">Pengelolaan Stok Inbound Truk/Kontainer</td>
-                  <td class="cell-bad">Stok tercampur tanpa nomor batch; barang lama tertimbun dan kedaluwarsa</td>
+                  <td class="cell-aspect">Pengelolaan Stok Inbound Truk/Kontainer</td>
+                  <td class="cell-bad">
+                    <span class="cell-icon-bad">✕</span>
+                    <span>Stok tercampur tanpa nomor batch; barang lama tertimbun dan kedaluwarsa</span>
+                  </td>
                   <td class="cell-good">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Alokasi FIFO otomatis dengan barcode & tracking tanggal kedaluwarsa
+                    <span>Alokasi FIFO otomatis dengan barcode & tracking tanggal kedaluwarsa</span>
                   </td>
                 </tr>
                 <tr>
-                  <td style="color:#ffffff; font-weight:700;">Penagihan Piutang & Tempo Toko</td>
-                  <td class="cell-bad">Buku kasbon tercecer, pembeli lupa bayar, staf repot cek mutasi manual</td>
+                  <td class="cell-aspect">Penagihan Piutang & Tempo Toko</td>
+                  <td class="cell-bad">
+                    <span class="cell-icon-bad">✕</span>
+                    <span>Buku kasbon tercecer, pembeli lupa bayar, staf repot cek mutasi manual</span>
+                  </td>
                   <td class="cell-good">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Otomasi WhatsApp PayLink & QRIS dinamis berbatas plafon piutang
+                    <span>Otomasi WhatsApp PayLink & QRIS dinamis berbatas plafon piutang</span>
                   </td>
                 </tr>
                 <tr>
-                  <td style="color:#ffffff; font-weight:700;">Pengiriman & Surat Jalan (POD)</td>
-                  <td class="cell-bad">Kertas surat jalan rawan hilang; nota sopir membocorkan modal margin ke pelanggan</td>
+                  <td class="cell-aspect">Pengiriman & Surat Jalan (POD)</td>
+                  <td class="cell-bad">
+                    <span class="cell-icon-bad">✕</span>
+                    <span>Kertas surat jalan rawan hilang; nota sopir membocorkan modal margin ke pelanggan</span>
+                  </td>
                   <td class="cell-good">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Surat jalan digital, HPP terproteksi rahasia, bukti foto GPS & tanda tangan
+                    <span>Surat jalan digital, HPP terproteksi rahasia, bukti foto GPS & tanda tangan</span>
                   </td>
                 </tr>
                 <tr>
-                  <td style="color:#ffffff; font-weight:700;">Pencairan Uang Hasil Penjualan</td>
-                  <td class="cell-bad">Dana tertahan di rekening perantara atau pihak ketiga</td>
+                  <td class="cell-aspect">Pencairan Uang Hasil Penjualan</td>
+                  <td class="cell-bad">
+                    <span class="cell-icon-bad">✕</span>
+                    <span>Dana tertahan di rekening perantara atau pihak ketiga</span>
+                  </td>
                   <td class="cell-good">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    Arsitektur BYOK: Dana langsung masuk 100% ke rekening bank pemilik toko
+                    <span>Arsitektur BYOK: Dana langsung masuk 100% ke rekening bank pemilik toko</span>
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Mobile Comparison Cards (Shown exclusively on Mobile Screens <= 768px) -->
+          <div class="comparison-mobile-cards">
+            <!-- Item 1 -->
+            <div class="comp-mobile-card">
+              <div class="comp-mobile-aspect">Konversi Satuan & Harga Grosir</div>
+              <div class="comp-mobile-box bad">
+                <div class="comp-box-label">Metode Konvensional / Kertas</div>
+                <div class="comp-box-content">
+                  <span class="cell-icon-bad">✕</span>
+                  <span>Manual di kalkulator, sering salah hitung antar satuan dus/renceng</span>
+                </div>
+              </div>
+              <div class="comp-mobile-box good">
+                <div class="comp-box-label">Sistem Operasi SiDaya</div>
+                <div class="comp-box-content">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Otomatis bertingkat per tier pelanggan dalam 1 detik</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="comp-mobile-card">
+              <div class="comp-mobile-aspect">Pengelolaan Stok Inbound Truk/Kontainer</div>
+              <div class="comp-mobile-box bad">
+                <div class="comp-box-label">Metode Konvensional / Kertas</div>
+                <div class="comp-box-content">
+                  <span class="cell-icon-bad">✕</span>
+                  <span>Stok tercampur tanpa nomor batch; barang lama tertimbun dan kedaluwarsa</span>
+                </div>
+              </div>
+              <div class="comp-mobile-box good">
+                <div class="comp-box-label">Sistem Operasi SiDaya</div>
+                <div class="comp-box-content">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Alokasi FIFO otomatis dengan barcode & tracking tanggal kedaluwarsa</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="comp-mobile-card">
+              <div class="comp-mobile-aspect">Penagihan Piutang & Tempo Toko</div>
+              <div class="comp-mobile-box bad">
+                <div class="comp-box-label">Metode Konvensional / Kertas</div>
+                <div class="comp-box-content">
+                  <span class="cell-icon-bad">✕</span>
+                  <span>Buku kasbon tercecer, pembeli lupa bayar, staf repot cek mutasi manual</span>
+                </div>
+              </div>
+              <div class="comp-mobile-box good">
+                <div class="comp-box-label">Sistem Operasi SiDaya</div>
+                <div class="comp-box-content">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Otomasi WhatsApp PayLink & QRIS dinamis berbatas plafon piutang</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item 4 -->
+            <div class="comp-mobile-card">
+              <div class="comp-mobile-aspect">Pengiriman & Surat Jalan (POD)</div>
+              <div class="comp-mobile-box bad">
+                <div class="comp-box-label">Metode Konvensional / Kertas</div>
+                <div class="comp-box-content">
+                  <span class="cell-icon-bad">✕</span>
+                  <span>Kertas surat jalan rawan hilang; nota sopir membocorkan modal margin ke pelanggan</span>
+                </div>
+              </div>
+              <div class="comp-mobile-box good">
+                <div class="comp-box-label">Sistem Operasi SiDaya</div>
+                <div class="comp-box-content">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Surat jalan digital, HPP terproteksi rahasia, bukti foto GPS & tanda tangan</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Item 5 -->
+            <div class="comp-mobile-card">
+              <div class="comp-mobile-aspect">Pencairan Uang Hasil Penjualan</div>
+              <div class="comp-mobile-box bad">
+                <div class="comp-box-label">Metode Konvensional / Kertas</div>
+                <div class="comp-box-content">
+                  <span class="cell-icon-bad">✕</span>
+                  <span>Dana tertahan di rekening perantara atau pihak ketiga</span>
+                </div>
+              </div>
+              <div class="comp-mobile-box good">
+                <div class="comp-box-label">Sistem Operasi SiDaya</div>
+                <div class="comp-box-content">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Arsitektur BYOK: Dana langsung masuk 100% ke rekening bank pemilik toko</span>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

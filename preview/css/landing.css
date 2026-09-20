@@ -837,12 +837,15 @@
   background: rgba(15, 23, 42, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  width: 100%;
 }
 
 .comparison-table {
   width: 100%;
+  min-width: 680px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -858,19 +861,19 @@
 
 .comparison-table th.col-dim {
   color: #94a3b8;
-  width: 32%;
+  width: 30%;
   background: rgba(15, 23, 42, 0.9);
 }
 
 .comparison-table th.col-bad {
   color: #f87171;
-  width: 34%;
+  width: 35%;
   background: rgba(239, 68, 68, 0.08);
 }
 
 .comparison-table th.col-good {
   color: #38bdf8;
-  width: 34%;
+  width: 35%;
   background: rgba(37, 99, 235, 0.15);
 }
 
@@ -878,30 +881,128 @@
   padding: 18px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   font-size: 0.9rem;
+  vertical-align: top;
 }
 
 .comparison-table tr:hover td {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.cell-aspect {
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
 .cell-bad {
   color: #fca5a5;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+  line-height: 1.5;
+}
+
+.cell-icon-bad {
+  color: #ef4444;
+  font-weight: 800;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 .cell-good {
   color: #f8fafc;
   font-weight: 700;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+  line-height: 1.5;
 }
 
 .cell-good svg {
   color: #10b981;
   flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* --- MOBILE RESPONSIVE COMPARISON CARDS --- */
+.comparison-mobile-cards {
+  display: none;
+  width: 100%;
+}
+
+.comp-mobile-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.comp-mobile-aspect {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  line-height: 1.35;
+}
+
+.comp-mobile-box {
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.comp-mobile-box.bad {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  margin-bottom: 12px;
+}
+
+.comp-mobile-box.good {
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.comp-box-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+.comp-mobile-box.bad .comp-box-label {
+  color: #f87171;
+}
+
+.comp-mobile-box.good .comp-box-label {
+  color: #38bdf8;
+}
+
+.comp-box-content {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.comp-mobile-box.bad .comp-box-content {
+  color: #fca5a5;
+}
+
+.comp-mobile-box.good .comp-box-content {
+  color: #f8fafc;
+  font-weight: 600;
+}
+
+.comp-mobile-box.good .comp-box-content svg {
+  color: #10b981;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 /* --- PRICING SECTION --- */
@@ -1336,6 +1437,14 @@
   .comparison-table th, .comparison-table td {
     padding: 12px 14px;
     font-size: 0.8rem;
+  }
+  .comparison-card-wrapper {
+    display: none !important;
+  }
+  .comparison-mobile-cards {
+    display: flex !important;
+    flex-direction: column;
+    gap: 16px;
   }
   .cta-banner-box {
     padding: 40px 20px;
@@ -1871,7 +1980,7 @@ html[data-theme="light"] .pillar-desc-text {
   color: #475569;
 }
 
-/* 7. Comparison Table in Light Mode */
+/* 7. Comparison Table & Mobile Cards in Light Mode */
 html[data-theme="light"] .comparison-card-wrapper {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -1906,11 +2015,53 @@ html[data-theme="light"] .comparison-table tr:hover td {
   background: #f8fafc;
 }
 
+html[data-theme="light"] .cell-aspect {
+  color: #0f172a;
+}
+
 html[data-theme="light"] .cell-bad {
   color: #dc2626;
 }
 
 html[data-theme="light"] .cell-good {
+  color: #0f172a;
+}
+
+/* Mobile Comparison Cards in Light Mode */
+html[data-theme="light"] .comp-mobile-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+html[data-theme="light"] .comp-mobile-aspect {
+  color: #090d1b;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+html[data-theme="light"] .comp-mobile-box.bad {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+html[data-theme="light"] .comp-mobile-box.bad .comp-box-label {
+  color: #dc2626;
+}
+
+html[data-theme="light"] .comp-mobile-box.bad .comp-box-content {
+  color: #991b1b;
+}
+
+html[data-theme="light"] .comp-mobile-box.good {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+html[data-theme="light"] .comp-mobile-box.good .comp-box-label {
+  color: #2563eb;
+}
+
+html[data-theme="light"] .comp-mobile-box.good .comp-box-content {
   color: #0f172a;
 }
 
