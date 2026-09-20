@@ -62,7 +62,7 @@ const AuthView = {
     const proto = (typeof getAppProtocol === 'function') ? getAppProtocol() : 'https:';
     return `
       <div id="merchant-register-screen" class="login-overlay" style="display:none;">
-        <div class="login-card register-card" style="max-width: 580px; width:100%; margin: 24px auto;">
+        <div class="login-card register-card" style="max-width: 580px; width:100%; margin: auto;">
           
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
             <button type="button" class="btn btn-outline btn-sm" onclick="showLoginScreen()" style="gap:5px; padding:6px 12px; font-size:12px; font-weight:700;">
