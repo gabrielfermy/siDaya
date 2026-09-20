@@ -55,9 +55,8 @@ const LandingView = {
               <a class="landing-nav-link" href="#faq" onclick="event.preventDefault(); document.getElementById('faq')?.scrollIntoView({behavior:'smooth'});">FAQ</a>
             </nav>
 
-            <!-- Desktop Action Buttons & Theme Dropdown -->
+            <!-- Desktop Action Buttons -->
             <div class="landing-nav-actions">
-              ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'landing-nav-theme-dropdown', showLabel: false }) : ''}
               <button type="button" class="btn-nav-login" onclick="navigate('/login')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -768,15 +767,20 @@ const LandingView = {
             </div>
           </div>
 
-          <div class="footer-bottom-bar">
+          <div class="footer-bottom-bar" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
             <div>
               © 2026 SiDaya Platform · Engineered <span style="color:#10B77F; font-weight:800;">By</span> <strong>Ashvin Labs Idn</strong>. Hak Cipta Dilindungi Undang-Undang RI.
             </div>
-            <div style="display:flex; gap:20px;">
-              <a onclick="navigate('/terms-and-conditions')" style="color:#64748b; cursor:pointer;">Syarat & Ketentuan</a>
-              <a onclick="navigate('/privacy-policy')" style="color:#64748b; cursor:pointer;">Privasi</a>
-              <a onclick="navigate('/refund-policy')" style="color:#64748b; cursor:pointer;">Refund</a>
-              <a onclick="navigate('/contact')" style="color:#64748b; cursor:pointer;">Kontak Resmi</a>
+            <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap;">
+              <div style="display:flex; gap:16px;">
+                <a onclick="navigate('/terms-and-conditions')" style="color:#64748b; cursor:pointer;">Syarat & Ketentuan</a>
+                <a onclick="navigate('/privacy-policy')" style="color:#64748b; cursor:pointer;">Privasi</a>
+                <a onclick="navigate('/refund-policy')" style="color:#64748b; cursor:pointer;">Refund</a>
+                <a onclick="navigate('/contact')" style="color:#64748b; cursor:pointer;">Kontak Resmi</a>
+              </div>
+              <div class="footer-theme-wrap">
+                ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'footer-theme-dropdown', showLabel: true }) : ''}
+              </div>
             </div>
           </div>
         </footer>
