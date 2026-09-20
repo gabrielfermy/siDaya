@@ -109,14 +109,9 @@ const LayoutView = {
         <!-- SIDEBAR NAVIGATION DRAWER -->
         <aside class="sidebar" id="sidebar-nav">
           <div class="sidebar-top">
-            <a class="sidebar-brand" onclick="navigate('/dashboard')">
-              <div class="sidebar-logo" style="background:#090D1B; border:1.5px solid #262E4B; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:3px;">
-                <img src="/assets/brand/icon-transparent.svg" alt="siDaya Icon" width="26" height="26" style="display:block; object-fit:contain;">
-              </div>
-              <div class="brand-title-wrap">
-                <span class="sidebar-brand-name" style="font-weight:900;">s<span style="color:#10B77F;">i</span><span style="color:#5048E5;">D</span>aya</span>
-                <span class="sidebar-brand-sub" style="font-weight:800;"><span style="color:#10B77F;">By</span> <span style="color:#CBD5E1;">Ashvin Labs Idn</span></span>
-              </div>
+            <a class="sidebar-brand" onclick="navigate('/dashboard')" role="button" aria-label="siDaya by Ashvin Labs IDN" style="cursor:pointer; display:flex; align-items:center;">
+              <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="34" class="brand-logo-horizontal dark-theme-logo" style="height:34px; width:auto; max-width:170px; object-fit:contain;">
+              <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="34" class="brand-logo-horizontal light-theme-logo" style="height:34px; width:auto; max-width:170px; object-fit:contain;">
             </a>
             <div class="sidebar-tenant-badge">
               <span class="tenant-badge-label" id="sidebar-tenant-badge-label">Active Workspace</span>

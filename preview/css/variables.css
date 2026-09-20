@@ -109,6 +109,38 @@ html[data-theme="dark"] {
   --topbar-bg: rgba(9, 13, 27, 0.92);
 }
 
+/* ==========================================================================
+   THEME-ADAPTIVE BRAND ASSETS UTILITIES
+   ========================================================================== */
+.brand-logo-horizontal {
+  display: block;
+  height: 38px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.brand-logo-horizontal:hover {
+  transform: scale(1.02);
+}
+
+/* Light Theme Visibility */
+html[data-theme="light"] .dark-theme-logo {
+  display: none !important;
+}
+html[data-theme="light"] .light-theme-logo {
+  display: block !important;
+}
+
+/* Dark Theme Visibility */
+html[data-theme="dark"] .light-theme-logo {
+  display: none !important;
+}
+html[data-theme="dark"] .dark-theme-logo {
+  display: block !important;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -134,3 +166,4 @@ body {
   from { opacity: 0; transform: translateY(20px) scale(0.97); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+

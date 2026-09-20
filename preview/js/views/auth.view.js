@@ -6,13 +6,11 @@ const AuthView = {
     return `
       <div id="merchant-login-screen" class="login-overlay">
         <div class="login-card">
-          <div class="login-brand">
-            <div class="login-logo" style="background:#090D1B; border:1.5px solid #262E4B; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:4px;">
-              <img src="/assets/brand/icon-transparent.svg" alt="siDaya Icon" width="32" height="32" style="display:block; object-fit:contain;">
-            </div>
-            <h2 class="login-title">s<span style="color:#10B77F;">i</span><span style="color:#5048E5;">D</span>aya Login</h2>
-            <p class="login-desc">Sistem Operasi Grosir · <span style="color:#10B77F; font-weight:800;">By</span> <span style="color:#CBD5E1; font-weight:800;">Ashvin Labs Idn</span></p>
-            <div class="login-security-badge">
+          <div class="login-brand" style="display:flex; flex-direction:column; align-items:center; margin-bottom:18px;">
+            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal dark-theme-logo" style="height:42px; width:auto; max-width:200px; object-fit:contain; margin-bottom:6px;">
+            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal light-theme-logo" style="height:42px; width:auto; max-width:200px; object-fit:contain; margin-bottom:6px;">
+            <p class="login-desc" style="margin-top:2px;">Sistem Operasi Grosir Multi-Tenant & POS</p>
+            <div class="login-security-badge" style="margin-top:8px;">
               <span>🔒</span>
               <span>Keamanan Terisolasi Multi-Tenant & RBAC</span>
             </div>
@@ -75,12 +73,10 @@ const AuthView = {
             </div>
           </div>
 
-          <div class="login-brand" style="margin-bottom: 18px;">
-            <div class="login-logo" style="background:#090D1B; border:1.5px solid #262E4B; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:4px;">
-              <img src="/assets/brand/icon-transparent.svg" alt="siDaya Icon" width="32" height="32" style="display:block; object-fit:contain;">
-            </div>
-            <h2 class="login-title">Daftar Akun s<span style="color:#10B77F;">i</span><span style="color:#5048E5;">D</span>aya</h2>
-            <p class="login-desc">Sistem Operasi Grosir · <span style="color:#10B77F; font-weight:800;">By</span> <span style="color:#CBD5E1; font-weight:800;">Ashvin Labs Idn</span></p>
+          <div class="login-brand" style="display:flex; flex-direction:column; align-items:center; margin-bottom: 18px;">
+            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal dark-theme-logo" style="height:42px; width:auto; max-width:200px; object-fit:contain; margin-bottom:6px;">
+            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="42" class="brand-logo-horizontal light-theme-logo" style="height:42px; width:auto; max-width:200px; object-fit:contain; margin-bottom:6px;">
+            <p class="login-desc" style="margin-top:2px;">Registrasi Toko Baru & Inisialisasi Workspace</p>
           </div>
 
           <form id="owner-registration-form" onsubmit="handleOwnerRegistrationSubmit(event)">

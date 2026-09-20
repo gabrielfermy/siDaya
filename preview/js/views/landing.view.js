@@ -41,15 +41,9 @@ const LandingView = {
         <!-- 1. EXECUTIVE NAVIGATION BAR -->
         <header class="landing-navbar">
           <div class="landing-nav-inner">
-            <!-- Brand Logo & Tagline (Affinity Vector Alignment) -->
-            <div class="landing-brand" onclick="navigate('/')">
-              <div class="landing-brand-logo-wrap" style="width:42px; height:42px; background:#090D1B; border:1.5px solid #262E4B; border-radius:12px; display:flex; align-items:center; justify-content:center; padding:4px;">
-                <img src="/assets/brand/icon-transparent.svg" alt="siDaya Icon" width="32" height="32" style="display:block; object-fit:contain;">
-              </div>
-              <div class="landing-brand-text">
-                <span class="landing-brand-title" style="font-size:1.35rem; font-weight:900; letter-spacing:-0.5px;">s<span style="color:#10B77F;">i</span><span style="color:#5048E5;">D</span>aya</span>
-                <span class="landing-brand-sub" style="font-size:0.68rem; font-weight:800; letter-spacing:0.8px;"><span style="color:#10B77F;">By</span> <span style="color:#CBD5E1;">Ashvin Labs Idn</span></span>
-              </div>
+            <!-- Brand Logo (Affinity Designer Bespoke Vector Lockup) -->
+            <div class="landing-brand" onclick="navigate('/')" role="button" aria-label="siDaya by Ashvin Labs IDN">
+              <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal" style="height:38px; width:auto; max-width:200px; object-fit:contain; display:block;">
             </div>
 
             <!-- Desktop Menu Links -->
@@ -98,14 +92,8 @@ const LandingView = {
           <div>
             <!-- Drawer Header -->
             <div class="drawer-top-header">
-              <div class="landing-brand" onclick="LandingView.toggleMobileMenu(false); navigate('/');">
-                <div class="landing-brand-logo-wrap" style="width:38px; height:38px; background:#090D1B; border:1.5px solid #262E4B; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:3px;">
-                  <img src="/assets/brand/icon-transparent.svg" alt="siDaya Icon" width="28" height="28" style="display:block; object-fit:contain;">
-                </div>
-                <div class="landing-brand-text">
-                  <span class="landing-brand-title" style="font-size:1.15rem; font-weight:900;">s<span style="color:#10B77F;">i</span><span style="color:#5048E5;">D</span>aya</span>
-                  <span class="landing-brand-sub" style="font-size:0.62rem; font-weight:800;"><span style="color:#10B77F;">By</span> <span style="color:#CBD5E1;">Ashvin Labs Idn</span></span>
-                </div>
+              <div class="landing-brand" onclick="LandingView.toggleMobileMenu(false); navigate('/');" role="button" aria-label="siDaya by Ashvin Labs IDN">
+                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="34" class="brand-logo-horizontal" style="height:34px; width:auto; max-width:180px; object-fit:contain; display:block;">
               </div>
 
               <button type="button" class="drawer-close-btn" onclick="LandingView.toggleMobileMenu(false)" aria-label="Tutup Menu">
@@ -740,14 +728,8 @@ const LandingView = {
         <footer class="landing-footer">
           <div class="footer-main-grid">
             <div>
-              <div class="landing-brand" style="margin-bottom:14px;" onclick="navigate('/')">
-                <div class="landing-brand-logo-wrap" style="width:40px; height:40px; background:#090D1B; border:1.5px solid #262E4B; border-radius:10px; display:flex; align-items:center; justify-content:center; padding:4px;">
-                  <img src="/assets/brand/icon-transparent.svg" alt="siDaya Icon" width="30" height="30" style="display:block; object-fit:contain;">
-                </div>
-                <div class="landing-brand-text">
-                  <span class="landing-brand-title" style="font-size:1.25rem; font-weight:900;">s<span style="color:#10B77F;">i</span><span style="color:#5048E5;">D</span>aya</span>
-                  <span class="landing-brand-sub" style="font-size:0.65rem; font-weight:800;"><span style="color:#10B77F;">By</span> <span style="color:#CBD5E1;">Ashvin Labs Idn</span></span>
-                </div>
+              <div class="landing-brand" style="margin-bottom:14px;" onclick="navigate('/')" role="button" aria-label="siDaya by Ashvin Labs IDN">
+                <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="38" class="brand-logo-horizontal" style="height:38px; width:auto; max-width:200px; object-fit:contain; display:block;">
               </div>
               <p class="footer-brand-desc">
                 Platform SaaS terpadu untuk pedagang grosir komoditas, manajemen muatan FIFO, surat jalan digital, dan otomasi penagihan pembayaran di Indonesia.

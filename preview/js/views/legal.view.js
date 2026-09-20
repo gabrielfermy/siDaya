@@ -51,12 +51,9 @@ const LegalView = {
       <div class="legal-portal-wrapper">
         <!-- STANDALONE PORTAL HEADER -->
         <header class="legal-portal-header">
-          <div class="legal-brand-block" onclick="navigate('/dashboard')">
-            <div class="legal-logo-box">S</div>
-            <div>
-              <div class="legal-brand-title">SiDaya</div>
-              <div class="legal-brand-sub">by Ashvin Labs • Enterprise OS</div>
-            </div>
+          <div class="legal-brand-block" onclick="navigate('/dashboard')" role="button" aria-label="siDaya by Ashvin Labs IDN" style="cursor:pointer; display:flex; align-items:center;">
+            <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="34" class="brand-logo-horizontal dark-theme-logo" style="height:34px; width:auto; max-width:170px; object-fit:contain;">
+            <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="34" class="brand-logo-horizontal light-theme-logo" style="height:34px; width:auto; max-width:170px; object-fit:contain;">
           </div>
 
           <div class="legal-header-actions">
