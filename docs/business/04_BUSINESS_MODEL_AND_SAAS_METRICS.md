@@ -29,35 +29,34 @@ graph LR
 
 | Tier | Target Merchant | Price (Monthly / Annual) | Active Feature Entitlements (Dynamic Registry) |
 | :--- | :--- | :--- | :--- |
-| **Starter (Free)** | Micro stalls, solo warung, trial merchants | **Free forever** | 1 Device, 3-Tap Basic POS, Cash checkout, standard receipt generation (PDF/Image). |
-| **Retail Starter** | Single-location retail, fashion kiosks, boutiques | **IDR 49,000 / mo** (~$3.20 USD)<br>*(IDR 490,000/yr)* | Everything in Starter + **Client PayLink activation (QRIS/VA)**, Bluetooth thermal printer driver (58/80mm), real-time stock counts & low-stock alerts. |
-| **Grosir & B2B Pro** | Wholesalers, commodity distributors (rice, FMCG), spare-parts | **IDR 99,000 / mo** (~$6.50 USD)<br>*(IDR 990,000/yr)* | Everything in Retail + **Wholesale Multi-Tier Pricing (Eceran, Grosir, Salesman)**, **Compound Discounts (`5%+2%+Rp`)**, **Unit Conversions (PCS $\rightarrow$ Dus)**, **Inbound POs & Storage Bin Locations (Warehouse/Zone/Bin)**, **Automated FIFO / FEFO Batch Allocation**, **Price-Masked Driver Working Permits (*Surat Jalan*) linked to Invoices**, **Dot Matrix Continuous Form driver**, **Piutang & Kasbon Ledger**, **Supabase Realtime multi-device sync (up to 3 devices)**, **Staff PIN switch & Shift cash float balancing**. |
-| **Omnichannel Enterprise**| Multi-station grosir, regional distributors, multi-outlet chains | **IDR 249,000 / mo** (~$16.00 USD)<br>*(IDR 2.49M/yr)* | Everything in Pro + **Unlimited devices on Supabase Realtime**, **Multi-warehouse stock routing & inter-bin transfers**, **Supplier Return (RTV) & credit note accounting**, **Marketplace Order Sync (Tokopedia, Shopee, TikTok Shop)**, **Full RBAC with COGS/Modal privacy masking**, priority SLA. |
+| **🟢 Perintis (Supplier Mandiri)** | Solo suppliers, perorangan, warung keliling | **Rp 0 / Free forever** | 1 Owner Device, Quick POS, WhatsApp PDF & ESC/POS Bluetooth receipt, basic SKU catalog, simple kasbon/piutang ledger, **Managed PayLink** (QRIS & VA). |
+| **🔵 Starter (Toko & Agen)** | Single-location retail & semi-grosir with cashiers | **Rp 149.000 / mo** *(Rp 1.490.000/yr)* | Everything in Perintis + **Up to 3 Staff Accounts (PIN Station isolated)**, **Multi-Tier Wholesale Pricing (Ecer/Grosir)**, **Multi-Unit Conversions (Dus/Pcs)**, Shift cash reconciliation, WhatsApp auto-reminders, Excel report export. |
+| **🟣 Grosir Pro (Distributor & Gudang)** | Wholesalers, FMCG distributors, multi-depot | **Rp 399.000 / mo** *(Rp 3.990.000/yr)* | Everything in Starter + **Up to 3 Warehouses/Branches**, **Unlimited Staff (Cashier, Warehouse, Driver)**, **Inbound FIFO & Batch Lot Expiry Tracking**, **Driver Digital Surat Jalan & GPS Geotagged POD**, **Strict Piutang Credit Limits & Auto-Lock**, **Bebas Pilih: Managed PayLink ATAU BYOK Gateway Pribadi (Midtrans/iPaymu/Xendit)**, Subdomain + SSL. |
+| **🟡 Enterprise Fleet** | Regional distribution chains, food principal manufacturers | **Rp 899.000 / mo** *(Rp 8.990.000/yr)* | Everything in Pro + **Unlimited Warehouses & Depots**, **Custom Own Domain (`pos.namatoko.com`)**, **Open API & Webhook ERP Integration (SAP, Accurate, Odoo)**, Custom RBAC Matrix, 99.9% SLA, Dedicated Account Manager. |
 
 ---
 
-### Pluggable Add-On Modules (A La Carte Expansion)
-Merchants on any paid tier can dynamically toggle modular add-ons directly from their dashboard without switching entire tiers:
-* **Marketplace Sync Add-on**: IDR 39,000 / mo (Shopee, Tokopedia, TikTok Shop order & inventory sync).
-* **Additional Device Stream (Supabase Realtime)**: IDR 15,000 / mo per additional simultaneous active device.
-* **Extra Storage / Warehouse Location Pack**: IDR 25,000 / mo (for managing secondary warehouses or external logistics hubs).
-*(Note: Cafe/Resto table management module is deferred to low-priority backlog).*
+### Dual Gateway Policy: Managed Gateway vs BYOK
+1. **Perintis (Free) & Starter Tiers**: Use **SiDaya Managed PayLink**. SiDaya manages the payment infrastructure, allowing micro-merchants to accept QRIS & VA instantly without needing corporate PT/CV registration. SiDaya monetizes via transaction convenience spreads.
+2. **Grosir Pro & Enterprise Tiers**: Merchants have the option to enable **Bring Your Own Key (BYOK)** to connect their direct merchant gateway accounts (iPaymu, Midtrans, Xendit). When BYOK is enabled, funds settle directly to the merchant's bank account with 0% platform transaction cut, and SiDaya monetizes purely on the SaaS recurring subscription.
 
 ## 3. Transaction Take-Rate Economics (The PayLink Engine)
 
-Every time a merchant's customer settles an invoice via a dynamic PayLink, SiDaya captures a payment processing margin between the wholesale acquirer cost and the merchant fee.
+Every time an invoice is settled via SiDaya Managed PayLink, the platform earns from payment convenience and disbursement spreads:
 
 ### Payment Rail Economics (Per Transaction)
 
-| Payment Method | Merchant Processing Fee | Wholesale Provider Cost (Midtrans/Xendit/Bank) | **SiDaya Net Margin (Take Rate)** |
+| Payment Method | Merchant/Customer Processing Fee | Wholesale Provider Cost (Midtrans/Xendit/Bank) | **SiDaya Net Margin (Take Rate)** |
 | :--- | :--- | :--- | :--- |
-| **QRIS (Instant QR)** | 0.70% of transaction value | 0.35% (acquirer interchange) | **+0.35% Net Spread** |
-| **Virtual Account (VA)** | IDR 4,000 flat fee | IDR 2,200 flat cost | **+IDR 1,800 Net Profit** per transaction |
+| **QRIS (Instant QR)** | 0.70% (Standard BI MDR) | 0.35% (acquirer interchange) | **+0.35% Net Spread** |
+| **Virtual Account (VA)** | Rp 4.000 flat fee | Rp 2.200 flat bank cost | **+Rp 1.800 Net Profit** per transaction |
+| **Disbursement / Penarikan Saldo** | Rp 3.500 per payout | Rp 1.500 BI-FAST cost | **+Rp 2.000 Net Margin** per payout |
 | **E-Wallets (GoPay, OVO, ShopeePay)** | 1.50% of transaction value | 1.00% | **+0.50% Net Spread** |
-| **Credit / Debit Cards** | 2.50% + IDR 2,000 | 1.90% + IDR 1,500 | **+0.60% + IDR 500 Net Spread** |
 
-#### Why Merchants Happily Pay This Fee:
-Small merchants frequently lose hours reconciling manual bank transfers or suffer from uncollected debt. Paying a small, standardized 0.7% QRIS fee or IDR 4,000 VA fee is vastly cheaper than hiring an administrative assistant or writing off 10% of uncollected credit.
+#### Why Micro-Merchants Happily Welcome This Model:
+1. **Zero Financial Risk**: Micro-suppliers pay Rp 0 upfront when they have no sales. They only incur small transaction fees when revenue is already realized.
+2. **Low Relative Cost**: A Rp 3.500 VA admin fee on a Rp 750.000 wholesale order is less than 0.5% — far cheaper than hiring an administrative assistant or losing money to manual transfer reconciliation errors.
+3. **Instant Corporate-Grade Capabilities**: Sole suppliers without corporate legal entities gain instant access to dynamic multi-bank VAs and QRIS.
 
 ---
 

@@ -615,10 +615,58 @@ const LandingView = {
           </div>
 
           <div class="pricing-cards-grid">
+            <!-- TIER 0: PERINTIS / SUPPLIER MANDIRI (FREE FOREVER) -->
+            <div class="tier-card free-tier">
+              <div class="free-ribbon">GRATIS SELAMANYA</div>
+              <h3 class="tier-title">Perintis</h3>
+              <p class="tier-subtitle">Didedikasikan untuk pemasok perorangan, agen rumahan, dan juragan mandiri yang ingin bebas dari pembukuan manual.</p>
+              <div class="tier-price-box">
+                <span class="tier-price-val">Rp 0</span>
+                <span class="tier-price-period">/ selamanya</span>
+              </div>
+              <ul class="tier-features-list">
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>1 Akun Pemilik (Solo Operator)</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>1 Lokasi Usaha / Gudang Mandiri</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>POS Kasir Cepat & Struk Bluetooth 58mm</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Kirim Nota & Faktur PDF via WhatsApp</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Master Katalog & Stok Sederhana</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Buku Kasbon & Saldo Piutang Dasar</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span><strong>PayLink SiDaya</strong> (Dynamic QRIS & Transfer)</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Subdomain Resmi <code>[toko].${baseDomain}</code></span>
+                </li>
+              </ul>
+              <button type="button" class="btn-tier btn-free" onclick="navigate('/register?plan=free')">
+                <span>Mulai Gratis Sekarang</span>
+              </button>
+            </div>
+
             <!-- TIER 1: STARTER -->
             <div class="tier-card">
               <h3 class="tier-title">Starter</h3>
-              <p class="tier-subtitle">Untuk toko grosir mandiri (1 lokasi) yang ingin beralih dari nota manual ke sistem digital.</p>
+              <p class="tier-subtitle">Untuk toko grosir & agen 1 lokasi yang mulai memiliki tim kasir dan butuh kontrol harga bertingkat.</p>
               <div class="tier-price-box">
                 <span class="tier-price-val">Rp 149.000</span>
                 <span class="tier-price-period">/ bulan</span>
@@ -630,11 +678,23 @@ const LandingView = {
                 </li>
                 <li class="tier-feature-item">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Hingga 2 Akun Kasir POS Aktif</span>
+                  <span>Hingga 3 Akun Staf (PIN Terisolasi)</span>
                 </li>
                 <li class="tier-feature-item">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Master SKU & Multi-Satuan Dasar</span>
+                  <span>Multi-Tier Harga Grosir (Ecer, Agen)</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Konversi Multi-Satuan (Dus, Pcs)</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Rekap Shift & Laporan Buka/Tutup Toko</span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Pengingat Kasbon WhatsApp Otomatis</span>
                 </li>
                 <li class="tier-feature-item">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -642,14 +702,10 @@ const LandingView = {
                 </li>
                 <li class="tier-feature-item">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Laporan Penjualan Harian & Tutup Kasir</span>
-                </li>
-                <li class="tier-feature-item">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Subdomain Resmi <code>[toko].${baseDomain}</code></span>
+                  <span>Export Laporan Penjualan ke Excel</span>
                 </li>
               </ul>
-              <button type="button" class="btn-tier" onclick="navigate('/register')">
+              <button type="button" class="btn-tier" onclick="navigate('/register?plan=starter')">
                 <span>Pilih Paket Starter</span>
               </button>
             </div>
@@ -658,7 +714,7 @@ const LandingView = {
             <div class="tier-card featured">
               <div class="featured-ribbon">PALING BANYAK DIGUNAKAN DISTRIBUTOR</div>
               <h3 class="tier-title">Grosir Pro</h3>
-              <p class="tier-subtitle">Solusi komprehensif untuk distributor sembako, agen FMCG, dan toko grosir bervolume tinggi.</p>
+              <p class="tier-subtitle">Solusi komprehensif untuk distributor sembako, agen FMCG, dan toko grosir bervolume tinggi dengan armada pengiriman.</p>
               <div class="tier-price-box">
                 <span class="tier-price-val">Rp 399.000</span>
                 <span class="tier-price-period">/ bulan</span>
@@ -678,22 +734,26 @@ const LandingView = {
                 </li>
                 <li class="tier-feature-item">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span><strong>Surat Jalan Digital + Bukti Foto GPS POD</strong></span>
+                  <span><strong>Surat Jalan Digital + Foto GPS POD Driver</strong></span>
                 </li>
                 <li class="tier-feature-item">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span><strong>WhatsApp PayLink & Dynamic QRIS Otomatis</strong></span>
+                  <span>Plafon Piutang & Auto-Lock Tempo Toko</span>
                 </li>
                 <li class="tier-feature-item">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Plafon Piutang, Umur Kasbon & Reminder Otomatis</span>
+                  <span><strong>Bebas Pilih: PayLink SiDaya ATAU BYOK Gateway</strong></span>
+                </li>
+                <li class="tier-feature-item">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Virtual Account Multi-Bank & Dynamic QRIS</span>
                 </li>
                 <li class="tier-feature-item">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                   <span>Subdomain Resmi <code>[toko].${baseDomain}</code> + SSL</span>
                 </li>
               </ul>
-              <button type="button" class="btn-tier btn-featured" onclick="navigate('/register')">
+              <button type="button" class="btn-tier btn-featured" onclick="navigate('/register?plan=pro')">
                 <span>Mulai Uji Coba Grosir Pro</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
               </button>
