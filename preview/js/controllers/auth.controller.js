@@ -173,6 +173,9 @@ const AuthController = {
     }
     showToast(`Selamat datang kembali, ${account.name}! Melanjutkan ke ${intended}`);
     navigate(intended);
+    if (typeof OnboardingService !== 'undefined' && OnboardingService.checkAndAutoStart) {
+      OnboardingService.checkAndAutoStart();
+    }
   },
 
   quickLoginOperator(email, role) {
@@ -263,9 +266,12 @@ const AuthController = {
     ['merchant-login-screen', 'email-verification-screen'].forEach(id => document.getElementById(id)?.style.setProperty('display', 'none', 'important'));
     document.getElementById('merchant-register-screen')?.style.setProperty('display', 'flex', 'important');
     document.documentElement.classList.add('is-register-page', 'is-auth-page');
-    document.documentElement.classList.remove('is-landing-page');
+    document.documentElement.classList.remove('is-landing-page', 'is-legal-portal-page');
     const appShell = document.getElementById('app-shell');
-    if (appShell) appShell.style.setProperty('display', 'none', 'important');
+    if (appShell) {
+      appShell.classList.remove('is-legal-portal', 'is-landing-page');
+      appShell.style.setProperty('display', 'none', 'important');
+    }
     if (window.location.pathname !== '/register') window.history.pushState({}, '', '/register');
     document.title = 'SiDaya - Pendaftaran Toko Grosir Baru';
   },
@@ -274,9 +280,12 @@ const AuthController = {
     ['merchant-register-screen', 'email-verification-screen'].forEach(id => document.getElementById(id)?.style.setProperty('display', 'none', 'important'));
     document.getElementById('merchant-login-screen')?.style.setProperty('display', 'flex', 'important');
     document.documentElement.classList.add('is-auth-page');
-    document.documentElement.classList.remove('is-register-page', 'is-landing-page');
+    document.documentElement.classList.remove('is-register-page', 'is-landing-page', 'is-legal-portal-page');
     const appShell = document.getElementById('app-shell');
-    if (appShell) appShell.style.setProperty('display', 'none', 'important');
+    if (appShell) {
+      appShell.classList.remove('is-legal-portal', 'is-landing-page');
+      appShell.style.setProperty('display', 'none', 'important');
+    }
     if (window.location.pathname !== '/login' && window.location.pathname !== '/') window.history.pushState({}, '', '/login');
     document.title = 'SiDaya - Workspace Login';
   },
@@ -430,6 +439,7 @@ const AuthController = {
 };
 
 Object.assign(window, {
+  AuthController,
   quickLoginPreset: (e) => AuthController.quickLoginPreset(e),
   handleMerchantLoginSubmit: () => AuthController.handleMerchantLoginSubmit(),
   quickLoginOperator: (e, r) => AuthController.quickLoginOperator(e, r),

@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="/css/daya.css">
   <link rel="stylesheet" href="/css/legal.css">
   <link rel="stylesheet" href="/css/landing.css">
+  <link rel="stylesheet" href="/css/onboarding.css">
 
   <script>
     /* Synchronous Pre-Paint Auth State & Session Expiry Resolver (Zero FOUC Flash) */
@@ -83,7 +84,10 @@
 
         // 4. Set Pre-paint Declarative State Classes
         if (isLegalPath) {
-          document.documentElement.classList.add('is-legal-portal-page');
+          var baseAuthClass = isOps 
+            ? (hasOpsSession ? 'state-auth-ops' : 'state-unauth-ops')
+            : (hasMerchantSession ? 'state-auth-merchant' : 'state-unauth-merchant');
+          document.documentElement.className = baseAuthClass + ' is-legal-portal-page';
         } else if (isOps) {
           document.documentElement.className = hasOpsSession ? 'state-auth-ops' : 'state-unauth-ops';
         } else {
@@ -150,6 +154,20 @@
   <!-- 4. Components & Helpers -->
   <script src="/js/components/toast.js"></script>
   <script src="/js/components/modals.js"></script>
+
+  <!-- 4.1. Modular Interactive Onboarding Tour Subsystem -->
+  <script src="/js/onboarding/onboarding.registry.js"></script>
+  <script src="/js/onboarding/modules/dashboard.tour.js"></script>
+  <script src="/js/onboarding/modules/katalog.tour.js"></script>
+  <script src="/js/onboarding/modules/fifo.tour.js"></script>
+  <script src="/js/onboarding/modules/pos.tour.js"></script>
+  <script src="/js/onboarding/modules/customers.tour.js"></script>
+  <script src="/js/onboarding/modules/sj.tour.js"></script>
+  <script src="/js/onboarding/modules/piutang.tour.js"></script>
+  <script src="/js/onboarding/modules/users.tour.js"></script>
+  <script src="/js/onboarding/modules/settings.tour.js"></script>
+  <script src="/js/onboarding/onboarding.view.js"></script>
+  <script src="/js/onboarding/onboarding.service.js"></script>
 
   <!-- 5. Controllers Layer (Event Handlers & Action Dispatchers) -->
   <script src="/js/controllers/auth.controller.js"></script>

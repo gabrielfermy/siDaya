@@ -63,8 +63,12 @@ const Router = {
   setErrorMode(active) {
     const appShell = document.getElementById('app-shell');
     if (appShell) {
-      if (active) appShell.classList.add('is-error-page');
-      else appShell.classList.remove('is-error-page');
+      if (active) {
+        appShell.classList.add('is-error-page');
+        appShell.style.removeProperty('display');
+      } else {
+        appShell.classList.remove('is-error-page');
+      }
     }
   },
 
@@ -77,6 +81,7 @@ const Router = {
     if (appShell) {
       if (active) {
         appShell.classList.add('is-legal-portal');
+        appShell.style.removeProperty('display');
         document.documentElement.classList.add('is-legal-portal-page');
       } else {
         appShell.classList.remove('is-legal-portal');
@@ -94,6 +99,7 @@ const Router = {
     if (appShell) {
       if (active) {
         appShell.classList.add('is-landing-page');
+        appShell.style.removeProperty('display');
         document.documentElement.classList.add('is-landing-page');
       } else {
         appShell.classList.remove('is-landing-page');
@@ -140,8 +146,12 @@ const Router = {
     if (this.publicLegalRoutes[cleanPath]) {
       const legalSpec = this.publicLegalRoutes[cleanPath];
       this.setErrorMode(false);
+      this.setLandingMode(false);
       this.setLegalMode(true);
       
+      const appShell = document.getElementById('app-shell');
+      if (appShell) appShell.style.removeProperty('display');
+
       // Hide any active auth overlays
       document.querySelectorAll('.login-overlay').forEach(el => el.style.setProperty('display', 'none', 'important'));
       
@@ -213,6 +223,11 @@ const Router = {
     const route = routeTable[cleanPath] || (state?.auth?.impersonation?.active ? this.merchantRoutes[cleanPath] : null);
 
     try {
+      const appShell = document.getElementById('app-shell');
+      if (appShell) appShell.style.removeProperty('display');
+      this.setLegalMode(false);
+      this.setLandingMode(false);
+
       if (route) {
         this.setErrorMode(false);
         container.innerHTML = route.render(state);

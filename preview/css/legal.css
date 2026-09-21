@@ -452,16 +452,22 @@
 /* Standalone Page State Mode for App Shell */
 html.is-legal-portal-page #merchant-login-screen,
 html.is-legal-portal-page #merchant-register-screen,
-html.is-legal-portal-page #operator-login-screen {
+html.is-legal-portal-page #operator-login-screen,
+html.is-legal-portal-page #email-verification-screen,
+html.is-legal-portal-page .login-overlay {
   display: none !important;
 }
 
-html.is-legal-portal-page #app-shell {
+html.is-legal-portal-page #app-shell,
+.app-shell.is-legal-portal {
   display: flex !important;
 }
 
 .app-shell.is-legal-portal .sidebar,
-.app-shell.is-legal-portal .topbar {
+.app-shell.is-legal-portal .topbar,
+.app-shell.is-legal-portal .sidebar-backdrop,
+.app-shell.is-legal-portal #impersonation-banner-root,
+.app-shell.is-legal-portal #onboarding-tour-root {
   display: none !important;
 }
 
@@ -473,4 +479,5 @@ html.is-legal-portal-page #app-shell {
 
 .app-shell.is-legal-portal .content-container {
   padding: 0 !important;
+  max-width: 100% !important;
 }

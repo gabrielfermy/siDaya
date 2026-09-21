@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "echo 'No install needed for static site'",
   "buildCommand": "echo 'Static portal ready'",
-  "outputDirectory": ".",
+  "outputDirectory": "preview",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [

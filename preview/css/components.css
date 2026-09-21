@@ -340,6 +340,21 @@ html[data-theme="light"] .theme-dropdown-check {
   color: var(--brand-warm-blue, #5048e5);
 }
 
+/* Auth Screen Top-Right Floating Theme Switcher */
+.auth-theme-toggle-wrap {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  z-index: 10001;
+}
+
+@media (max-width: 640px) {
+  .auth-theme-toggle-wrap {
+    top: 14px;
+    right: 14px;
+  }
+}
+
 .theme-toggle-btn {
   background: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);

@@ -30,7 +30,8 @@ docs/
     ├── 09_DUAL_PATH_AND_PLUGGABLE_PAYMENT_ENGINE.md # Platform Subscription Billing vs Pluggable Merchant Rails (BYOK/OPAP)
     ├── 10_SECURITY_BY_DESIGN_WORKFLOW.md    # The 7 Golden Security Invariants & DoD Security Checklist
     ├── 11_SECURITY_ASSESSMENT_FRAMEWORK.md  # Continuous Security Assessment Framework (CSAF) & Automated VAPT
-    └── 12_PACKAGE_AND_MODULE_MANIFEST.md    # Complete @sidaya/* package inventory, exports, and dependency graph
+    ├── 12_PACKAGE_AND_MODULE_MANIFEST.md    # Complete @sidaya/* package inventory, exports, and dependency graph
+    └── 13_MODULAR_ROLE_BASED_ONBOARDING_SYSTEM.md # Pluggable interactive tour engine, role transitions, and ops manager
 ```
 
 

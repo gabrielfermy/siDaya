@@ -41,8 +41,23 @@ document.addEventListener('DOMContentLoaded', () => {
     moduleManager.register('Controller:Daya', ['Store'], DayaController);
     moduleManager.register('Util:Audit', ['Store'], AuditEmitter);
 
+    if (typeof OnboardingRegistry !== 'undefined') {
+      moduleManager.register('Onboarding:Registry', [], OnboardingRegistry);
+    }
+    if (typeof OnboardingService !== 'undefined') {
+      moduleManager.register('Onboarding:Service', ['Onboarding:Registry'], OnboardingService);
+    }
+    if (typeof OnboardingView !== 'undefined') {
+      moduleManager.register('View:Onboarding', [], OnboardingView);
+    }
+
     // Validate internal dependency graph integrity
     moduleManager.validateAll();
+  }
+
+  // 1.5. Initialize Executive Theme Manager & Media Listeners
+  if (typeof ThemeManager !== 'undefined' && ThemeManager.init) {
+    ThemeManager.init();
   }
 
   // 2. Mount Auth Overlays
@@ -78,6 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 7. Initialize SPA Router
   Router.init();
+
+  // 8. Auto-Check Interactive Onboarding Tour Sequence
+  if (typeof OnboardingService !== 'undefined' && OnboardingService.checkAndAutoStart) {
+    OnboardingService.checkAndAutoStart();
+  }
 
   // 6. Global Keyboard Shortcuts
   window.addEventListener('keydown', (e) => {
@@ -428,10 +448,34 @@ function switchDevSubdomain(subdomain) {
 }
 
 // UI Action Bindings
-function openAddProductModal() { showToast('Form Tambah Produk SKU dibuka.'); }
-function openReceiveInboundModal() { showToast('Form Penerimaan Muatan Inbound dibuka.'); }
-function openAddCustomerModal() { showToast('Form Tambah Pelanggan Baru dibuka.'); }
-function openCreateSjModal() { showToast('Form Penerbitan Surat Jalan dibuka.'); }
+function openAddProductModal() {
+  if (typeof KatalogController !== 'undefined' && KatalogController.openAddProductModal) {
+    KatalogController.openAddProductModal();
+  } else {
+    openModal('modal-add-product');
+  }
+}
+function openReceiveInboundModal() {
+  if (typeof FifoController !== 'undefined' && FifoController.openReceiveInboundModal) {
+    FifoController.openReceiveInboundModal();
+  } else {
+    openModal('modal-receive-inbound');
+  }
+}
+function openAddCustomerModal() {
+  if (typeof CustomersController !== 'undefined' && CustomersController.openAddCustomerModal) {
+    CustomersController.openAddCustomerModal();
+  } else {
+    openModal('modal-add-customer');
+  }
+}
+function openCreateSjModal() {
+  if (typeof CustomersController !== 'undefined' && CustomersController.openCreateSjModal) {
+    CustomersController.openCreateSjModal();
+  } else {
+    openModal('modal-create-sj');
+  }
+}
 function openInviteStaffModal() {
   if (typeof UsersController !== 'undefined' && UsersController.openInviteModal) {
     UsersController.openInviteModal();
