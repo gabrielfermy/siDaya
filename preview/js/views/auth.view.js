@@ -99,10 +99,19 @@ const AuthView = {
                 <div class="form-group" style="margin-bottom:6px;">
                   <label class="form-label">Bentuk Badan Usaha</label>
                   <select id="reg-biz-entity" class="form-select">
+                    <option value="PERORANGAN" selected>Toko Perorangan / Pemasok Mandiri</option>
                     <option value="UD">UD / Usaha Dagang</option>
-                    <option value="CV" selected>CV (Komanditer)</option>
+                    <option value="CV">CV (Komanditer)</option>
                     <option value="PT">PT (Perseroan Terbatas)</option>
-                    <option value="PERORANGAN">Toko Perorangan</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:6px; grid-column: span 2;">
+                  <label class="form-label">Pilihan Paket Langganan</label>
+                  <select id="reg-plan-tier" class="form-select">
+                    <option value="FREE" selected>🟢 Perintis (Supplier Mandiri) — Rp 0 / Gratis Selamanya</option>
+                    <option value="STARTER">🔵 Starter (Toko & Agen) — Rp 149.000 / bln</option>
+                    <option value="PRO">🟣 Grosir Pro (Distributor & Gudang) — Rp 399.000 / bln</option>
+                    <option value="ENTERPRISE">🟡 Enterprise Fleet (Jaringan Distribusi) — Rp 899.000 / bln</option>
                   </select>
                 </div>
               </div>

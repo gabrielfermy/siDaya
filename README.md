@@ -61,17 +61,19 @@ SiDaya operates across 3 strictly separated tiers with automated HTTPS domain re
 
 ## 💎 SaaS Subscription Pricing Matrix
 
-| Feature Dimension | Starter (Toko Perintis) | Grosir Pro (Distributor & Agen) <br>*(Paling Diminati)* | Enterprise Fleet (Jaringan Distribusi) |
-| :--- | :--- | :--- | :--- |
-| **Monthly Pricing** | **Rp 149.000** / bln | **Rp 399.000** / bln | **Rp 899.000** / bln |
-| **Cabang / Gudang** | 1 Lokasi Usaha | Hingga 3 Cabang / Gudang | **Unlimited Cabang & Multi-Gudang** |
-| **Akun Staf** | 2 Akun Kasir POS | **Unlimited Akun Staf** | **Unlimited Akun Staf** |
-| **Subdomain Toko** | `[toko].sidaya.biz.id` | `[toko].sidaya.biz.id` | **Custom Domain Sendiri** (`pos.namatoko.com`) |
-| **Inbound FIFO & Expiry** | — | **✓ Lot FIFO & Expiry Alerts** | **✓ Multi-Gudang FIFO & Transfer Batch** |
-| **Surat Jalan & POD** | — | **✓ Digital POD + Foto GPS** | **✓ Fleet Route Dispatch & Manifests** |
-| **WhatsApp PayLink** | Basic | **✓ QRIS Dinamis & Auto-Settle** | **✓ Dedicated Gateway BYOK + Multi-VA** |
-| **Open API & Webhooks** | — | — | **✓ Full Webhook & ERP Integration** |
-| **SLA & Support** | Standar Jam Kerja | Prioritas WhatsApp | **Dedicated 24/7 Account Manager (99.9% SLA)** |
+| Feature Dimension | 🟢 Perintis (Supplier Mandiri) | 🔵 Starter (Toko & Agen) | 🟣 Grosir Pro (Distributor & Agen) <br>*(Paling Diminati)* | 🟡 Enterprise Fleet (Jaringan Distribusi) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Monthly Pricing** | **Rp 0** / Gratis Selamanya | **Rp 149.000** / bln | **Rp 399.000** / bln | **Rp 899.000** / bln |
+| **Cabang / Gudang** | 1 Lokasi Usaha Mandiri | 1 Lokasi Usaha | Hingga 3 Cabang / Gudang | **Unlimited Cabang & Multi-Gudang** |
+| **Akun Staf** | 1 Akun Pemilik (Solo) | 3 Akun Staf (Owner + 2 Kasir) | **Unlimited Akun Staf** | **Unlimited Akun Staf** |
+| **POS & Nota** | POS Cepat & Struk WhatsApp PDF | POS Kasir & Rekap Shift | POS Grosir & Barcode Scanner | Custom Multi-Station POS |
+| **Harga Grosir** | Harga Satuan Standar | Multi-Tier (Ecer/Grosir) & Dus/Pcs | Multi-Tier Dinamis per Segmen | Custom Pricing Matrix ERP |
+| **Inbound FIFO & Expiry**| Stok Sederhana | Stok Minimum & Reorder Alert | **✓ Inbound Lot FIFO & Expiry Alerts** | **✓ Multi-Gudang FIFO & Transfer Batch**|
+| **Surat Jalan & POD** | — | — | **✓ Digital POD + Foto GPS & TTD** | **✓ Fleet Route Dispatch & Manifests** |
+| **Fintech PayLink** | **Managed PayLink** (QRIS/VA) | **Managed PayLink** (QRIS/VA) | **Bebas: Managed ATAU BYOK Gateway** | **Dedicated Gateway BYOK + Multi-VA** |
+| **Subdomain Toko** | `[toko].sidaya.biz.id` | `[toko].sidaya.biz.id` | `[toko].sidaya.biz.id` + SSL | **Custom Domain Sendiri** (`pos.namatoko.com`) |
+| **Open API & Webhooks** | — | — | — | **✓ Full Webhook & ERP Integration** |
+| **SLA & Support** | Komunitas & Panduan Mandiri | Standar Jam Kerja | Prioritas WhatsApp | **Dedicated 24/7 Account Manager (99.9%)**|
 
 ---
 

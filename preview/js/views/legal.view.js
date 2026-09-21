@@ -228,12 +228,13 @@ const LegalView = {
       </div>
 
       <div class="legal-section">
-        <h2>3. Langganan, Tagihan & Pembayaran Gateway</h2>
+        <h2>3. Paket Layanan, Skema Langganan & Pemrosesan Pembayaran (PayLink)</h2>
         <ol>
-          <li>SiDaya menyediakan paket langganan berbasis periode (Bulanan / Tahunan) dengan fitur sesuai tier yang dipilih (Starter, Pro, Enterprise).</li>
-          <li>Seluruh transaksi pembayaran biaya langganan SaaS diproses secara aman melalui gerbang pembayaran resmi mitra (iPaymu / Payment Gateway terdaftar).</li>
-          <li>Tagihan diterbitkan secara otomatis dan harus dilunasi sebelum masa aktif berakhir guna mencegah pembekuan sementara layanan (*grace period* 7 hari kalender).</li>
-          <li>Biaya transaksi MDR (Merchant Discount Rate) untuk fitur PayLink WhatsApp ditanggung sesuai kesepakatan paket atau dibebankan sesuai regulasi Bank Indonesia.</li>
+          <li><strong>Pilihan Paket:</strong> SiDaya menyediakan paket <em>Perintis</em> (Rp 0 / Gratis Selamanya untuk Pemasok Mandiri/Usaha Mikro) serta paket berbayar bertingkat (<em>Starter</em>, <em>Grosir Pro</em>, <em>Enterprise Fleet</em>) dengan kuota dan kapabilitas fitur yang disesuaikan untuk skala usaha Merchant.</li>
+          <li><strong>Paket Perintis (Gratis Selamanya):</strong> Diberikan tanpa biaya langganan software bulanan untuk mendukung pemberdayaan dan digitalisasi pemasok mandiri serta UMKM perorangan di Indonesia.</li>
+          <li><strong>Pemrosesan Pembayaran PayLink (Managed Gateway):</strong> Untuk memudahkan transaksi penjualan tanpa keharusan membuat badan usaha (PT/CV) atau integrasi payment gateway mandiri, Pengguna dapat menggunakan infrastruktur PayLink bawaan SiDaya. Biaya pemrosesan transaksi (MDR QRIS standar Bank Indonesia serta biaya administrasi Virtual Account dan biaya pencairan dana) dicantumkan secara transparan sebelum transaksi diselesaikan.</li>
+          <li><strong>Ketentuan Integrasi Mandiri (BYOK - Bring Your Own Key):</strong> Merchant pada paket <em>Grosir Pro</em> dan <em>Enterprise Fleet</em> berhak mengintegrasikan kredensial akun Payment Gateway terdaftar milik sendiri (seperti iPaymu, Midtrans, Xendit), di mana tarif MDR dan alur pencairan dana berlaku langsung antara Merchant dan penyedia Payment Gateway terkait.</li>
+          <li><strong>Pembayaran Langganan SaaS:</strong> Seluruh transaksi pembayaran biaya langganan berbayar SaaS diproses secara aman melalui gerbang pembayaran mitra resmi. Tagihan diterbitkan otomatis sebelum masa aktif berakhir dengan periode tenggang (*grace period*) 7 hari kalender.</li>
         </ol>
       </div>
 

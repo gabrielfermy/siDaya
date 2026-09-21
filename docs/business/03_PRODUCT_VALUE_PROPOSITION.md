@@ -14,6 +14,12 @@ A small store owner, wholesale trader, or busy shopkeeper does not have time to 
 3. **Zero-Latency Feel**: Instant local feedback. Even in a basement storeroom with 1 bar of Edge network signal, buttons click immediately, items add instantaneously, and search operates locally with sub-10ms response times.
 4. **Role-Adaptive Field Clarity**: Field staff are never overwhelmed by irrelevant buttons. A cashier's phone opens directly to the register, a warehouse runner sees receiving bins, a delivery driver sees manifests and signature pads, and the store owner sees executive turnover and profit margins—all governed by the granular Owner Checkbox Matrix.
 
+### 4 Core User Personas Served:
+* **Persona 0: Pemasok & Supplier Mandiri (Paket Perintis - Rp 0 / Gratis Selamanya)**: Pemasok perorangan (telur, beras keliling, sayur/daging, frozen food) yang butuh pembukuan digital tanpa beban biaya bulanan, membuat nota PDF WhatsApp instan, dan menerima pembayaran QRIS tanpa ribet badan hukum PT/CV.
+* **Persona 1: Toko Grosir & Agen Berkembang (Paket Starter - Rp 149.000/bln)**: Toko 1 lokasi dengan tim kecil (Owner + 2 Kasir) yang butuh rekap shift, harga grosir bertingkat (ecer/grosir), dan konversi satuan (dus/pcs).
+* **Persona 2: Distributor Sembako & FMCG (Paket Grosir Pro - Rp 399.000/bln)**: Distributor dengan armada truk pengiriman, gudang bertingkat, tracking lot FIFO/kedaluwarsa, dan Surat Jalan digital GPS POD.
+* **Persona 3: Jaringan Distribusi & Prinsipal (Paket Enterprise - Rp 899.000/bln)**: Perusahaan rantai distribusi multi-gudang dengan custom domain, integrasi API ERP, dan SLA 99.9%.
+
 ---
 
 ## 2. The Core Differentiator: PayLink Loop & Real-Time Sync vs. Legacy e-Nota

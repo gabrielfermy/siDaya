@@ -1008,16 +1008,28 @@
 /* --- PRICING SECTION --- */
 .pricing-cards-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
   align-items: stretch;
+}
+
+@media (max-width: 1200px) {
+  .pricing-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .pricing-cards-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .tier-card {
   background: rgba(15, 23, 42, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
-  padding: 36px 30px;
+  padding: 34px 24px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -1026,18 +1038,23 @@
   -webkit-backdrop-filter: blur(16px);
 }
 
+.tier-card.free-tier {
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  background: rgba(15, 23, 42, 0.75);
+}
+
 .tier-card.featured {
   background: rgba(15, 23, 42, 0.95);
   border: 2px solid #38bdf8;
   box-shadow: 0 20px 50px rgba(37, 99, 235, 0.3), 0 0 30px rgba(56, 189, 248, 0.15);
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 
 .tier-card:hover {
   transform: translateY(-5px);
 }
 .tier-card.featured:hover {
-  transform: scale(1.03) translateY(-5px);
+  transform: scale(1.02) translateY(-5px);
 }
 
 .featured-ribbon {
@@ -1047,12 +1064,32 @@
   transform: translateX(-50%);
   background: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
   color: #ffffff;
-  padding: 5px 18px;
+  padding: 5px 16px;
   border-radius: 20px;
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+  white-space: nowrap;
+}
+
+.free-ribbon {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  padding: 5px 16px;
+  border-radius: 20px;
+  font-size: 0.70rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+  white-space: nowrap;
+}
   box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
 }
 
@@ -1146,6 +1183,17 @@
 .btn-tier.btn-featured:hover {
   box-shadow: 0 8px 28px rgba(37, 99, 235, 0.65);
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.btn-tier.btn-free {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+}
+
+.btn-tier.btn-free:hover {
+  box-shadow: 0 8px 26px rgba(16, 185, 129, 0.55);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
 /* --- TRUST & COMPLIANCE BAR --- */
