@@ -100,10 +100,74 @@ const OperatorView = {
                       <button class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="toggleTenantStatus('${t.id}')">
                         Status
                       </button>
+                      <button class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:0.75rem;" 
+                              onclick="OperatorController.resetTenantOnboarding('${t.subdomain}')" title="Reset status panduan kilat tenant ini">
+                        🔄 Reset Panduan
+                      </button>
                     </td>
                   </tr>
                 `;
               }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ONBOARDING MODULES MANAGEMENT & SIMULATOR -->
+      <div class="card" style="margin-top:20px; border-left: 4px solid #10b981;">
+        <div class="card-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span>🎓 Manajemen Modul Panduan Kilat & Simulator (Onboarding Engine)</span>
+          <span class="badge badge-success" style="font-size:11px;">MODULAR REGISTRY</span>
+        </div>
+        <p style="font-size:0.82rem; color:var(--text-secondary); margin-bottom:14px; line-height:1.5;">
+          Kelola modul tutorial interaktif, aktifkan/nonaktifkan pilar secara dinamis, edit narasi edukasi (What/Why/How), atau jalankan simulasi langsung sesuai peran.
+        </p>
+
+        <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center; background:var(--bg-surface); padding:12px 14px; border-radius:10px; border:1px solid var(--border-subtle);">
+          <span style="font-size:0.8rem; font-weight:700; color:var(--text-primary);">🎮 Simulator Peran:</span>
+          <button class="btn btn-primary btn-sm" style="font-size:0.75rem;" onclick="OperatorController.simulateRoleTour('OWNER')">👑 Simulasi Owner (18 Langkah)</button>
+          <button class="btn btn-outline btn-sm" style="font-size:0.75rem;" onclick="OperatorController.simulateRoleTour('KASIR')">🛒 Simulasi Kasir (6 Langkah)</button>
+          <button class="btn btn-outline btn-sm" style="font-size:0.75rem;" onclick="OperatorController.simulateRoleTour('GUDANG')">📦 Simulasi Gudang (5 Langkah)</button>
+          <button class="btn btn-outline btn-sm" style="font-size:0.75rem;" onclick="OperatorController.simulateRoleTour('SUPIR')">🚚 Simulasi Supir (3 Langkah)</button>
+          <button class="btn btn-outline btn-sm" style="font-size:0.75rem;" onclick="OperatorController.simulateRoleTour('FINANCE')">💳 Simulasi Finance (5 Langkah)</button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Modul Pilar</th>
+                <th>Rute Target</th>
+                <th>Tier Minimum</th>
+                <th>Akses Peran / Izin</th>
+                <th>Jml Langkah</th>
+                <th>Status Modul</th>
+                <th>Aksi Editor</th>
+              </tr>
+            </thead>
+            <tbody id="operator-onboarding-tbody">
+              ${(typeof OnboardingRegistry !== 'undefined' ? OnboardingRegistry.getAllModules() : []).map(m => `
+                <tr>
+                  <td><strong>${m.icon || '📌'} ${m.title}</strong> <div style="font-size:11px; color:var(--text-muted);"><code>${m.id}</code></div></td>
+                  <td><code>${m.route}</code></td>
+                  <td><span class="tier-badge ${m.tier === 'GROSIR_PRO' ? 'tier-grosir-pro' : 'tier-starter-free'}">${m.tier}</span></td>
+                  <td>${m.isOwnerOnly ? '<span class="badge badge-warning" style="font-size:10px;">Owner Only</span>' : m.requiredPermissions.length > 0 ? `<span class="badge-tag" style="font-size:10px;">${m.requiredPermissions.join(', ')}</span>` : '<span class="badge badge-success" style="font-size:10px;">Semua Staf</span>'}</td>
+                  <td><strong>${m.steps.length} Langkah</strong></td>
+                  <td>
+                    <span class="badge ${m.enabled !== false ? 'badge-success' : 'badge-danger'}">
+                      ${m.enabled !== false ? 'Aktif' : 'Nonaktif'}
+                    </span>
+                  </td>
+                  <td style="display:flex; gap:6px;">
+                    <button class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="OperatorController.openEditTourModuleModal('${m.id}')">
+                      ✏️ Edit Teks
+                    </button>
+                    <button class="btn btn-outline btn-sm" style="padding:4px 8px; font-size:0.75rem;" onclick="OperatorController.toggleTourModule('${m.id}')">
+                      ${m.enabled !== false ? 'Nonaktifkan' : 'Aktifkan'}
+                    </button>
+                  </td>
+                </tr>
+              `).join('')}
             </tbody>
           </table>
         </div>
@@ -294,6 +358,41 @@ const OperatorView = {
             <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
               <button type="button" class="btn btn-outline" onclick="OperatorController.closeModal('modal-delete-operator')">Batal</button>
               <button type="submit" class="btn btn-primary" style="background:#ef4444; border-color:#ef4444;">Ya, Cabut Akses</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="modal-edit-tour-module" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 600px; border-color: rgba(16, 185, 129, 0.4);">
+          <button class="modal-close-btn" onclick="OperatorController.closeModal('modal-edit-tour-module')">✕</button>
+          <div style="margin-bottom: 14px;">
+            <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary); margin:0;">✏️ Edit Konten Panduan Modul</h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;" id="edit-tour-module-subtitle">
+              Perbarui narasi edukasi What, Why, dan How & Where untuk modul ini.
+            </p>
+          </div>
+          <form id="edit-tour-module-form" onsubmit="event.preventDefault(); OperatorController.handleSaveTourStep();">
+            <input type="hidden" id="edit-tour-mod-id">
+            <div class="form-group">
+              <label class="form-label">Pilih Langkah yang Ingin Diedit</label>
+              <select id="edit-tour-step-select" class="form-select" onchange="OperatorController.handleTourStepSelectChange(this.value)"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">📌 Apa Ini (What)</label>
+              <textarea id="edit-tour-step-what" class="form-input" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">💡 Mengapa Penting & Dari Mana (Why)</label>
+              <textarea id="edit-tour-step-why" class="form-input" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">🚀 Langkah & Lokasi Setup (How & Where)</label>
+              <textarea id="edit-tour-step-how" class="form-input" rows="3" required></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+              <button type="button" class="btn btn-outline" onclick="OperatorController.closeModal('modal-edit-tour-module')">Batal</button>
+              <button type="submit" class="btn btn-primary" style="background:linear-gradient(135deg, #10b981, #059669); border:none;">💾 Simpan Narasi</button>
             </div>
           </form>
         </div>

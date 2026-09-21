@@ -43,13 +43,33 @@ const SettingsView = {
         </div>
       </div>
 
+      <!-- SETUP REMINDER IF BANK ACCOUNT OR ADDRESS EMPTY -->
+      ${(!s.businessProfile?.bankAccount?.accountNumber || !s.storeAddress) ? `
+        <div class="card" style="margin-bottom:20px; border-left: 4px solid var(--primary); background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(99, 102, 241, 0.02) 100%);">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:flex-start; gap:12px;">
+              <div style="font-size:2rem;">🏦</div>
+              <div>
+                <div class="card-title" style="margin:0 0 4px 0;">Lengkapi Profil Rekening Bank & Alamat Toko</div>
+                <p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.5; max-width:620px; margin:0;">
+                  Nomor rekening bank resmi dan alamat lengkap toko Anda akan otomatis dicetak pada kop <strong>Faktur Kasir</strong>, <strong>Invoice Tempo Kasbon</strong>, dan <strong>Surat Jalan (POD)</strong> sebagai rujukan transfer pembayaran pelanggan grosir.
+                </p>
+              </div>
+            </div>
+            <div>
+              <button class="btn btn-primary" onclick="document.getElementById('settings-bank-number')?.focus()">🏦 Isi Rekening Sekarang</button>
+            </div>
+          </div>
+        </div>
+      ` : ''}
+
       <div class="settings-grid">
         
         <!-- Kolom 1: Subdomain & Domain Management -->
         <div style="display:flex; flex-direction:column; gap:20px;">
           
           <!-- Card 1: Subdomain Self-Service (Solution A) -->
-          <div class="card">
+          <div id="tour-settings-subdomain" class="card">
             <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
               <span>🌐 Subdomain & Alamat Web Workspace</span>
               <span class="badge badge-success">Live Active</span>
@@ -146,7 +166,7 @@ const SettingsView = {
         <!-- Kolom 2: Profil Bisnis, Bank & Hardware Printer -->
         <div style="display:flex; flex-direction:column; gap:20px;">
           
-          <div class="card">
+          <div id="tour-settings-bank" class="card">
             <div class="card-title">🏪 Profil Bisnis & Identitas Perusahaan</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
               <div class="form-group">
@@ -167,27 +187,27 @@ const SettingsView = {
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
               <div class="form-group">
                 <label class="form-label">NPWP Perusahaan / Pemilik</label>
-                <input id="settings-npwp" type="text" class="form-input" value="${s.businessProfile?.npwp || '01.234.567.8-012.000'}">
+                <input id="settings-npwp" type="text" class="form-input" value="${s.businessProfile?.npwp || ''}" placeholder="01.234.567.8-012.000">
               </div>
               <div class="form-group">
                 <label class="form-label">Nomor Induk Berusaha (NIB)</label>
-                <input id="settings-nib" type="text" class="form-input" value="${s.businessProfile?.nib || '9120001234567'}">
+                <input id="settings-nib" type="text" class="form-input" value="${s.businessProfile?.nib || ''}" placeholder="9120001234567">
               </div>
             </div>
 
             <div class="form-group">
               <label class="form-label">Alamat Lengkap Toko & Gudang</label>
-              <textarea id="settings-store-address" class="form-input" rows="2" style="resize:vertical;">${s.storeAddress}</textarea>
+              <textarea id="settings-store-address" class="form-input" rows="2" style="resize:vertical;" placeholder="contoh: Jl. Raya Pasar Induk No. 12, Jakarta">${s.storeAddress || ''}</textarea>
             </div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
               <div class="form-group">
                 <label class="form-label">WhatsApp Resmi Toko</label>
-                <input id="settings-store-phone" type="tel" class="form-input" value="${s.storePhone}">
+                <input id="settings-store-phone" type="tel" class="form-input" value="${s.storePhone || ''}" placeholder="0812-xxxx-xxxx">
               </div>
               <div class="form-group">
                 <label class="form-label">Email Kontak Bisnis</label>
-                <input id="settings-contact-email" type="email" class="form-input" value="${s.businessProfile?.contactEmail || 'kontak@berasjaya.com'}">
+                <input id="settings-contact-email" type="email" class="form-input" value="${s.businessProfile?.contactEmail || ''}" placeholder="kontak@tokoanda.com">
               </div>
             </div>
 
@@ -196,16 +216,16 @@ const SettingsView = {
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                 <div class="form-group">
                   <label class="form-label">Nama Bank</label>
-                  <input id="settings-bank-name" type="text" class="form-input" value="${s.businessProfile?.bankAccount?.bank || 'BCA'}">
+                  <input id="settings-bank-name" type="text" class="form-input" value="${s.businessProfile?.bankAccount?.bank || ''}" placeholder="contoh: BCA / Mandiri / BRI">
                 </div>
                 <div class="form-group">
                   <label class="form-label">Nomor Rekening</label>
-                  <input id="settings-bank-number" type="text" class="form-input" value="${s.businessProfile?.bankAccount?.accountNumber || '8492-019-283'}">
+                  <input id="settings-bank-number" type="text" class="form-input" value="${s.businessProfile?.bankAccount?.accountNumber || ''}" placeholder="contoh: 8492-019-283">
                 </div>
               </div>
               <div class="form-group">
                 <label class="form-label">Nama Pemilik Rekening (A/N)</label>
-                <input id="settings-bank-holder" type="text" class="form-input" value="${s.businessProfile?.bankAccount?.accountHolder || 'CV Beras Jaya Bersama'}">
+                <input id="settings-bank-holder" type="text" class="form-input" value="${s.businessProfile?.bankAccount?.accountHolder || ''}" placeholder="contoh: ${s.storeName}">
               </div>
             </div>
           </div>

@@ -47,20 +47,31 @@ const LegalView = {
         break;
     }
 
+    const hasSession = (typeof AuthController !== 'undefined' && (AuthController.getSession('merchant') || AuthController.getSession('operator')));
+
     return `
       <div class="legal-portal-wrapper">
         <!-- STANDALONE PORTAL HEADER -->
         <header class="legal-portal-header">
-          <div class="legal-brand-block" onclick="navigate('/dashboard')" role="button" aria-label="siDaya by Ashvin Labs IDN" style="cursor:pointer; display:flex; align-items:center;">
+          <div class="legal-brand-block" onclick="navigate('/')" role="button" aria-label="siDaya by Ashvin Labs IDN" style="cursor:pointer; display:flex; align-items:center;">
             <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="44" class="brand-logo-horizontal dark-theme-logo" style="height:44px; width:auto; max-width:220px; object-fit:contain;">
             <img src="/assets/brand/logo-horizontal-transparent.svg" alt="siDaya By Ashvin Labs Idn" height="44" class="brand-logo-horizontal light-theme-logo" style="height:44px; width:auto; max-width:220px; object-fit:contain;">
           </div>
 
           <div class="legal-header-actions">
             ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'legal-theme-dropdown', showLabel: false }) : ''}
-            <button class="btn btn-primary btn-sm" onclick="navigate('/dashboard')" style="font-weight:700;">
-              <span>🚀</span> Buka Aplikasi SiDaya
-            </button>
+            ${hasSession ? `
+              <button class="btn btn-primary btn-sm" onclick="navigate('/dashboard')" style="font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+                <span>←</span> Kembali ke Dashboard
+              </button>
+            ` : `
+              <button class="btn btn-outline btn-sm" onclick="AuthController.showLoginScreen()" style="font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+                <span>←</span> Kembali ke Login
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="AuthController.showRegisterScreen()" style="font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+                <span>🚀</span> Daftar Toko Baru
+              </button>
+            `}
           </div>
         </header>
 
@@ -93,6 +104,7 @@ const LegalView = {
             <a onclick="navigate('/refund-policy')">Kebijakan Refund</a>
             <a onclick="navigate('/privacy-policy')">Privasi (UU PDP)</a>
             <a onclick="navigate('/contact')">Kontak Kami</a>
+            <a onclick="AuthController.showLoginScreen()" style="color:var(--brand-warm-blue, #5048e5); font-weight:700; cursor:pointer;">Masuk Akun →</a>
           </div>
         </footer>
       </div>

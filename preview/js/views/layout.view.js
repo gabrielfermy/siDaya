@@ -150,6 +150,10 @@ const LayoutView = {
             </div>
 
             <div class="topbar-controls">
+              <button id="btn-topbar-tour" class="btn btn-outline btn-sm" onclick="OnboardingService.startTour(null, false)" title="Buka Panduan Kilat Interaktif" style="display:inline-flex; align-items:center; gap:6px; font-weight:600; font-size:0.78rem; border-color:var(--border-subtle);">
+                <span>🎓</span>
+                <span class="hide-on-mobile">Panduan Kilat</span>
+              </button>
               ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'app-topbar-theme-dropdown', showLabel: false }) : ''}
             </div>
           </header>
@@ -160,6 +164,9 @@ const LayoutView = {
           </div>
         </main>
       </div>
+
+      <!-- FLOATING ONBOARDING TOUR MOUNT -->
+      <div id="onboarding-tour-root"></div>
 
       <!-- SIDEBAR BACKDROP FOR MOBILE DRAWER -->
       <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleMobileDrawer()"></div>

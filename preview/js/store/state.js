@@ -5,7 +5,8 @@
  */
 
 // 1. Strictly Scoped Tenant (Merchant) State - Zero Operator Data Leakage
-const INITIAL_TENANT_STATE = {
+// 1. Preserved Rich Demo Dataset for Preview & Demo Accounts (Beras Jaya)
+const DEMO_TENANT_STATE = {
   version: 6,
   ui: {
     theme: 'light',
@@ -202,6 +203,159 @@ const INITIAL_TENANT_STATE = {
   },
 };
 
+/**
+ * Creates a clean, empty state tree for newly registered real tenants
+ * @param {Object} [tenantInfo]
+ * @param {Object} [ownerInfo]
+ * @returns {Object} Clean reactive state tree
+ */
+function createCleanTenantState(tenantInfo = {}, ownerInfo = {}) {
+  const bizName = tenantInfo.storeName || tenantInfo.businessName || 'Toko Grosir Baru';
+  const sub = (tenantInfo.subdomain || 'tokobaru').toLowerCase();
+  const phone = tenantInfo.storePhone || tenantInfo.phone || ownerInfo?.phone || '';
+  const ownerEmail = ownerInfo?.email || 'owner@' + sub + '.id';
+  const ownerName = ownerInfo?.name || 'Pemilik Usaha';
+
+  return {
+    version: 6,
+    ui: {
+      theme: 'light',
+      portalMode: 'MERCHANT',
+      activePath: '/dashboard',
+      sidebarOpen: false,
+      activeModal: null,
+    },
+    auth: {
+      merchantUser: ownerInfo?.email ? {
+        name: ownerName,
+        email: ownerEmail,
+        phone,
+        role: 'Owner / Direktur Utama',
+        tenantName: bizName,
+        subdomain: sub,
+        isOwner: true,
+        avatar: ownerName[0] || 'O',
+      } : null,
+      operatorUser: null,
+      impersonation: {
+        active: false,
+        originalOperator: null,
+        targetTenant: null,
+        targetUser: null,
+        ticketRef: null,
+        reason: null,
+        startedAt: null,
+      },
+    },
+
+    // Pilar 01: Executive Dashboard - Starts fresh at 0
+    pilar1: {
+      omsetToday: 0,
+      grossMarginPercent: 0,
+      grossMarginNominal: 0,
+      totalPiutangOutstanding: 0,
+      cashMixPercent: 100,
+      recentOrders: [],
+    },
+
+    // Pilar 02: Master SKU, Katalog & Batch FIFO - Empty
+    pilar2: {
+      products: [],
+      batches: [],
+    },
+
+    // Pilar 03: CRM & Credit Limits - Empty
+    pilar3: {
+      customers: [],
+    },
+
+    // Pilar 05: POS Terminal & Invoices - Empty
+    pilar5: {
+      products: [],
+      cart: [],
+      cartSubtotal: 0,
+      cartDiscount: 0,
+      cartTotal: 0,
+      invoices: [],
+    },
+
+    // Pilar 06: Surat Jalan & Logistics - Empty
+    pilar6: {
+      deliveryOrders: [],
+    },
+
+    // Pilar 07: Buku Piutang & WA PayLink - Zero Aging
+    pilar7: {
+      aging0to7: 0,
+      aging8to14: 0,
+      aging15to30: 0,
+      agingOver30: 0,
+      debts: [],
+    },
+
+    // Pilar 08: Staff Directory - Only Registered Owner
+    pilar8: {
+      staff: [
+        {
+          id: 'stf_owner_' + Date.now(),
+          name: ownerName,
+          email: ownerEmail,
+          phone,
+          role: 'Owner / Direktur Utama',
+          isOwner: true,
+          status: 'VERIFIED',
+          pinConfigured: false,
+          permissions: [
+            'pos:checkout', 'pos:void_item', 'pos:open_cash_drawer',
+            'catalog:view_cogs', 'catalog:manage_prices',
+            'inventory:inbound', 'inventory:stock_opname',
+            'customers:manage_credit_limit',
+            'logistics:issue_surat_jalan', 'logistics:sign_pod',
+            'finance:reports', 'settings:manage'
+          ],
+        },
+      ],
+      auditLogs: [
+        {
+          id: 'aud_t_' + Date.now(),
+          time: new Date().toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }),
+          actor: `${ownerName} (Owner)`,
+          action: 'WORKSPACE_INITIALIZED',
+          target: bizName,
+          reason: 'Inisialisasi workspace mandiri toko',
+          status: 'SUCCESS'
+        }
+      ],
+    },
+
+    // Pilar 09: Settings
+    pilar9: {
+      settings: {
+        storeName: bizName,
+        storeAddress: tenantInfo.storeAddress || '',
+        storePhone: phone,
+        subdomain: sub,
+        subdomainAliases: [],
+        customDomain: '',
+        printerType: 'USB',
+        paperWidth: '80mm',
+        businessProfile: {
+          legalEntity: tenantInfo.legalEntity || 'CV',
+          companyName: bizName,
+          npwp: '',
+          nib: '',
+          bankAccount: {
+            bank: '',
+            accountNumber: '',
+            accountHolder: '',
+          },
+          contactEmail: ownerEmail,
+        },
+      },
+    },
+  };
+}
+
 // 2. Operator Control Plane Domain Data (Telemetry, Tenants Directory, Operators, Audit)
 const INITIAL_OPERATOR_DATA = {
   currentRole: null,
@@ -252,15 +406,17 @@ const INITIAL_OPERATOR_STATE = {
   },
   operator: JSON.parse(JSON.stringify(INITIAL_OPERATOR_DATA)),
   // Workspace blueprints for operator impersonation sessions
-  pilar1: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar1)),
-  pilar2: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar2)),
-  pilar3: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar3)),
-  pilar5: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar5)),
-  pilar6: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar6)),
-  pilar7: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar7)),
-  pilar8: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar8)),
-  pilar9: JSON.parse(JSON.stringify(INITIAL_TENANT_STATE.pilar9)),
+  pilar1: JSON.parse(JSON.stringify(DEMO_TENANT_STATE.pilar1)),
+  pilar2: JSON.parse(JSON.stringify(DEMO_TENANT_STATE.pilar2)),
+  pilar3: JSON.parse(JSON.stringify(DEMO_TENANT_STATE.pilar3)),
+  pilar5: JSON.parse(JSON.stringify(DEMO_TENANT_STATE.pilar5)),
+  pilar6: JSON.parse(JSON.stringify(DEMO_TENANT_STATE.pilar6)),
+  pilar7: JSON.parse(JSON.stringify(DEMO_TENANT_STATE.pilar7)),
+  pilar8: JSON.parse(JSON.stringify(DEMO_TENANT_STATE.pilar8)),
+  pilar9: JSON.parse(JSON.stringify(DEMO_TENANT_STATE.pilar9)),
 };
 
-// Canonical fallback: Safe default pointing strictly to Tenant State (sanitized from operator data)
-const INITIAL_DEFAULT_STATE = INITIAL_TENANT_STATE;
+// Canonical Fallbacks
+const INITIAL_TENANT_STATE = DEMO_TENANT_STATE;
+const INITIAL_DEFAULT_STATE = DEMO_TENANT_STATE;
+
