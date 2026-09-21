@@ -29,11 +29,31 @@ const UsersView = {
           </p>
         </div>
         <div class="view-actions">
-          <button class="btn btn-primary" onclick="openInviteStaffModal()">
+          <button id="tour-users-invite-btn" class="btn btn-primary" onclick="openInviteStaffModal()">
             <span>➕</span> Undang Staf Baru
           </button>
         </div>
       </div>
+
+      <!-- SETUP REMINDER IF ONLY 1 STAFF (OWNER) -->
+      ${totalStaff <= 1 ? `
+        <div class="card" style="margin-bottom:20px; border-left: 4px solid var(--primary); background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(99, 102, 241, 0.02) 100%);">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:flex-start; gap:12px;">
+              <div style="font-size:2rem;">👥</div>
+              <div>
+                <div class="card-title" style="margin:0 0 4px 0;">Undang Anggota Tim Toko Anda</div>
+                <p style="font-size:0.8rem; color:var(--text-secondary); line-height:1.5; max-width:620px; margin:0;">
+                  Saat ini hanya akun Pemilik Toko (Owner) yang terdaftar. Tambahkan staf kasir, bagian gudang, atau supir logistik dengan hak akses terukur langsung (misal: kasir tidak dapat melihat modal HPP/COGS).
+                </p>
+              </div>
+            </div>
+            <div>
+              <button class="btn btn-primary" onclick="openInviteStaffModal()">+ Undang Staf Pertama</button>
+            </div>
+          </div>
+        </div>
+      ` : ''}
 
       <!-- KPI METRICS SUMMARY -->
       <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 20px;">
@@ -60,7 +80,7 @@ const UsersView = {
       </div>
 
       <!-- STAFF DIRECTORY CARD -->
-      <div class="card">
+      <div id="tour-users-directory" class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
           <div>
             <div class="card-title" style="margin-bottom:2px;">Direktori Staf & Batasan Hak Akses Langsung</div>

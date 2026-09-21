@@ -337,6 +337,178 @@ const ModalsView = {
         </div>
       </div>
 
+      <!-- MODAL: RECEIVE INBOUND LOT FIFO -->
+      <div id="modal-receive-inbound" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 520px;">
+          <button class="modal-close-btn" onclick="closeModal()">✕</button>
+          <div style="margin-bottom: 14px;">
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(79, 70, 229, 0.1); color:var(--primary); padding:3px 8px; border-radius:6px; font-size:11.5px; font-weight:700; margin-bottom:6px;">
+              <span>📦</span> Inbound Lot FIFO
+            </div>
+            <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary); margin:0;">Terima Muatan Masuk (Inbound)</h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
+              Catat nomor lot batch, kuantitas barang masuk, dan HPP modal beli dari supplier untuk audit FIFO otomatis.
+            </p>
+          </div>
+
+          <form id="receive-inbound-form" onsubmit="FifoController.handleReceiveInboundSubmit(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">Nomor Lot Batch*</label>
+                <input id="inbound-lot-number" type="text" class="form-input" required placeholder="LOT-BRS-2026-0921">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Lokasi Bin / Rak Gudang*</label>
+                <input id="inbound-bin-label" type="text" class="form-input" required placeholder="GUDANG-A / RAK-01" value="GUDANG-A / RAK-01">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Pilih Komoditas Master SKU*</label>
+              <select id="inbound-product-select" class="form-select" required>
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">Jumlah Kuantitas Masuk*</label>
+                <input id="inbound-qty" type="number" class="form-input" required min="1" value="50" placeholder="50">
+              </div>
+              <div class="form-group">
+                <label class="form-label">HPP / Modal Beli per Unit (Rp)*</label>
+                <input id="inbound-cogs" type="number" class="form-input" required min="0" placeholder="560000">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Tanggal Penerimaan / Kadaluwarsa</label>
+              <input id="inbound-date" type="text" class="form-input" placeholder="21 Sep 2026">
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+              <button type="button" class="btn btn-outline" onclick="closeModal()">Batal</button>
+              <button type="submit" class="btn btn-primary">📥 Simpan & Tambah Stok Masuk</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL: ADD CUSTOMER (CRM & LIMIT PIUTANG) -->
+      <div id="modal-add-customer" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 500px;">
+          <button class="modal-close-btn" onclick="closeModal()">✕</button>
+          <div style="margin-bottom: 14px;">
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16, 185, 129, 0.1); color:var(--accent-green); padding:3px 8px; border-radius:6px; font-size:11.5px; font-weight:700; margin-bottom:6px;">
+              <span>👥</span> CRM & Plafon Kasbon
+            </div>
+            <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary); margin:0;">Tambah Pelanggan / Mitra Grosir</h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
+              Daftarkan toko langganan atau mitra retail dengan batas kredit kasbon & jangka waktu pembayaran (TOP).
+            </p>
+          </div>
+
+          <form id="add-customer-form" onsubmit="CustomersController.handleAddCustomerSubmit(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">Nama Pemilik / PIC*</label>
+                <input id="cust-owner-name" type="text" class="form-input" required placeholder="Pak Haji Rahmat">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nama Toko / Usaha*</label>
+                <input id="cust-store-name" type="text" class="form-input" required placeholder="Toko Barokah Jaya">
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">Nomor WhatsApp*</label>
+                <input id="cust-phone" type="tel" class="form-input" required placeholder="0812-9876-5432">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tipe Pelanggan</label>
+                <select id="cust-type" class="form-select">
+                  <option value="GROSIR_PRIME">Grosir Prime (Prioritas)</option>
+                  <option value="GROSIR_REGULER" selected>Grosir Reguler</option>
+                  <option value="WARUNG_TUNAI">Warung Tunai (Non-Kredit)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">Plafon Kasbon / Limit Kredit (Rp)*</label>
+                <input id="cust-credit-limit" type="number" class="form-input" required min="0" value="10000000" placeholder="10000000">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Syarat TOP (Hari)*</label>
+                <input id="cust-top-days" type="number" class="form-input" required min="0" value="14" placeholder="14">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+              <button type="button" class="btn btn-outline" onclick="closeModal()">Batal</button>
+              <button type="submit" class="btn btn-primary">💾 Simpan Data Pelanggan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL: CREATE SURAT JALAN (POD) -->
+      <div id="modal-create-sj" class="modal-overlay hidden">
+        <div class="modal-card" style="max-width: 520px;">
+          <button class="modal-close-btn" onclick="closeModal()">✕</button>
+          <div style="margin-bottom: 14px;">
+            <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(217, 119, 6, 0.1); color:var(--accent-amber); padding:3px 8px; border-radius:6px; font-size:11.5px; font-weight:700; margin-bottom:6px;">
+              <span>🚚</span> Logistik Armada
+            </div>
+            <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary); margin:0;">Terbitkan Surat Jalan Baru (POD)</h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:3px;">
+              Buat manifest pengiriman barang bebas harga finansial untuk supir pengantar toko.
+            </p>
+          </div>
+
+          <form id="create-sj-form" onsubmit="handleCreateSjSubmit(event)">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">No. Surat Jalan*</label>
+                <input id="sj-number" type="text" class="form-input" required placeholder="SJ-20260921-001">
+              </div>
+              <div class="form-group">
+                <label class="form-label">No. Ref Pesanan / Faktur</label>
+                <input id="sj-order-ref" type="text" class="form-input" placeholder="ORD-20260921-001">
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="form-group">
+                <label class="form-label">Nama Supir Pengantar*</label>
+                <input id="sj-driver-name" type="text" class="form-input" required placeholder="Joko Supir">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nomor Polisi Armada*</label>
+                <input id="sj-plate-number" type="text" class="form-input" required placeholder="B 9123 SDB">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Toko / Alamat Tujuan Pengiriman*</label>
+              <input id="sj-destination" type="text" class="form-input" required placeholder="Toko Barokah Jaya (Pasar Kramat Jati)">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Ringkasan Muatan Komoditas*</label>
+              <textarea id="sj-item-summary" class="form-input" rows="2" required placeholder="contoh: 20 Karung Beras Rojolele 50kg, 10 Pouch Minyak 2L"></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+              <button type="button" class="btn btn-outline" onclick="closeModal()">Batal</button>
+              <button type="submit" class="btn btn-primary">🚚 Terbitkan Surat Jalan</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
     `;
   },
 };

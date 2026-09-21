@@ -37,29 +37,44 @@ class SiDayaStateStore {
   }
 
   /**
-   * Returns storage key for the specified portal plane
+   * Returns storage key for the specified portal plane and tenant subdomain
    * @param {'MERCHANT'|'OPS'} portalMode
+   * @param {string} [subdomain]
    * @returns {string}
    */
-  getStorageKey(portalMode) {
-    return portalMode === 'OPS' ? 'sidaya_store_operator' : 'sidaya_store_tenant';
+  getStorageKey(portalMode, subdomain) {
+    if (portalMode === 'OPS') return 'sidaya_store_operator';
+    const sub = (subdomain || (typeof getCurrentSubdomain === 'function' ? getCurrentSubdomain() : 'berasjaya')).toLowerCase();
+    return `sidaya_store_tenant_${sub}`;
   }
 
   /**
-   * Loads persisted state from localStorage with plane isolation
+   * Loads persisted state from localStorage with tenant and plane isolation
    * @returns {Object} Reactive state tree
    */
   loadState() {
     const portalMode = this.getInitialPortalMode();
     const activePath = this.getInitialPath(portalMode);
-    const storageKey = this.getStorageKey(portalMode);
-    const defaultTemplate = portalMode === 'OPS' ? INITIAL_OPERATOR_STATE : INITIAL_TENANT_STATE;
+    const sub = (typeof getCurrentSubdomain === 'function' ? getCurrentSubdomain() : 'berasjaya').toLowerCase();
+    const storageKey = this.getStorageKey(portalMode, sub);
+    const sessionUser = this._loadSession('sidaya_merchant_session');
+
+    let defaultTemplate;
+    if (portalMode === 'OPS') {
+      defaultTemplate = INITIAL_OPERATOR_STATE;
+    } else if (sub === 'berasjaya') {
+      defaultTemplate = DEMO_TENANT_STATE;
+    } else {
+      defaultTemplate = (typeof createCleanTenantState === 'function')
+        ? createCleanTenantState({ subdomain: sub, businessName: sessionUser?.tenantName || sessionUser?.name || 'Toko ' + sub }, sessionUser)
+        : DEMO_TENANT_STATE;
+    }
     const defaultState = JSON.parse(JSON.stringify(defaultTemplate));
 
     let stored = null;
     try {
-      // Purge legacy contaminated single-store keys
-      ['sidaya_store_v1', 'sidaya_store_v2', 'sidaya_store_v3', 'sidaya_store_v4', 'sidaya_store_v5'].forEach((k) => localStorage.removeItem(k));
+      // Purge legacy single-store keys
+      ['sidaya_store_v1', 'sidaya_store_v2', 'sidaya_store_v3', 'sidaya_store_v4', 'sidaya_store_v5', 'sidaya_store_tenant'].forEach((k) => localStorage.removeItem(k));
       const raw = localStorage.getItem(storageKey);
       if (raw) stored = JSON.parse(raw);
     } catch (e) {
@@ -86,7 +101,11 @@ class SiDayaStateStore {
     // Strict Plane Boundary & Session Authentication Enforcement
     if (portalMode !== 'OPS') {
       delete stored.operator;
-      stored.auth = { ...(stored.auth || {}), operatorUser: null, merchantUser: this._loadSession('sidaya_merchant_session') };
+      stored.auth = { ...(stored.auth || {}), operatorUser: null, merchantUser: sessionUser };
+      // Ensure settings subdomain matches active subdomain
+      if (stored.pilar9 && stored.pilar9.settings) {
+        stored.pilar9.settings.subdomain = sub;
+      }
     } else {
       const opsSession = this._loadSession('sidaya_operator_session');
       stored.auth = { ...(stored.auth || {}), operatorUser: opsSession };
@@ -123,7 +142,8 @@ class SiDayaStateStore {
   saveState() {
     try {
       const isOpsHost = this.getInitialPortalMode() === 'OPS';
-      const key = this.getStorageKey(isOpsHost ? 'OPS' : 'MERCHANT');
+      const curSub = (this.state.pilar9?.settings?.subdomain || (typeof getCurrentSubdomain === 'function' ? getCurrentSubdomain() : 'berasjaya')).toLowerCase();
+      const key = this.getStorageKey(isOpsHost ? 'OPS' : 'MERCHANT', curSub);
       if (!isOpsHost) { delete this.state.operator; if (this.state.auth) this.state.auth.operatorUser = null; }
       this.state.version = 6;
       localStorage.setItem(key, JSON.stringify(this.state));
@@ -139,9 +159,12 @@ class SiDayaStateStore {
   notify() { this.saveState(); this.subscribers.forEach((sub) => sub(this.state)); }
 
   dispatch(action, payload) {
-    switch (action) {
+    const actionType = (typeof action === 'object' && action !== null) ? action.type : action;
+    const actionPayload = (typeof action === 'object' && action !== null) ? action.payload : payload;
+
+    switch (actionType) {
       case 'NAVIGATE': {
-        const raw = (payload || '').replace(/^\/+|\/+$/g, '').toLowerCase();
+        const raw = (actionPayload || '').replace(/^\/+|\/+$/g, '').toLowerCase();
         this.state.ui.activePath = '/' + (raw || (this.state.ui.portalMode === 'OPS' ? 'telemetry' : 'dashboard'));
         this.state.ui.sidebarOpen = false;
         break;
@@ -149,11 +172,11 @@ class SiDayaStateStore {
       case 'TOGGLE_THEME': this.state.ui.theme = this.state.ui.theme === 'light' ? 'dark' : 'light'; break;
       case 'TOGGLE_SIDEBAR': this.state.ui.sidebarOpen = !this.state.ui.sidebarOpen; break;
       case 'CLOSE_SIDEBAR': this.state.ui.sidebarOpen = false; break;
-      case 'OPEN_MODAL': this.state.ui.activeModal = payload; break;
+      case 'OPEN_MODAL': this.state.ui.activeModal = actionPayload; break;
       case 'CLOSE_MODAL': this.state.ui.activeModal = null; break;
       case 'POS_CLEAR_CART': this.state.pilar5.cart = []; this._recalculateCart(); break;
       case 'POS_ADD_TO_CART': {
-        const pid = payload?.productId || payload, p = this.state.pilar5.products.find((prod) => prod.id === pid || prod.sku === pid);
+        const pid = actionPayload?.productId || actionPayload, p = this.state.pilar5.products.find((prod) => prod.id === pid || prod.sku === pid);
         if (p) {
           const item = this.state.pilar5.cart.find((c) => c.id === p.id);
           if (item) item.qty += 1; else this.state.pilar5.cart.push({ id: p.id, sku: p.sku, name: p.name, price: p.price, qty: 1, unit: p.unit });
@@ -163,7 +186,7 @@ class SiDayaStateStore {
       }
       case 'POS_UPDATE_CART_QTY':
       case 'POS_UPDATE_QTY': {
-        const pid = payload?.productId || payload?.id || payload?.sku, delta = payload?.delta || 0;
+        const pid = actionPayload?.productId || actionPayload?.id || actionPayload?.sku, delta = actionPayload?.delta || 0;
         const idx = this.state.pilar5.cart.findIndex((c) => c.id === pid || c.sku === pid);
         if (idx !== -1) {
           this.state.pilar5.cart[idx].qty += delta;
@@ -174,7 +197,7 @@ class SiDayaStateStore {
       }
 
       case 'POS_CHECKOUT': {
-        const method = payload?.method || 'CASH', total = this.state.pilar5.cartTotal;
+        const method = actionPayload?.method || 'CASH', total = this.state.pilar5.cartTotal;
         const invNum = 'INV-20260909-' + Math.floor(100 + Math.random() * 900);
         const dateStr = '09 Sep 2026 ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
         this.state.pilar5.invoices.unshift({ invoiceNumber: invNum, date: dateStr, customerName: 'Pelanggan Tunai / Kasir', cashierName: 'Siti Rahma', paymentMethod: method, totalAmount: total, status: 'PAID' });
@@ -184,19 +207,58 @@ class SiDayaStateStore {
         this._recalculateCart();
         break;
       }
+      case 'ADD_PRODUCT': {
+        if (!Array.isArray(this.state.pilar2?.products)) this.state.pilar2.products = [];
+        if (!Array.isArray(this.state.pilar5?.products)) this.state.pilar5.products = [];
+        const prod = {
+          id: actionPayload.id || ('prod_' + Date.now()),
+          sku: actionPayload.sku,
+          barcode: actionPayload.barcode || actionPayload.sku,
+          name: actionPayload.name,
+          unit: actionPayload.unit || 'Pcs',
+          price: Number(actionPayload.price) || 0,
+          cogs: Number(actionPayload.cogs) || 0,
+          stock: Number(actionPayload.stock) || 0,
+        };
+        this.state.pilar2.products.unshift(prod);
+        this.state.pilar5.products.unshift(prod);
+        this._logTenantAudit('PRODUCT_ADDED', `${prod.sku} (${prod.name})`, 'Penambahan komoditas SKU baru');
+        break;
+      }
       case 'FIFO_RECEIVE_INBOUND': {
-        this.state.pilar2.batches.unshift(payload);
-        const prod = this.state.pilar2.products.find((p) => p.sku === payload.sku);
-        if (prod) prod.stock += payload.initialQty;
+        if (!Array.isArray(this.state.pilar2?.batches)) this.state.pilar2.batches = [];
+        this.state.pilar2.batches.unshift(actionPayload);
+        const prod = this.state.pilar2.products?.find((p) => p.sku === actionPayload.sku || p.name === actionPayload.productName);
+        if (prod) prod.stock = (prod.stock || 0) + (Number(actionPayload.initialQty) || 0);
+        // Also sync to POS catalog
+        const posProd = this.state.pilar5?.products?.find((p) => p.sku === actionPayload.sku || p.name === actionPayload.productName);
+        if (posProd) posProd.stock = (posProd.stock || 0) + (Number(actionPayload.initialQty) || 0);
+        this._logTenantAudit('INBOUND_LOT_RECEIVED', `${actionPayload.lotNumber} (${actionPayload.productName})`, 'Penerimaan stok masuk gudang');
+        break;
+      }
+      case 'ADD_CUSTOMER': {
+        if (!this.state.pilar3) this.state.pilar3 = { customers: [] };
+        if (!Array.isArray(this.state.pilar3.customers)) this.state.pilar3.customers = [];
+        this.state.pilar3.customers.unshift(actionPayload);
+        this._logTenantAudit('CUSTOMER_REGISTERED', `${actionPayload.name} (${actionPayload.storeName})`, 'Pendaftaran mitra pelanggan baru');
+        break;
+      }
+      case 'CREATE_SURAT_JALAN': {
+        if (!this.state.pilar6) this.state.pilar6 = { deliveryOrders: [] };
+        if (!Array.isArray(this.state.pilar6.deliveryOrders)) this.state.pilar6.deliveryOrders = [];
+        this.state.pilar6.deliveryOrders.unshift(actionPayload);
+        this._logTenantAudit('SURAT_JALAN_ISSUED', `${actionPayload.sjNumber} (${actionPayload.destination})`, 'Penerbitan surat jalan armada');
         break;
       }
       case 'ADD_PRODUCTS_BULK': {
-        (payload.products || []).forEach((item) => {
+        (actionPayload.products || []).forEach((item) => {
           [this.state.pilar2.products, this.state.pilar5.products].forEach(list => {
+            if (!Array.isArray(list)) return;
             const idx = list.findIndex(p => p.sku === item.sku);
             if (idx !== -1) Object.assign(list[idx], item); else list.push(item);
           });
         });
+        this._logTenantAudit('PRODUCTS_BULK_ADDED', `${actionPayload.products?.length || 0} SKU`, 'Penambahan komoditas master');
         break;
       }
       case 'SJ_SIGN_POD': {
@@ -340,12 +402,30 @@ class SiDayaStateStore {
       case 'REGISTER_OWNER': {
         const { bizName, subdomain, ownerName, email, phone, password, legalEntity, isVerified = false } = payload;
         const curDomain = payload.baseDomain || (typeof getBaseDomain === 'function' ? getBaseDomain() : 'sidaya.biz.id');
-        this.state = JSON.parse(JSON.stringify(INITIAL_TENANT_STATE));
-        this.state.pilar9.settings.storeName = bizName; this.state.pilar9.settings.subdomain = subdomain; this.state.pilar9.settings.baseDomain = curDomain; this.state.pilar9.settings.storePhone = phone;
+        this.state = (typeof createCleanTenantState === 'function')
+          ? createCleanTenantState({ businessName: bizName, subdomain, phone, legalEntity }, { name: ownerName, email, phone })
+          : JSON.parse(JSON.stringify(DEMO_TENANT_STATE));
+        this.state.pilar9.settings.storeName = bizName;
+        this.state.pilar9.settings.subdomain = subdomain;
+        this.state.pilar9.settings.baseDomain = curDomain;
+        this.state.pilar9.settings.storePhone = phone;
         if (legalEntity && this.state.pilar9.settings.businessProfile) this.state.pilar9.settings.businessProfile.legalEntity = legalEntity;
-        this.state.pilar8.staff = [{ id: 'stf_owner_' + Date.now(), name: ownerName, email, phone, password: password || 'Password123!', role: 'Owner / Direktur Utama', isOwner: true, status: isVerified ? 'VERIFIED' : 'UNVERIFIED', isEmailVerified: !!isVerified, pinConfigured: false, permissions: (typeof STAFF_CAPABILITIES !== 'undefined' ? STAFF_CAPABILITIES.map(c => c.key) : []) }];
+        this.state.pilar8.staff = [{
+          id: 'stf_owner_' + Date.now(),
+          name: ownerName,
+          email,
+          phone,
+          password: password || 'Password123!',
+          role: 'Owner / Direktur Utama',
+          isOwner: true,
+          status: isVerified ? 'VERIFIED' : 'UNVERIFIED',
+          isEmailVerified: !!isVerified,
+          pinConfigured: false,
+          permissions: (typeof STAFF_CAPABILITIES !== 'undefined' ? STAFF_CAPABILITIES.map(c => c.key) : [])
+        }];
         const session = { name: ownerName, email, role: 'Owner', tenantName: bizName, subdomain, baseDomain: curDomain, isEmailVerified: !!isVerified, expiresAt: Date.now() + 1800000 };
-        this.state.auth.merchantUser = session; localStorage.setItem('sidaya_merchant_session', JSON.stringify(session));
+        this.state.auth.merchantUser = session;
+        localStorage.setItem('sidaya_merchant_session', JSON.stringify(session));
         this._logTenantAudit('WORKSPACE_INITIALIZED', bizName, `Inisialisasi toko baru (${subdomain}.${curDomain})`);
         this._logOperatorAudit('TENANT_REGISTERED', `${bizName} (${subdomain}.${curDomain})`, '#REG-SELF', 'Pendaftaran mandiri owner');
         break;
@@ -423,6 +503,11 @@ class SiDayaStateStore {
 
 // Global Store Singleton
 const store = new SiDayaStateStore();
+
+if (typeof window !== 'undefined') {
+  window.store = store;
+  window.SiDayaStateStore = SiDayaStateStore;
+}
 
 function resetAndReloadState() {
   ['sidaya_store_v1', 'sidaya_store_v2', 'sidaya_store_v3', 'sidaya_store_v4', 'sidaya_store_v5', 'sidaya_store_tenant', 'sidaya_store_operator', 'sidaya_merchant_session', 'sidaya_operator_session'].forEach((k) => localStorage.removeItem(k));

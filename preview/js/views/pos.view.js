@@ -17,12 +17,12 @@ const PosView = {
           <p class="view-subtitle">Transaksi cepat multi-kemasan (Karung/Bal/Pcs) dengan alokasi FIFO otomatis.</p>
         </div>
         <div class="view-actions">
-          <button class="btn btn-outline" onclick="openShiftCloseModal()">🔒 Tutup Shift Kasir</button>
+          <button id="tour-pos-shift-btn" class="btn btn-outline" onclick="openShiftCloseModal()">🔒 Tutup Shift Kasir</button>
         </div>
       </div>
 
       <!-- BARCODE FAST SCAN BAR -->
-      <div class="barcode-action-bar">
+      <div id="tour-pos-scan" class="barcode-action-bar">
         <span class="barcode-icon">📷</span>
         <input id="pos-barcode-input" type="text" class="barcode-input" placeholder="Scan barcode / ketik SKU (lalu Enter)..." autofocus onkeypress="handlePosBarcodeKey(event)">
         <button class="btn btn-primary" onclick="handlePosBarcodeScanSubmit()">⚡ Tambah Cepat</button>
@@ -30,7 +30,7 @@ const PosView = {
 
       <div class="pos-layout">
         <!-- LEFT: PRODUCT CATALOG GRID -->
-        <div class="pos-products-col">
+        <div id="tour-pos-grid" class="pos-products-col">
           <div class="pos-filter-bar">
             <button class="filter-pill active" onclick="filterPosCategory('ALL', this)">Semua Komoditas</button>
             <button class="filter-pill" onclick="filterPosCategory('BERAS', this)">Beras</button>
@@ -39,24 +39,38 @@ const PosView = {
             <button class="filter-pill" onclick="filterPosCategory('TEPUNG', this)">Tepung Terigu</button>
           </div>
 
-          <div class="product-grid" id="pos-product-grid">
-            ${products.map(p => `
-              <div class="product-card" onclick="addToPosCart('${p.id}')">
-                <div class="product-card-body">
-                  <div class="product-sku">${p.sku}</div>
-                  <div class="product-name">${p.name}</div>
-                  <div class="product-price">${formatRupiah(p.price)} <span class="product-unit">/${p.unit}</span></div>
-                  <div class="product-stock-tag ${p.stock > 10 ? 'in-stock' : 'low-stock'}">
-                    Stok: ${p.stock} ${p.unit}
+          ${products.length > 0 ? `
+            <div class="product-grid" id="pos-product-grid">
+              ${products.map(p => `
+                <div class="product-card" onclick="addToPosCart('${p.id}')">
+                  <div class="product-card-body">
+                    <div class="product-sku">${p.sku}</div>
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-price">${formatRupiah(p.price)} <span class="product-unit">/${p.unit}</span></div>
+                    <div class="product-stock-tag ${p.stock > 10 ? 'in-stock' : 'low-stock'}">
+                      Stok: ${p.stock} ${p.unit}
+                    </div>
                   </div>
                 </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div style="padding:48px 20px; text-align:center; background:var(--bg-card); border:1px dashed var(--border-color); border-radius:12px; margin-top:12px;">
+              <div style="font-size:2.5rem; margin-bottom:10px;">📦</div>
+              <div style="font-weight:700; font-size:1.05rem; color:var(--text-primary); margin-bottom:6px;">Katalog Kasir Belum Tersedia</div>
+              <p style="font-size:0.8rem; color:var(--text-secondary); max-width:440px; margin:0 auto 16px auto; line-height:1.5;">
+                Anda belum mendaftarkan komoditas ke Master SKU. Tambahkan produk pertama toko Anda agar kasir dapat melakukan scan barcode, menambah ke keranjang, dan mencetak struk thermal.
+              </p>
+              <div style="display:inline-flex; gap:8px;">
+                <button class="btn btn-primary" onclick="openAddProductModal()">+ Tambah Produk SKU</button>
+                <button class="btn btn-outline" onclick="navigate('/katalog')">🏷️ Buka Master SKU</button>
               </div>
-            `).join('')}
-          </div>
+            </div>
+          `}
         </div>
 
         <!-- RIGHT: CART DRAWER & PAYMENT DISPATCH -->
-        <div class="pos-cart-col">
+        <div id="tour-pos-cart" class="pos-cart-col">
           <div class="card" style="height: 100%; display:flex; flex-direction:column;">
             <div class="card-title" style="display:flex; justify-content:space-between; align-items:center;">
               <span>🛒 Keranjang Belanja</span>

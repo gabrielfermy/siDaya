@@ -53,13 +53,43 @@ function getAppProtocol() {
 /**
  * Generates full tenant or operator workspace URL for given subdomain
  * @param {string} subdomain
+ * @param {string} [path='']
  * @returns {string}
  */
-function getSubdomainUrl(subdomain) {
+function getSubdomainUrl(subdomain, path = '') {
   const proto = getAppProtocol();
   const base = getBaseDomain();
-  if (!subdomain) return `${proto}//${base}`;
-  return `${proto}//${subdomain}.${base}`;
+  const cleanPath = path ? (path.startsWith('/') ? path : '/' + path) : '';
+  return `${proto}//${subdomain}.${base}${cleanPath}`;
+}
+
+/**
+ * Resolves active tenant subdomain from current hostname or stored session
+ * @returns {string}
+ */
+function getCurrentSubdomain() {
+  if (typeof window === 'undefined') return 'berasjaya';
+  const hostname = window.location.hostname.toLowerCase();
+  
+  // Direct subdomain check from hostname
+  const parts = hostname.split('.');
+  if (parts.length >= 2) {
+    const first = parts[0];
+    if (first !== 'www' && first !== 'sidaya' && first !== 'localhost') {
+      return first;
+    }
+  }
+
+  // Fallback check from active merchant session
+  try {
+    const raw = localStorage.getItem('sidaya_merchant_session');
+    if (raw) {
+      const sess = JSON.parse(raw);
+      if (sess && sess.subdomain) return sess.subdomain.toLowerCase();
+    }
+  } catch (e) {}
+
+  return 'berasjaya';
 }
 
 // Global window attachment
@@ -67,5 +97,7 @@ if (typeof window !== 'undefined') {
   window.getBaseDomain = getBaseDomain;
   window.getAppProtocol = getAppProtocol;
   window.getSubdomainUrl = getSubdomainUrl;
+  window.getCurrentSubdomain = getCurrentSubdomain;
 }
+
 

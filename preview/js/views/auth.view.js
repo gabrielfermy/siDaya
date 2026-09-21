@@ -5,6 +5,9 @@ const AuthView = {
   renderMerchantLogin() {
     return `
       <div id="merchant-login-screen" class="login-overlay">
+        <div class="auth-theme-toggle-wrap">
+          ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'merchant-login-theme-dropdown', showLabel: false }) : ''}
+        </div>
         <div class="login-card">
           <div class="login-brand" style="display:flex; flex-direction:column; align-items:center; margin-bottom:18px;">
             <img src="/assets/brand/logo-horizontal-dark.svg" alt="siDaya By Ashvin Labs Idn" height="200" class="brand-logo-horizontal dark-theme-logo" style="height:200px; width:auto; max-width:400px; object-fit:contain; margin-bottom:8px;">
@@ -62,6 +65,9 @@ const AuthView = {
     const proto = (typeof getAppProtocol === 'function') ? getAppProtocol() : 'https:';
     return `
       <div id="merchant-register-screen" class="login-overlay" style="display:none;">
+        <div class="auth-theme-toggle-wrap">
+          ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'merchant-register-theme-dropdown', showLabel: false }) : ''}
+        </div>
         <div class="login-card register-card" style="max-width: 580px; width:100%; margin: auto;">
           
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
@@ -100,22 +106,29 @@ const AuthView = {
                   </select>
                 </div>
               </div>
-              <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label">Subdomain Unik Toko (Alamat Web)*</label>
-                <div style="position:relative;">
-                  <input id="reg-biz-subdomain" type="text" class="form-input" required placeholder="berasmakmur" style="padding-right:150px;" oninput="handleRegSubdomainChange(this.value)">
-                  <span id="reg-subdomain-suffix" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:11px; font-weight:600; color:var(--text-muted); pointer-events:none;">.${baseDomain}</span>
+
+              <!-- Live Subdomain Checker Input -->
+              <div class="form-group" style="margin-top:10px; margin-bottom:6px;">
+                <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+                  <span>Subdomain Workspace Pilihan*</span>
+                  <span id="reg-subdomain-status" style="font-size:11.5px; font-weight:700; color:var(--text-muted);">Masukkan nama...</span>
+                </label>
+                <div class="subdomain-input-group">
+                  <div class="subdomain-input-wrap">
+                    <input id="reg-subdomain" type="text" class="form-input subdomain-input" required placeholder="berasmakmur" oninput="handleRegSubdomainInput(this.value)">
+                    <span class="subdomain-suffix">.${baseDomain}</span>
+                  </div>
                 </div>
-                <div id="reg-subdomain-hint" style="font-size:11px; color:var(--text-secondary); margin-top:4px;">
-                  Alamat resmi toko: <code>${proto}//<span id="reg-subdomain-preview">berasmakmur</span>.${baseDomain}</code>
+                <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">
+                  Alamat akses toko Anda nantinya: <code id="reg-subdomain-preview" style="font-weight:700; color:var(--color-primary, #6366f1);">${proto}//berasmakmur.${baseDomain}</code>
                 </div>
               </div>
             </div>
 
-            <!-- Bagian 2: Kontak & Identitas Owner -->
-            <div style="background:var(--bg-hover); border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:12px;">
+            <!-- Bagian 2: Akun Pemilik Toko (Owner Credentials) -->
+            <div style="background:var(--bg-hover); border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:14px;">
               <div style="font-size:12px; font-weight:800; color:var(--text-primary); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-                <span>👑</span> 2. Identitas Pemilik Toko (Owner)
+                <span>👤</span> 2. Akun Pemilik Toko (Owner Credentials)
               </div>
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                 <div class="form-group" style="margin-bottom:6px;">
@@ -123,31 +136,25 @@ const AuthView = {
                   <input id="reg-owner-name" type="text" class="form-input" required placeholder="H. Hendro Purnomo">
                 </div>
                 <div class="form-group" style="margin-bottom:6px;">
-                  <label class="form-label">No. WhatsApp Bisnis*</label>
-                  <input id="reg-biz-phone" type="tel" class="form-input" required placeholder="081234567890">
+                  <label class="form-label">No. WhatsApp Aktif*</label>
+                  <input id="reg-owner-phone" type="tel" class="form-input" required placeholder="0812-3456-7890">
                 </div>
               </div>
-              <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label">Alamat Email Owner (Akun Login)*</label>
-                <input id="reg-owner-email" type="email" class="form-input" required placeholder="hendro@berasmakmur.com">
-              </div>
-            </div>
 
-            <!-- Bagian 3: Keamanan Sandi -->
-            <div style="background:var(--bg-hover); border:1px solid var(--border-color); border-radius:10px; padding:14px; margin-bottom:14px;">
-              <div style="font-size:12px; font-weight:800; color:var(--text-primary); margin-bottom:10px; display:flex; align-items:center; gap:6px;">
-                <span>🔑</span> 3. Keamanan Sandi Akun
+              <div class="form-group" style="margin-top:6px; margin-bottom:6px;">
+                <label class="form-label">Alamat Email Login*</label>
+                <input id="reg-owner-email" type="email" class="form-input" required placeholder="hendro@berasmakmur.com" autocomplete="username">
               </div>
-              <div class="form-group" style="margin-bottom:10px;">
-                <label class="form-label">Kata Sandi*</label>
-                <input id="reg-owner-password" type="password" class="form-input" required placeholder="Minimal 8 karakter (huruf & angka)" oninput="checkPasswordStrengthAndMatch()">
-              </div>
-              <div class="form-group" style="margin-bottom:8px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                  <label class="form-label" style="margin-bottom:0;">Konfirmasi Sandi*</label>
-                  <div id="reg-password-match-indicator" style="font-size:11px; font-weight:700;"></div>
+
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:6px;">
+                <div class="form-group" style="margin-bottom:2px;">
+                  <label class="form-label">Kata Sandi Baru*</label>
+                  <input id="reg-owner-password" type="password" class="form-input" required placeholder="Minimal 8 karakter" autocomplete="new-password" oninput="checkPasswordStrengthAndMatch()">
                 </div>
-                <input id="reg-owner-password-confirm" type="password" class="form-input" required placeholder="Ulangi kata sandi" oninput="checkPasswordStrengthAndMatch()">
+                <div class="form-group" style="margin-bottom:2px;">
+                  <label class="form-label">Konfirmasi Kata Sandi*</label>
+                  <input id="reg-owner-password-confirm" type="password" class="form-input" required placeholder="Ulangi kata sandi" oninput="checkPasswordStrengthAndMatch()">
+                </div>
               </div>
 
               <!-- Single Unmask Checkbox -->
@@ -198,6 +205,9 @@ const AuthView = {
   renderOperatorLogin() {
     return `
       <div id="operator-login-screen" class="login-overlay">
+        <div class="auth-theme-toggle-wrap">
+          ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'operator-login-theme-dropdown', showLabel: false }) : ''}
+        </div>
         <div class="login-card" style="border-color: rgba(124, 58, 237, 0.4);">
           <div class="login-brand">
             <div class="login-logo" style="background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);">⚡</div>
@@ -230,6 +240,9 @@ const AuthView = {
   renderEmailVerification() {
     return `
       <div id="email-verification-screen" class="login-overlay" style="display:none;">
+        <div class="auth-theme-toggle-wrap">
+          ${(typeof ThemeManager !== 'undefined') ? ThemeManager.renderDropdown({ id: 'email-verification-theme-dropdown', showLabel: false }) : ''}
+        </div>
         <div class="login-card" style="max-width: 480px; width:100%; margin: auto; text-align:center;">
           <div style="width:54px; height:54px; margin:0 auto 14px auto; border-radius:50%; background:rgba(37,99,235,0.1); color:var(--color-primary, #2563EB); display:flex; align-items:center; justify-content:center; font-size:26px;">
             ✉️

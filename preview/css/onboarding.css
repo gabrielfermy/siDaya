@@ -1,0 +1,267 @@
+/**
+ * @file onboarding.css
+ * @description Glassmorphic Floating Bubble Card & Spotlight Halo Animations
+ * @module Onboarding:Styles
+ * @author Ashvin Labs Engineering Team
+ * @license Proprietary - SiDaya
+ */
+
+/* Onboarding Spotlight Ring & Pulsing Halo */
+.onboarding-spotlight-active {
+  position: relative !important;
+  z-index: 9990 !important;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.4), 0 0 25px 8px rgba(16, 185, 129, 0.3) !important;
+  border-color: rgba(16, 185, 129, 0.8) !important;
+  animation: onboarding-spotlight-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
+  transition: all 0.3s ease-in-out;
+}
+
+@keyframes onboarding-spotlight-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.5), 0 0 20px 4px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.15), 0 0 35px 12px rgba(16, 185, 129, 0.5);
+  }
+}
+
+/* Floating Tour Container */
+#onboarding-tour-root {
+  position: fixed;
+  top: 76px;
+  right: 24px;
+  z-index: 9999;
+  max-width: 440px;
+  width: calc(100vw - 32px);
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  #onboarding-tour-root {
+    top: auto;
+    bottom: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: 100%;
+    width: auto;
+  }
+}
+
+/* Glassmorphic Bubble Card */
+.onboarding-bubble-card {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 80vh;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] .onboarding-bubble-card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 20px 40px -8px rgba(15, 23, 42, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+.onboarding-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.onboarding-close-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.onboarding-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+}
+
+[data-theme="light"] .onboarding-close-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+.onboarding-progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+[data-theme="light"] .onboarding-progress-track {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.onboarding-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+  border-radius: 999px;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.onboarding-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0;
+  color: #ffffff;
+}
+
+[data-theme="light"] .onboarding-title {
+  color: #0f172a;
+}
+
+.onboarding-body {
+  overflow-y: auto;
+  max-height: 38vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+}
+
+.onboarding-section {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  padding: 10px 12px;
+  border-left: 3px solid transparent;
+}
+
+[data-theme="light"] .onboarding-section {
+  background: rgba(241, 245, 249, 0.7);
+}
+
+.onboarding-section:nth-child(1) {
+  border-left-color: #38bdf8;
+}
+
+.onboarding-section:nth-child(2) {
+  border-left-color: #fbbf24;
+}
+
+.onboarding-section:nth-child(3) {
+  border-left-color: #34d399;
+}
+
+.onboarding-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.onboarding-text {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+[data-theme="light"] .onboarding-text {
+  color: #334155;
+}
+
+.onboarding-checkbox-row {
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .onboarding-checkbox-row {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.onboarding-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.btn-tour-primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-tour-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.btn-tour-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+[data-theme="light"] .btn-tour-secondary {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.btn-tour-secondary:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="light"] .btn-tour-secondary:hover:not(:disabled) {
+  background: #e2e8f0;
+}
+
+.btn-tour-skip {
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-tour-skip:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .btn-tour-skip:hover {
+  color: #0f172a;
+  background: rgba(0, 0, 0, 0.04);
+}

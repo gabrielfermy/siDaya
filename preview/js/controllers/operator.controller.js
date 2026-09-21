@@ -310,6 +310,133 @@ const OperatorController = {
   sendPasswordReset(email) {
     Toast.show(`✉️ Tautan reset kata sandi korporat telah dikirimkan ke ${email}.`, 'info');
   },
+
+  /**
+   * Resets onboarding progress for a target tenant
+   * @param {string} subdomain
+   */
+  resetTenantOnboarding(subdomain) {
+    if (!subdomain) return;
+    if (typeof OnboardingService !== 'undefined') {
+      OnboardingService.resetTenantOnboarding(subdomain);
+      Toast.show(`🔄 Panduan kilat untuk tenant '${subdomain}' berhasil di-reset.`, 'success');
+    }
+  },
+
+  /**
+   * Toggles a tour module active/disabled state
+   * @param {string} moduleId
+   */
+  toggleTourModule(moduleId) {
+    if (typeof OnboardingRegistry === 'undefined') return;
+    const newState = OnboardingRegistry.toggleModule(moduleId);
+    Toast.show(`Modul '${moduleId}' ${newState ? 'diaktifkan' : 'dinonaktifkan'}.`, 'info');
+    const container = document.getElementById('main-content');
+    if (container) {
+      container.innerHTML = OperatorView.render(store.getState());
+    }
+  },
+
+  /**
+   * Runs an interactive onboarding tour simulation for a specific role
+   * @param {'OWNER'|'KASIR'|'GUDANG'|'SUPIR'|'FINANCE'} role
+   */
+  simulateRoleTour(role) {
+    if (typeof OnboardingRegistry === 'undefined' || typeof OnboardingService === 'undefined') {
+      Toast.show('Modul Onboarding belum termuat.', 'warning');
+      return;
+    }
+
+    let mockUser = { isOwner: true, permissions: ['*'], role: 'Owner' };
+    if (role === 'KASIR') {
+      mockUser = { isOwner: false, role: 'Kasir', permissions: ['pos:checkout', 'invoices:read', 'catalog:read'] };
+    } else if (role === 'GUDANG') {
+      mockUser = { isOwner: false, role: 'Gudang', permissions: ['inventory:inbound', 'inventory:transfer', 'sj:read', 'sj:sign'] };
+    } else if (role === 'SUPIR') {
+      mockUser = { isOwner: false, role: 'Supir', permissions: ['sj:read', 'sj:sign'] };
+    } else if (role === 'FINANCE') {
+      mockUser = { isOwner: false, role: 'Finance', permissions: ['reports:read', 'catalog:view_cogs', 'piutang:read', 'piutang:paylink', 'invoices:read', 'invoices:export'] };
+    }
+
+    const steps = OnboardingRegistry.resolveStepsForUser(mockUser, 'GROSIR_PRO');
+    if (steps.length === 0) {
+      Toast.show(`Tidak ada langkah tur untuk simulasi peran ${role}`, 'warning');
+      return;
+    }
+
+    Toast.show(`🎮 Memulai simulasi tur untuk peran ${role} (${steps.length} langkah)`, 'info');
+    OnboardingService.startTour(steps, true);
+  },
+
+  /**
+   * Opens modal to edit tour step text
+   * @param {string} moduleId
+   */
+  openEditTourModuleModal(moduleId) {
+    if (typeof OnboardingRegistry === 'undefined') return;
+    const mod = OnboardingRegistry.getModule(moduleId);
+    if (!mod) return;
+
+    const modIdEl = document.getElementById('edit-tour-mod-id');
+    const subtitleEl = document.getElementById('edit-tour-module-subtitle');
+    const stepSelectEl = document.getElementById('edit-tour-step-select');
+
+    if (modIdEl) modIdEl.value = mod.id;
+    if (subtitleEl) subtitleEl.textContent = `Mengedit modul: ${mod.icon || '📌'} ${mod.title} (${mod.steps.length} langkah)`;
+
+    if (stepSelectEl) {
+      stepSelectEl.innerHTML = mod.steps.map((s, idx) => `
+        <option value="${s.id}">Langkah ${idx + 1}: ${s.title} (${s.id})</option>
+      `).join('');
+
+      if (mod.steps.length > 0) {
+        this.handleTourStepSelectChange(mod.steps[0].id);
+      }
+    }
+
+    this.openModal('modal-edit-tour-module');
+  },
+
+  /**
+   * Updates textarea inputs when a step is selected in editor
+   * @param {string} stepId
+   */
+  handleTourStepSelectChange(stepId) {
+    const modId = document.getElementById('edit-tour-mod-id')?.value;
+    if (!modId || !stepId || typeof OnboardingRegistry === 'undefined') return;
+
+    const mod = OnboardingRegistry.getModule(modId);
+    if (!mod) return;
+    const step = mod.steps.find(s => s.id === stepId);
+    if (!step) return;
+
+    const whatEl = document.getElementById('edit-tour-step-what');
+    const whyEl = document.getElementById('edit-tour-step-why');
+    const howEl = document.getElementById('edit-tour-step-how');
+
+    if (whatEl) whatEl.value = step.what || '';
+    if (whyEl) whyEl.value = step.why || '';
+    if (howEl) howEl.value = step.howWhere || '';
+  },
+
+  /**
+   * Saves updated step text back to OnboardingRegistry
+   */
+  handleSaveTourStep() {
+    const modId = document.getElementById('edit-tour-mod-id')?.value;
+    const stepId = document.getElementById('edit-tour-step-select')?.value;
+    const what = document.getElementById('edit-tour-step-what')?.value || '';
+    const why = document.getElementById('edit-tour-step-why')?.value || '';
+    const howWhere = document.getElementById('edit-tour-step-how')?.value || '';
+
+    if (!modId || !stepId) return;
+
+    if (typeof OnboardingRegistry !== 'undefined') {
+      OnboardingRegistry.updateStepContent(modId, stepId, { what, why, howWhere });
+      Toast.show('💾 Narasi langkah panduan berhasil disimpan.', 'success');
+      this.closeModal('modal-edit-tour-module');
+    }
+  },
 };
 
 // Global handles
