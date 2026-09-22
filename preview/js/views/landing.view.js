@@ -451,56 +451,76 @@ const LandingView = {
                 <tr>
                   <td class="cell-aspect">Konversi Satuan & Harga Grosir</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Manual di kalkulator, sering salah hitung antar satuan dus/renceng</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Manual di kalkulator, sering salah hitung antar satuan dus/renceng</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Otomatis bertingkat per tier pelanggan dalam 1 detik</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Otomatis bertingkat per tier pelanggan dalam 1 detik</span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="cell-aspect">Pengelolaan Stok Inbound Truk/Kontainer</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Stok tercampur tanpa nomor batch; barang lama tertimbun dan kedaluwarsa</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Stok tercampur tanpa nomor batch; barang lama tertimbun dan kedaluwarsa</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Alokasi FIFO otomatis dengan barcode & tracking tanggal kedaluwarsa</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Alokasi FIFO otomatis dengan barcode & tracking tanggal kedaluwarsa</span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="cell-aspect">Penagihan Piutang & Tempo Toko</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Buku kasbon tercecer, pembeli lupa bayar, staf repot cek mutasi manual</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Buku kasbon tercecer, pembeli lupa bayar, staf repot cek mutasi manual</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Otomasi WhatsApp PayLink & QRIS dinamis berbatas plafon piutang</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Otomasi WhatsApp PayLink & QRIS dinamis berbatas plafon piutang</span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="cell-aspect">Pengiriman & Surat Jalan (POD)</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Kertas surat jalan rawan hilang; nota sopir membocorkan modal margin ke pelanggan</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Kertas surat jalan rawan hilang; nota sopir membocorkan modal margin ke pelanggan</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Surat jalan digital, HPP terproteksi rahasia, bukti foto GPS & tanda tangan</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Surat jalan digital, HPP terproteksi rahasia, bukti foto GPS & tanda tangan</span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="cell-aspect">Pencairan Uang Hasil Penjualan</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Dana tertahan di rekening perantara atau pihak ketiga</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Dana tertahan di rekening perantara atau pihak ketiga</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Arsitektur BYOK: Dana langsung masuk 100% ke rekening bank pemilik toko</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Arsitektur BYOK: Dana langsung masuk 100% ke rekening bank pemilik toko</span>
+                    </div>
                   </td>
                 </tr>
               </tbody>
