@@ -103,7 +103,7 @@ const tenantController = new TenantController();
 // Setup App Router
 const router = new AppRouter();
 
-router.get('/health', (_req, res) => {
+const healthHandler = (_req: any, res: any) => {
   const env = (process.env['NODE_ENV'] || 'development').toLowerCase();
   const baseDomain = env === 'production' ? 'sidaya.biz.id' : env === 'staging' ? 'sidaya.my.id' : 'sidaya.test';
   sendJson(res, 200, {
@@ -119,7 +119,11 @@ router.get('/health', (_req, res) => {
     database: process.env['DATABASE_URL'] ? 'CONNECTED' : 'LOCAL_POSTGRES_54350',
     registeredPaymentGateways: gatewayRegistry.listRegistered(),
   });
-});
+};
+
+router.get('/health', healthHandler);
+router.get('/api/health', healthHandler);
+router.get('/api/v1/health', healthHandler);
 
 registerAuthRoutes(router, authController);
 registerOrderRoutes(router, orderController);

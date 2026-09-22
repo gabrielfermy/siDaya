@@ -8,6 +8,21 @@ importers:
 
   .:
     dependencies:
+      '@sidaya/api-core':
+        specifier: workspace:*
+        version: link:packages/api-core
+      '@sidaya/database':
+        specifier: workspace:*
+        version: link:packages/database
+      '@sidaya/hardware-core':
+        specifier: workspace:*
+        version: link:packages/hardware-core
+      '@sidaya/payment-core':
+        specifier: workspace:*
+        version: link:packages/payment-core
+      '@sidaya/shared-types':
+        specifier: workspace:*
+        version: link:packages/shared-types
       zustand:
         specifier: ^5.0.15
         version: 5.0.15(@types/react@18.3.31)
@@ -15,6 +30,9 @@ importers:
       '@types/node':
         specifier: ^20.19.43
         version: 20.19.43
+      esbuild:
+        specifier: ^0.28.2
+        version: 0.28.2
       typescript:
         specifier: ^5.5.4
         version: 5.9.3
