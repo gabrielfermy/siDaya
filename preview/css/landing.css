@@ -896,6 +896,16 @@
 
 .cell-bad {
   color: #fca5a5;
+  line-height: 1.5;
+}
+
+.cell-good {
+  color: #f8fafc;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.cell-flex {
   display: flex;
   align-items: flex-start;
   gap: 8px;
@@ -909,16 +919,8 @@
   margin-top: 1px;
 }
 
-.cell-good {
-  color: #f8fafc;
-  font-weight: 700;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  line-height: 1.5;
-}
-
-.cell-good svg {
+.cell-good svg,
+.cell-flex svg {
   color: #10b981;
   flex-shrink: 0;
   margin-top: 2px;

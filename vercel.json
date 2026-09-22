@@ -1,13 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "echo 'No install needed for static site'",
-  "buildCommand": "echo 'Static portal ready'",
+  "buildCommand": "pnpm -r run build && esbuild api/_entry.ts --bundle --platform=node --target=node20 --format=cjs --outfile=api/index.js",
   "outputDirectory": "preview",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/((?!css|js|favicon.ico|_redirects|_headers).*)",
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
+    {
+      "source": "/((?!css|js|assets|favicon.ico|_redirects|_headers).*)",
       "destination": "/index.html"
     }
   ]

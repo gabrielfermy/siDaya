@@ -27,8 +27,8 @@ export const PLATFORM_PLANS: Record<SubscriptionTier, SubscriptionPlanDef> = {
   [SubscriptionTier.RETAIL_STARTER]: {
     tier: SubscriptionTier.RETAIL_STARTER,
     name: 'SiDaya Retail Starter',
-    priceMonthly: 99000,
-    priceAnnual: 990000,
+    priceMonthly: 149000,
+    priceAnnual: 1490000,
     features: ['pos:checkout', 'shifts:operate', 'catalog:view', 'warehouse:inbound', 'reports:basic'],
     maxBranches: 1,
     maxUsers: 5,
@@ -36,8 +36,8 @@ export const PLATFORM_PLANS: Record<SubscriptionTier, SubscriptionPlanDef> = {
   [SubscriptionTier.GROSIR_PRO]: {
     tier: SubscriptionTier.GROSIR_PRO,
     name: 'SiDaya Grosir Pro Wholesale',
-    priceMonthly: 299000,
-    priceAnnual: 2990000,
+    priceMonthly: 399000,
+    priceAnnual: 3990000,
     features: [
       'pos:checkout',
       'shifts:operate',
@@ -83,6 +83,7 @@ export interface CreateSubscriptionCheckoutDTO {
   tenantSubdomain: string;
   ownerEmail: string;
   ownerName: string;
+  ownerPhone?: string;
   tier: SubscriptionTier;
   billingPeriod: 'MONTHLY' | 'ANNUAL';
 }
@@ -106,16 +107,20 @@ export interface PlatformSubscriptionRecord {
 export class PlatformBillingService {
   constructor(private readonly platformGatewayProvider: IPaymentGatewayProvider) {}
 
-  public async createSubscriptionSession(dto: CreateSubscriptionCheckoutDTO) {
+  public async createSubscriptionSession(
+    dto: CreateSubscriptionCheckoutDTO,
+    providerOverride?: IPaymentGatewayProvider,
+  ) {
     const plan = PLATFORM_PLANS[dto.tier];
     if (!plan) {
       throw new Error(`Invalid plan tier requested: ${dto.tier}`);
     }
 
+    const provider = providerOverride ?? this.platformGatewayProvider;
     const amount = dto.billingPeriod === 'ANNUAL' ? plan.priceAnnual : plan.priceMonthly;
     const invoiceNumber = `SUB-${dto.tenantSubdomain.toUpperCase()}-${Date.now().toString().slice(-6)}`;
 
-    const session = await this.platformGatewayProvider.createPaymentSession({
+    const session = await provider.createPaymentSession({
       tenantId: dto.tenantId,
       orderId: `sub_order_${dto.tenantId}_${Date.now()}`,
       orderNumber: invoiceNumber,
@@ -123,7 +128,7 @@ export class PlatformBillingService {
       customer: {
         name: dto.ownerName,
         email: dto.ownerEmail,
-        phone: '081234567890',
+        phone: dto.ownerPhone || '08139506092',
       },
       items: [
         {
@@ -141,6 +146,7 @@ export class PlatformBillingService {
       tier: dto.tier,
       amount,
       billingPeriod: dto.billingPeriod,
+      gatewayProvider: session.gatewayProvider,
       checkoutUrl: session.checkoutUrl,
       paymentToken: session.paymentToken,
       qrString: session.qrString,

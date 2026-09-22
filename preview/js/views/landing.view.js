@@ -451,56 +451,76 @@ const LandingView = {
                 <tr>
                   <td class="cell-aspect">Konversi Satuan & Harga Grosir</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Manual di kalkulator, sering salah hitung antar satuan dus/renceng</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Manual di kalkulator, sering salah hitung antar satuan dus/renceng</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Otomatis bertingkat per tier pelanggan dalam 1 detik</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Otomatis bertingkat per tier pelanggan dalam 1 detik</span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="cell-aspect">Pengelolaan Stok Inbound Truk/Kontainer</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Stok tercampur tanpa nomor batch; barang lama tertimbun dan kedaluwarsa</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Stok tercampur tanpa nomor batch; barang lama tertimbun dan kedaluwarsa</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Alokasi FIFO otomatis dengan barcode & tracking tanggal kedaluwarsa</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Alokasi FIFO otomatis dengan barcode & tracking tanggal kedaluwarsa</span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="cell-aspect">Penagihan Piutang & Tempo Toko</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Buku kasbon tercecer, pembeli lupa bayar, staf repot cek mutasi manual</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Buku kasbon tercecer, pembeli lupa bayar, staf repot cek mutasi manual</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Otomasi WhatsApp PayLink & QRIS dinamis berbatas plafon piutang</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Otomasi WhatsApp PayLink & QRIS dinamis berbatas plafon piutang</span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="cell-aspect">Pengiriman & Surat Jalan (POD)</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Kertas surat jalan rawan hilang; nota sopir membocorkan modal margin ke pelanggan</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Kertas surat jalan rawan hilang; nota sopir membocorkan modal margin ke pelanggan</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Surat jalan digital, HPP terproteksi rahasia, bukti foto GPS & tanda tangan</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Surat jalan digital, HPP terproteksi rahasia, bukti foto GPS & tanda tangan</span>
+                    </div>
                   </td>
                 </tr>
                 <tr>
                   <td class="cell-aspect">Pencairan Uang Hasil Penjualan</td>
                   <td class="cell-bad">
-                    <span class="cell-icon-bad">✕</span>
-                    <span>Dana tertahan di rekening perantara atau pihak ketiga</span>
+                    <div class="cell-flex">
+                      <span class="cell-icon-bad">✕</span>
+                      <span>Dana tertahan di rekening perantara atau pihak ketiga</span>
+                    </div>
                   </td>
                   <td class="cell-good">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Arsitektur BYOK: Dana langsung masuk 100% ke rekening bank pemilik toko</span>
+                    <div class="cell-flex">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                      <span>Arsitektur BYOK: Dana langsung masuk 100% ke rekening bank pemilik toko</span>
+                    </div>
                   </td>
                 </tr>
               </tbody>
@@ -705,7 +725,7 @@ const LandingView = {
                   <span>Export Laporan Penjualan ke Excel</span>
                 </li>
               </ul>
-              <button type="button" class="btn-tier" onclick="navigate('/register?plan=starter')">
+              <button type="button" class="btn-tier" onclick="LandingView.openCheckoutModal('STARTER', 'Starter', 149000)">
                 <span>Pilih Paket Starter</span>
               </button>
             </div>
@@ -753,8 +773,8 @@ const LandingView = {
                   <span>Subdomain Resmi <code>[toko].${baseDomain}</code> + SSL</span>
                 </li>
               </ul>
-              <button type="button" class="btn-tier btn-featured" onclick="navigate('/register?plan=pro')">
-                <span>Mulai Uji Coba Grosir Pro</span>
+              <button type="button" class="btn-tier btn-featured" onclick="LandingView.openCheckoutModal('PRO', 'Grosir Pro', 399000)">
+                <span>Pilih Paket Grosir Pro</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
               </button>
             </div>
@@ -796,6 +816,34 @@ const LandingView = {
               <button type="button" class="btn-tier" onclick="navigate('/contact')">
                 <span>Hubungi Tim Enterprise</span>
               </button>
+            </div>
+          </div>
+
+          <!-- OFFICIAL PAYMENT GATEWAY PARTNER TRUST BANNER -->
+          <div style="max-width:1120px; margin:32px auto 0 auto; background:var(--bg-card, #ffffff); border:1px solid var(--border-color, #e2e8f0); border-radius:14px; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="width:44px; height:44px; border-radius:10px; background:rgba(2, 132, 199, 0.1); display:flex; align-items:center; justify-content:center; font-size:22px;">
+                🛡️
+              </div>
+              <div>
+                <div style="font-size:13.5px; font-weight:800; color:var(--text-primary); letter-spacing:-0.2px;">
+                  Sistem Pembayaran Resmi Berlisensi Bank Indonesia
+                </div>
+                <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                  Seluruh transaksi langganan & operasional toko diproses langsung melalui Payment Gateway resmi terverifikasi:
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <div style="background:rgba(2, 132, 199, 0.08); border:1.5px solid #0284c7; color:#0284c7; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+                <span>🔷</span> Mitra Resmi: <strong>iPaymu Gateway</strong>
+              </div>
+              <div style="background:rgba(16, 183, 127, 0.08); border:1.5px solid #10b981; color:#059669; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+                <span>⚡</span> Mitra Resmi: <strong>Xendit Invoice</strong>
+              </div>
+              <div style="background:var(--bg-hover, #f1f5f9); color:var(--text-secondary); padding:7px 12px; border-radius:8px; font-size:11.5px; font-weight:600;">
+                QRIS Dinamis · VA BCA / Mandiri / BRI / BNI · Alfamart · Indomaret
+              </div>
             </div>
           </div>
         </section>
@@ -965,4 +1013,270 @@ const LandingView = {
       </div>
     `;
   },
+
+  /**
+   * Updates UI when user toggles payment gateway in checkout modal
+   * @param {'IPAYMU'|'XENDIT'} gw
+   * @param {string} formattedPrice
+   */
+  updateSelectedGateway(gw, formattedPrice) {
+    const cardIpaymu = document.getElementById('card-gw-ipaymu');
+    const cardXendit = document.getElementById('card-gw-xendit');
+    const descEl = document.getElementById('checkout-gateway-desc');
+    const submitBtn = document.getElementById('btn-submit-sub-checkout');
+
+    if (gw === 'IPAYMU') {
+      if (cardIpaymu) {
+        cardIpaymu.style.borderColor = '#0284c7';
+        cardIpaymu.style.background = 'rgba(2, 132, 199, 0.08)';
+      }
+      if (cardXendit) {
+        cardXendit.style.borderColor = 'var(--border-color, #e2e8f0)';
+        cardXendit.style.background = 'var(--card-bg, #fff)';
+      }
+      if (descEl) {
+        descEl.innerHTML = `
+          🛡️ <strong>Metode Pembayaran Resmi via iPaymu:</strong><br/>
+          Mendukung QRIS Dinamis (Semua Bank & E-Wallet), Virtual Account Multi-Bank (BCA, Mandiri, BRI, BNI, Permata, BSI), Direct Debit, & Gerai Retail (Indomaret, Alfamart).
+        `;
+      }
+      if (submitBtn) {
+        submitBtn.style.background = 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)';
+        submitBtn.innerHTML = `<span>🔷</span> Bayar via iPaymu (${formattedPrice})`;
+      }
+    } else {
+      if (cardXendit) {
+        cardXendit.style.borderColor = '#10b981';
+        cardXendit.style.background = 'rgba(16, 183, 127, 0.08)';
+      }
+      if (cardIpaymu) {
+        cardIpaymu.style.borderColor = 'var(--border-color, #e2e8f0)';
+        cardIpaymu.style.background = 'var(--card-bg, #fff)';
+      }
+      if (descEl) {
+        descEl.innerHTML = `
+          🛡️ <strong>Metode Pembayaran Resmi via Xendit:</strong><br/>
+          Mendukung QRIS Dinamis, Virtual Account Bank (BCA, Mandiri, BRI, BNI, Permata), Kartu Kredit/Debit Visa/Mastercard, & E-Wallet.
+        `;
+      }
+      if (submitBtn) {
+        submitBtn.style.background = 'linear-gradient(135deg, #10B77F 0%, #059669 100%)';
+        submitBtn.innerHTML = `<span>⚡</span> Bayar via Xendit (${formattedPrice})`;
+      }
+    }
+  },
+
+  /**
+   * Opens live subscription checkout modal with iPaymu & Xendit gateway choices
+   * @param {'STARTER'|'PRO'|'ENTERPRISE'} tier
+   * @param {string} planName
+   * @param {number} price
+   */
+  openCheckoutModal(tier, planName, price) {
+    const modalRoot = document.getElementById('modal-root') || document.body;
+    const formattedPrice = (typeof formatRupiah === 'function') 
+      ? formatRupiah(price) 
+      : 'Rp ' + Number(price).toLocaleString('id-ID');
+
+    // Remove existing if any
+    const existing = document.getElementById('modal-landing-checkout');
+    if (existing) existing.remove();
+
+    const wrapper = document.createElement('div');
+    wrapper.id = 'modal-landing-checkout';
+    wrapper.className = 'modal-overlay';
+    wrapper.style.zIndex = '99999';
+
+    wrapper.innerHTML = `
+      <div class="modal-card" style="max-width:540px;">
+        <button type="button" class="modal-close-btn" onclick="LandingView.closeCheckoutModal()">✕</button>
+        
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+          <div style="width:44px; height:44px; border-radius:12px; background:rgba(2, 132, 199, 0.12); display:flex; align-items:center; justify-content:center; font-size:22px;">
+            💳
+          </div>
+          <div>
+            <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary); margin:0;">
+              Langganan SiDaya — Paket ${planName}
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin:2px 0 0 0;">
+              Integrasi Resmi Payment Gateway Bank Indonesia via iPaymu & Xendit
+            </p>
+          </div>
+        </div>
+
+        <div style="background:var(--bg-hover, #f8fafc); border:1px solid var(--border-color, #e2e8f0); border-radius:8px; padding:12px 14px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:0.85rem; color:var(--text-secondary);">Paket Software SaaS:</span>
+            <strong style="font-size:0.9rem; color:var(--text-primary);">SiDaya ${planName}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:0.85rem; color:var(--text-secondary);">Siklus Pembayaran:</span>
+            <span style="font-size:0.85rem; font-weight:600; color:var(--primary);">Bulanan (Cancel Kapan Saja)</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px dashed var(--border-color, #cbd5e1);">
+            <span style="font-size:0.95rem; font-weight:700; color:var(--text-primary);">Total Tagihan:</span>
+            <span style="font-size:1.15rem; font-weight:800; color:var(--brand-warm-blue, #5048e5);">${formattedPrice} <span style="font-size:0.75rem; font-weight:500; color:var(--text-muted);">/ bulan</span></span>
+          </div>
+        </div>
+
+        <form id="landing-checkout-form" onsubmit="event.preventDefault(); LandingView.executeSubscriptionCheckout('${tier}', '${planName}', ${price});">
+          <!-- PAYMENT GATEWAY SELECTOR -->
+          <div style="margin-bottom:14px;">
+            <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">
+              Pilih Saluran Pembayaran Resmi:
+            </label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <label id="card-gw-ipaymu" style="border:2px solid #0284c7; background:rgba(2, 132, 199, 0.08); border-radius:8px; padding:10px 12px; cursor:pointer; display:flex; flex-direction:column; gap:4px; transition:all 0.2s ease;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:12.5px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+                    <input type="radio" name="selected_gateway" value="IPAYMU" checked onchange="LandingView.updateSelectedGateway('IPAYMU', '${formattedPrice}')" style="accent-color:#0284c7;">
+                    iPaymu
+                  </span>
+                  <span style="font-size:10px; background:#0284c7; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700;">Rekomendasi</span>
+                </div>
+                <span style="font-size:10.5px; color:var(--text-muted); margin-left:18px;">
+                  QRIS Dinamis, VA Bank, & Alfamart/Indomaret
+                </span>
+              </label>
+
+              <label id="card-gw-xendit" style="border:1px solid var(--border-color, #cbd5e1); background:var(--card-bg, #fff); border-radius:8px; padding:10px 12px; cursor:pointer; display:flex; flex-direction:column; gap:4px; transition:all 0.2s ease;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:12.5px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+                    <input type="radio" name="selected_gateway" value="XENDIT" onchange="LandingView.updateSelectedGateway('XENDIT', '${formattedPrice}')" style="accent-color:#10b981;">
+                    Xendit
+                  </span>
+                  <span style="font-size:10px; background:var(--badge-bg, #e2e8f0); color:var(--text-secondary); padding:2px 6px; border-radius:4px; font-weight:700;">Alternatif</span>
+                </div>
+                <span style="font-size:10.5px; color:var(--text-muted); margin-left:18px;">
+                  Invoice, Kartu Kredit/Debit & E-Wallet
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div>
+              <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Nama Usaha / Toko *</label>
+              <input id="sub-business-name" type="text" class="form-input" required value="Toko Grosir Beras Jaya" style="width:100%; font-size:12px; padding:8px 10px;">
+            </div>
+            <div>
+              <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Subdomain Workspace *</label>
+              <input id="sub-domain" type="text" class="form-input" required value="berasjaya" style="width:100%; font-size:12px; padding:8px 10px;">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+            <div>
+              <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Email Penanggung Jawab *</label>
+              <input id="sub-email" type="email" class="form-input" required value="ashvin.labs@gmail.com" style="width:100%; font-size:12px; padding:8px 10px;">
+            </div>
+            <div>
+              <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">No. WhatsApp / HP *</label>
+              <input id="sub-phone" type="tel" class="form-input" required value="08139506092" style="width:100%; font-size:12px; padding:8px 10px;">
+            </div>
+          </div>
+
+          <div id="checkout-gateway-desc" style="background:rgba(2, 132, 199, 0.06); border:1px solid rgba(2, 132, 199, 0.2); border-radius:6px; padding:10px; margin-bottom:14px; font-size:11.5px; color:var(--text-secondary); line-height:1.4;">
+            🛡️ <strong>Metode Pembayaran Resmi via iPaymu:</strong><br/>
+            Mendukung QRIS Dinamis (Semua Bank & E-Wallet), Virtual Account Multi-Bank (BCA, Mandiri, BRI, BNI, Permata, BSI), Direct Debit, & Gerai Retail (Indomaret, Alfamart).
+          </div>
+
+          <div id="checkout-action-status" style="margin-bottom:12px; font-size:12px; display:none;"></div>
+
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="btn btn-outline" style="flex:1; padding:10px;" onclick="LandingView.closeCheckoutModal()">
+              Batal
+            </button>
+            <button id="btn-submit-sub-checkout" type="submit" class="btn btn-primary" style="flex:2; padding:10px; font-weight:800; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+              <span>🔷</span> Bayar via iPaymu (${formattedPrice})
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    modalRoot.appendChild(wrapper);
+  },
+
+  closeCheckoutModal() {
+    const modal = document.getElementById('modal-landing-checkout');
+    if (modal) modal.remove();
+  },
+
+  async executeSubscriptionCheckout(tier, planName, price) {
+    const statusEl = document.getElementById('checkout-action-status');
+    const submitBtn = document.getElementById('btn-submit-sub-checkout');
+    const businessName = document.getElementById('sub-business-name')?.value || 'Toko Grosir Beras Jaya';
+    const tenantSubdomain = document.getElementById('sub-domain')?.value || 'berasjaya';
+    const ownerEmail = document.getElementById('sub-email')?.value || 'ashvin.labs@gmail.com';
+    const ownerPhone = document.getElementById('sub-phone')?.value || '08139506092';
+    const selectedGateway = document.querySelector('input[name="selected_gateway"]:checked')?.value || 'IPAYMU';
+    const isIpaymu = selectedGateway === 'IPAYMU';
+
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.innerHTML = isIpaymu
+        ? '<span style="color:#0284c7; font-weight:600;">⏳ Menghubungi API iPaymu untuk membuat sesi pembayaran resmi...</span>'
+        : '<span style="color:#10b981; font-weight:600;">⏳ Menghubungi API Xendit untuk membuat sesi invoice resmi...</span>';
+    }
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = isIpaymu
+        ? '<span>⏳</span> Memproses iPaymu...'
+        : '<span>⏳</span> Memproses Xendit...';
+    }
+
+    try {
+      const res = await fetch(`/api/v1/billing/subscription/checkout?gateway=${selectedGateway.toLowerCase()}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gateway: selectedGateway,
+          tier,
+          billingPeriod: 'MONTHLY',
+          businessName,
+          tenantSubdomain,
+          ownerEmail,
+          ownerPhone,
+          ownerName: 'Gabriel Fermy (Merchant SiDaya)'
+        })
+      });
+
+      const json = await res.json();
+      if (json && json.success && json.data?.checkoutUrl) {
+        const url = json.data.checkoutUrl;
+        const invNum = json.data.invoiceNumber || 'INV-001';
+        const gatewayTitle = isIpaymu ? 'iPaymu' : 'Xendit';
+        const btnBg = isIpaymu ? '#0284c7' : '#10B77F';
+
+        if (statusEl) {
+          statusEl.innerHTML = `
+            <div style="background:${isIpaymu ? 'rgba(2,132,199,0.12)' : 'rgba(16,183,127,0.12)'}; border:1px solid ${isIpaymu ? '#0284c7' : '#10b981'}; border-radius:6px; padding:12px; color:${isIpaymu ? '#0369a1' : '#065f46'}; font-size:12px; margin-bottom:10px;">
+              ✅ <strong>Sesi Pembayaran ${gatewayTitle} Terbit (${invNum})!</strong><br/>
+              Mengalihkan Anda ke portal pembayaran resmi ${gatewayTitle}...
+              <div style="margin-top:8px;">
+                <a href="${url}" target="_blank" class="btn btn-primary btn-sm" style="display:inline-block; font-weight:700; text-decoration:none; padding:8px 14px; background:${btnBg}; color:#fff; border-radius:6px;">
+                  🔗 Buka Portal Pembayaran ${gatewayTitle} (${invNum}) →
+                </a>
+              </div>
+            </div>
+          `;
+        }
+        setTimeout(() => {
+          window.open(url, '_blank');
+        }, 600);
+      } else {
+        throw new Error(json?.error?.message || 'Gagal membuat sesi pembayaran');
+      }
+    } catch (err) {
+      if (statusEl) {
+        statusEl.innerHTML = `<span style="color:#ef4444; font-weight:600;">✕ Gagal: ${err.message}. Silakan coba lagi.</span>`;
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>🚀</span> Coba Bayar Lagi (${isIpaymu ? 'iPaymu' : 'Xendit'})`;
+      }
+    }
+  }
 };

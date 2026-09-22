@@ -23,12 +23,17 @@
     "audit:security": "pnpm run test:security",
     "sync:assets": "node scripts/sync-assets.js"
   },
-
   "devDependencies": {
+    "@types/node": "^20.19.43",
+    "esbuild": "^0.28.2",
     "typescript": "^5.5.4"
   },
-  "packageManager": "pnpm@11.4.0",
   "dependencies": {
+    "@sidaya/api-core": "workspace:*",
+    "@sidaya/database": "workspace:*",
+    "@sidaya/hardware-core": "workspace:*",
+    "@sidaya/payment-core": "workspace:*",
+    "@sidaya/shared-types": "workspace:*",
     "zustand": "^5.0.15"
   }
 }

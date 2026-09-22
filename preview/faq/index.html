@@ -58,8 +58,9 @@
   <script src="/js/utils/formatters.js"></script>
   <script src="/js/utils/audit.helper.js"></script>
 
-  <!-- 3. Views Layer -->
+  <!-- 3. Views Layer (Declarative MVC Renderers) -->
   <script src="/js/views/layout.view.js"></script>
+  <script src="/js/views/landing.view.js"></script>
   <script src="/js/views/auth.view.js"></script>
   <script src="/js/views/modals.view.js"></script>
   <script src="/js/views/dashboard.view.js"></script>
@@ -84,7 +85,21 @@
   <script src="/js/components/toast.js"></script>
   <script src="/js/components/modals.js"></script>
 
-  <!-- 5. Controllers Layer -->
+  <!-- 4.1. Modular Interactive Onboarding Tour Subsystem -->
+  <script src="/js/onboarding/onboarding.registry.js"></script>
+  <script src="/js/onboarding/modules/dashboard.tour.js"></script>
+  <script src="/js/onboarding/modules/katalog.tour.js"></script>
+  <script src="/js/onboarding/modules/fifo.tour.js"></script>
+  <script src="/js/onboarding/modules/pos.tour.js"></script>
+  <script src="/js/onboarding/modules/customers.tour.js"></script>
+  <script src="/js/onboarding/modules/sj.tour.js"></script>
+  <script src="/js/onboarding/modules/piutang.tour.js"></script>
+  <script src="/js/onboarding/modules/users.tour.js"></script>
+  <script src="/js/onboarding/modules/settings.tour.js"></script>
+  <script src="/js/onboarding/onboarding.view.js"></script>
+  <script src="/js/onboarding/onboarding.service.js"></script>
+
+  <!-- 5. Controllers Layer (Event Handlers & Action Dispatchers) -->
   <script src="/js/controllers/auth.controller.js"></script>
   <script src="/js/controllers/katalog.controller.js"></script>
   <script src="/js/controllers/pos.controller.js"></script>
@@ -97,7 +112,8 @@
   <script src="/js/controllers/daya.controller.js"></script>
   <script src="/js/controllers/legal.controller.js"></script>
 
-  <!-- 6. SPA Router & App Bootstrapper -->
+  <!-- 6. SPA Router, HMR Engine & App Bootstrapper -->
+  <script src="/js/core/hmr-client.js"></script>
   <script src="/js/router.js"></script>
   <script src="/js/app.js"></script>
 </body>
