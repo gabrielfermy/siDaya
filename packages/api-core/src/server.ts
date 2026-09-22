@@ -46,7 +46,10 @@ const midtransProvider = new MidtransPaymentProvider({
 });
 const xenditProvider = new XenditPaymentProvider({
   secretApiKey: process.env['XENDIT_SECRET_KEY'] || 'xnd_development_TEST',
-  webhookVerificationToken: process.env['XENDIT_WEBHOOK_TOKEN'] || 'wh_token_dev_test',
+  webhookVerificationToken:
+    process.env['XENDIT_WEBHOOK_VERIFICATION_TOKEN'] ||
+    process.env['XENDIT_WEBHOOK_TOKEN'] ||
+    'wh_token_dev_test',
 });
 const duitkuProvider = new DuitkuPaymentProvider({
   merchantCode: process.env['DUITKU_MERCHANT_CODE'] || 'D1000',
