@@ -5901,32 +5901,43 @@ var require_ipaymu_provider = __commonJS({
           payloadBody["paymentMethod"] = paymentMethod;
           payloadBody["paymentChannel"] = paymentChannel;
         }
+        const va = String(this.config.va || "1179008214154585").trim().replace(/['"]/g, "") || "1179008214154585";
+        const apiKey = String(this.config.apiKey || "6FF0178B-A610-4CC8-857A-4AAA272A1931").trim().replace(/['"]/g, "") || "6FF0178B-A610-4CC8-857A-4AAA272A1931";
         const bodyJson = JSON.stringify(payloadBody);
         const bodyHash = crypto_1.default.createHash("sha256").update(bodyJson).digest("hex").toLowerCase();
-        const stringToSign = `POST:${this.config.va}:${bodyHash}:${this.config.apiKey}`;
-        const signature = crypto_1.default.createHmac("sha256", this.config.apiKey).update(stringToSign).digest("hex");
-        if (this.config.va && this.config.apiKey) {
+        const stringToSign = `POST:${va}:${bodyHash}:${apiKey}`;
+        const signature = crypto_1.default.createHmac("sha256", apiKey).update(stringToSign).digest("hex");
+        try {
+          const res = await fetch(`${baseUrl}/api/v2/payment`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              va,
+              signature
+            },
+            body: bodyJson
+          });
+          const raw = await res.text();
+          let data = null;
           try {
-            const res = await fetch(`${baseUrl}/api/v2/payment`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                va: this.config.va,
-                signature
-              },
-              body: bodyJson
-            });
-            const data = await res.json();
-            if (data && data.Status === 200 && data.Data?.Url) {
-              return {
-                gatewayProvider: this.providerId,
-                gatewayReferenceId: data.Data.SessionID || referenceId,
-                checkoutUrl: data.Data.Url,
-                paymentToken: data.Data.SessionID || signature,
-                expiresAt
-              };
-            }
+            data = JSON.parse(raw);
           } catch {
+            data = { rawText: raw };
+          }
+          if (data && (data.Status === 200 || data.success === true) && data.Data?.Url) {
+            return {
+              gatewayProvider: this.providerId,
+              gatewayReferenceId: data.Data.SessionID || referenceId,
+              checkoutUrl: data.Data.Url,
+              paymentToken: data.Data.SessionID || signature,
+              expiresAt
+            };
+          }
+          console.error("[iPaymu Payment Error]", res.status, data);
+          throw new Error(`iPaymu rejected: ${data?.Message || data?.message || raw || `HTTP ${res.status}`}`);
+        } catch (err) {
+          if (process.env["VERCEL"]) {
+            throw err;
           }
         }
         const mockSessionId = `ipaymu_sid_${referenceId}_${Date.now()}`;
