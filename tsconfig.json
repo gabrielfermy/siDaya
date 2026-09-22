@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@sidaya/shared-types": ["packages/shared-types/src/index.ts"],
+      "@sidaya/database": ["packages/database/src/index.ts"],
+      "@sidaya/payment-core": ["packages/payment-core/src/index.ts"],
+      "@sidaya/hardware-core": ["packages/hardware-core/src/index.ts"],
+      "@sidaya/api-core": ["packages/api-core/src/index.ts"]
+    }
+  },
+  "include": ["api/**/*", "packages/*/src/**/*"]
+}
