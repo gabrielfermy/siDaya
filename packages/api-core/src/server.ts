@@ -66,11 +66,19 @@ gatewayRegistry.register(duitkuProvider);
 gatewayRegistry.register(ipaymuProvider);
 
 // Setup Dual-Path Payment Services
-const platformBillingService = new PlatformBillingService(midtransProvider);
-const merchantPaymentRouter = new MerchantPaymentRouterService(midtransProvider);
+const defaultDriver = (process.env['PAYMENT_DEFAULT_DRIVER'] || 'XENDIT').toUpperCase();
+const defaultPlatformProvider =
+  defaultDriver === 'XENDIT'
+    ? xenditProvider
+    : defaultDriver === 'DUITKU'
+    ? duitkuProvider
+    : midtransProvider;
+
+const platformBillingService = new PlatformBillingService(defaultPlatformProvider);
+const merchantPaymentRouter = new MerchantPaymentRouterService(defaultPlatformProvider);
 
 // Setup Domain Services
-const orderDomainService = new OrderDomainService(gatewayRegistry.get('MIDTRANS'));
+const orderDomainService = new OrderDomainService(defaultPlatformProvider);
 const shiftDomainService = new ShiftDomainService();
 const deliveryOrderDomainService = new DeliveryOrderDomainService();
 const authTenantDomainService = new AuthTenantDomainService();
@@ -82,7 +90,6 @@ const webhookController = new PaymentWebhookController(
   platformBillingService,
   merchantPaymentRouter,
 );
-
 
 // Setup Controllers
 const authController = new AuthController(authTenantDomainService, platformAdminDomainService);
@@ -104,6 +111,7 @@ router.get('/health', (_req, res) => {
     service: 'SiDaya Core API & Payment Engine',
     environment: env,
     baseDomain,
+    defaultPaymentDriver: defaultDriver,
     merchantPlaneUrl: `https://${baseDomain}`,
     operatorPlaneUrl: `https://ops.${baseDomain}`,
     paylinkPlaneUrl: `https://pay.${baseDomain}`,
@@ -125,11 +133,12 @@ registerOpenApiRoutes(router);
 
 const server = http.createServer((req, res) => router.handleRequest(req, res));
 
-if (process.env['NODE_ENV'] !== 'test') {
+if (process.env['NODE_ENV'] !== 'test' && !process.env['VERCEL']) {
   server.listen(PORT, () => {
     const env = process.env['NODE_ENV'] || 'development';
-    console.log(`[SiDaya Core API] Running on port ${PORT} [Env: ${env}]`);
+    console.log(`[SiDaya Core API] Running on port ${PORT} [Env: ${env}, Default Driver: ${defaultDriver}]`);
   });
 }
 
+export { router };
 export default server;

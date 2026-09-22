@@ -23,8 +23,8 @@
     "audit:security": "pnpm run test:security",
     "sync:assets": "node scripts/sync-assets.js"
   },
-
   "devDependencies": {
+    "@types/node": "^20.19.43",
     "typescript": "^5.5.4"
   },
   "packageManager": "pnpm@11.4.0",

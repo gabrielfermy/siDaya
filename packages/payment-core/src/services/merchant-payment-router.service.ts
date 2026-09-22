@@ -23,18 +23,40 @@ export interface TenantPaymentConfig {
   enabledChannels?: string[];
 }
 
+export interface PaymentRoutingRule {
+  id: string;
+  name: string;
+  priority: number; // Higher number = higher precedence
+  evaluate: (dto: CreatePaymentSessionDTO, tenantConfig?: TenantPaymentConfig) => boolean;
+  targetProviderId: 'XENDIT' | 'DUITKU' | 'MIDTRANS' | 'CUSTOM_GATEWAY';
+}
+
 /**
  * Path 2: Pluggable Merchant Payment Router Service
- * Dynamically instantiates and routes payments through the tenant's chosen payment rail.
+ * Dynamically instantiates and routes payments through the tenant's chosen payment rail
+ * or platform-managed smart routing rules (by channel, ticket size, or fee policy).
  */
 export class MerchantPaymentRouterService {
   private tenantConfigs = new Map<string, TenantPaymentConfig>();
+  private routingRules: PaymentRoutingRule[] = [];
+  private providerPool = new Map<string, IPaymentGatewayProvider>();
   private defaultPlatformProvider?: IPaymentGatewayProvider | undefined;
 
   constructor(defaultPlatformProvider?: IPaymentGatewayProvider | undefined) {
     this.defaultPlatformProvider = defaultPlatformProvider;
+    if (defaultPlatformProvider) {
+      this.providerPool.set(defaultPlatformProvider.providerId.toUpperCase(), defaultPlatformProvider);
+    }
   }
 
+  public registerProvider(provider: IPaymentGatewayProvider): void {
+    this.providerPool.set(provider.providerId.toUpperCase(), provider);
+  }
+
+  public registerRoutingRule(rule: PaymentRoutingRule): void {
+    this.routingRules.push(rule);
+    this.routingRules.sort((a, b) => b.priority - a.priority);
+  }
 
   public registerTenantPaymentConfig(config: TenantPaymentConfig): void {
     this.tenantConfigs.set(config.tenantId, config);
@@ -45,28 +67,13 @@ export class MerchantPaymentRouterService {
   }
 
   /**
-   * Resolves the active IPaymentGatewayProvider instance for a specific tenant.
+   * Resolves the active IPaymentGatewayProvider instance for a specific tenant and transaction context.
    */
-  public resolveProviderForTenant(tenantId: string): IPaymentGatewayProvider {
+  public resolveProviderForSession(tenantId: string, dto?: CreatePaymentSessionDTO): IPaymentGatewayProvider {
     const config = this.tenantConfigs.get(tenantId);
 
-    // If no custom config or Tier is PLATFORM_MANAGED, fallback to platform gateway
-    if (!config || config.tier === 'PLATFORM_MANAGED') {
-      if (!this.defaultPlatformProvider) {
-        throw new Error(`No payment provider configured for tenant '${tenantId}' and no platform default available.`);
-      }
-      return this.defaultPlatformProvider;
-    }
-
-    if (config.tier === 'MANUAL') {
-      throw new Error(`Tenant '${tenantId}' operates in MANUAL payment mode (Cash/Direct Transfer). Online gateway session is disabled.`);
-    }
-
-    if (config.tier === 'CUSTOM_OPAP' && config.customOpap) {
-      return new CustomWebhookPaymentProvider(config.customOpap);
-    }
-
-    if (config.tier === 'BYOK') {
+    // 1. If Tenant has BYOK, their direct merchant configuration takes top priority
+    if (config?.tier === 'BYOK') {
       switch (config.activeProviderId.toUpperCase()) {
         case 'MIDTRANS':
           if (!config.midtrans) throw new Error(`Missing Midtrans configuration for tenant '${tenantId}'.`);
@@ -82,17 +89,49 @@ export class MerchantPaymentRouterService {
       }
     }
 
-    throw new Error(`Invalid payment configuration for tenant '${tenantId}'.`);
+    if (config?.tier === 'CUSTOM_OPAP' && config.customOpap) {
+      return new CustomWebhookPaymentProvider(config.customOpap);
+    }
+
+    if (config?.tier === 'MANUAL') {
+      throw new Error(`Tenant '${tenantId}' operates in MANUAL payment mode (Cash/Direct Transfer). Online gateway session is disabled.`);
+    }
+
+    // 2. Granular Smart Routing Evaluation (Channel, Amount, Fee optimization)
+    if (dto && this.routingRules.length > 0) {
+      for (const rule of this.routingRules) {
+        if (rule.evaluate(dto, config)) {
+          const matchedProvider = this.providerPool.get(rule.targetProviderId.toUpperCase());
+          if (matchedProvider) {
+            return matchedProvider;
+          }
+        }
+      }
+    }
+
+    // 3. Fallback to Platform Default Provider
+    if (this.defaultPlatformProvider) {
+      return this.defaultPlatformProvider;
+    }
+
+    throw new Error(`No payment provider configured for tenant '${tenantId}' and no platform default available.`);
   }
 
   /**
-   * Creates a commercial payment session for a customer order
+   * Resolves the active IPaymentGatewayProvider instance for a specific tenant.
+   */
+  public resolveProviderForTenant(tenantId: string): IPaymentGatewayProvider {
+    return this.resolveProviderForSession(tenantId);
+  }
+
+  /**
+   * Creates a commercial payment session for a customer order with granular smart routing
    */
   public async createCommercialPaymentSession(
     tenantId: string,
     dto: CreatePaymentSessionDTO,
   ): Promise<PaymentSessionResult> {
-    const provider = this.resolveProviderForTenant(tenantId);
+    const provider = this.resolveProviderForSession(tenantId, dto);
     return provider.createPaymentSession(dto);
   }
 
