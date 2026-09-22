@@ -1,11 +1,14 @@
 import http from 'http';
-import { PlatformBillingService, PLATFORM_PLANS } from '@sidaya/payment-core';
+import { PlatformBillingService, PLATFORM_PLANS, PaymentGatewayRegistry, IPaymentGatewayProvider } from '@sidaya/payment-core';
 import { SubscriptionTier } from '@sidaya/shared-types';
 import { sendJson } from '../middleware/cors.middleware';
 import { parseRequestBody } from '../middleware/body-parser.middleware';
 
 export class BillingController {
-  constructor(private readonly platformBillingService: PlatformBillingService) {}
+  constructor(
+    private readonly platformBillingService: PlatformBillingService,
+    private readonly gatewayRegistry?: PaymentGatewayRegistry,
+  ) {}
 
   /**
    * Returns list of available subscription plans and pricing
@@ -16,16 +19,15 @@ export class BillingController {
       currency: 'IDR',
       data: Object.values(PLATFORM_PLANS),
       supportedPaymentMethods: [
-        'QRIS (All Bank & E-Wallet)',
-        'Virtual Account (BCA, Mandiri, BRI, BNI, Permata, BSI)',
-        'Credit / Debit Card (Visa, Mastercard, JCB)',
-        'Retail Outlets (Indomaret, Alfamart)',
+        'iPaymu (QRIS, VA Mandiri/BCA/BRI/BNI, Alfamart, Indomaret)',
+        'Xendit (QRIS, Virtual Account, Credit/Debit Card)',
       ],
+      registeredGateways: this.gatewayRegistry ? this.gatewayRegistry.listRegistered() : ['XENDIT', 'IPAYMU'],
     });
   }
 
   /**
-   * Creates a live platform subscription invoice checkout session (via Xendit)
+   * Creates a live platform subscription invoice checkout session (supports iPaymu & Xendit)
    */
   public async checkoutSubscription(req: http.IncomingMessage, res: http.ServerResponse): Promise<void> {
     let body: any = {};
@@ -33,6 +35,21 @@ export class BillingController {
       body = await parseRequestBody(req);
     } catch {
       body = {};
+    }
+
+    // Determine target gateway (default to IPAYMU for sidaya.biz.id verification, or XENDIT if specified)
+    const reqUrl = (req.url || '').toLowerCase();
+    const explicitGateway = String(body.gateway || body.provider || '').toLowerCase();
+    const isXendit = reqUrl.includes('gateway=xendit') || explicitGateway === 'xendit';
+    const isIpaymu = reqUrl.includes('gateway=ipaymu') || explicitGateway === 'ipaymu' || !isXendit;
+
+    let providerOverride: IPaymentGatewayProvider | undefined = undefined;
+    if (this.gatewayRegistry) {
+      if (isIpaymu && this.gatewayRegistry.has('IPAYMU')) {
+        providerOverride = this.gatewayRegistry.get('IPAYMU');
+      } else if (isXendit && this.gatewayRegistry.has('XENDIT')) {
+        providerOverride = this.gatewayRegistry.get('XENDIT');
+      }
     }
 
     // Normalize plan tier
@@ -58,15 +75,18 @@ export class BillingController {
       .replace(/[^a-z0-9-]/g, '');
 
     try {
-      const session = await this.platformBillingService.createSubscriptionSession({
-        tenantId: `tenant_${tenantSubdomain || 'demo'}`,
-        tenantSubdomain: tenantSubdomain || 'demo',
-        ownerEmail,
-        ownerName: `${ownerName} - ${businessName}`,
-        ownerPhone,
-        tier,
-        billingPeriod,
-      });
+      const session = await this.platformBillingService.createSubscriptionSession(
+        {
+          tenantId: `tenant_${tenantSubdomain || 'demo'}`,
+          tenantSubdomain: tenantSubdomain || 'demo',
+          ownerEmail,
+          ownerName: `${ownerName} - ${businessName}`,
+          ownerPhone,
+          tier,
+          billingPeriod,
+        },
+        providerOverride,
+      );
 
       sendJson(res, 200, {
         success: true,
@@ -75,12 +95,13 @@ export class BillingController {
           tier: session.tier,
           amount: session.amount,
           billingPeriod: session.billingPeriod,
+          gatewayProvider: session.gatewayProvider || (isIpaymu ? 'IPAYMU' : 'XENDIT'),
           checkoutUrl: session.checkoutUrl,
           paymentToken: session.paymentToken,
           qrString: session.qrString,
           vaNumber: session.vaNumber,
           expiresAt: session.expiresAt,
-          merchantName: 'Ashvin Labs (SiDaya)',
+          merchantName: isIpaymu ? 'siDaya (iPaymu)' : 'Ashvin Labs (Xendit)',
           currency: 'IDR',
         },
       });

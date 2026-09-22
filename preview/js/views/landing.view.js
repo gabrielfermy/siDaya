@@ -726,7 +726,7 @@ const LandingView = {
                 </li>
               </ul>
               <button type="button" class="btn-tier" onclick="LandingView.openCheckoutModal('STARTER', 'Starter', 149000)">
-                <span>Pilih Paket Starter (Xendit)</span>
+                <span>Pilih Paket Starter</span>
               </button>
             </div>
 
@@ -774,7 +774,7 @@ const LandingView = {
                 </li>
               </ul>
               <button type="button" class="btn-tier btn-featured" onclick="LandingView.openCheckoutModal('PRO', 'Grosir Pro', 399000)">
-                <span>Pilih Paket Grosir Pro (Xendit)</span>
+                <span>Pilih Paket Grosir Pro</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
               </button>
             </div>
@@ -816,6 +816,34 @@ const LandingView = {
               <button type="button" class="btn-tier" onclick="navigate('/contact')">
                 <span>Hubungi Tim Enterprise</span>
               </button>
+            </div>
+          </div>
+
+          <!-- OFFICIAL PAYMENT GATEWAY PARTNER TRUST BANNER -->
+          <div style="max-width:1120px; margin:32px auto 0 auto; background:var(--bg-card, #ffffff); border:1px solid var(--border-color, #e2e8f0); border-radius:14px; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <div style="width:44px; height:44px; border-radius:10px; background:rgba(2, 132, 199, 0.1); display:flex; align-items:center; justify-content:center; font-size:22px;">
+                🛡️
+              </div>
+              <div>
+                <div style="font-size:13.5px; font-weight:800; color:var(--text-primary); letter-spacing:-0.2px;">
+                  Sistem Pembayaran Resmi Berlisensi Bank Indonesia
+                </div>
+                <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+                  Seluruh transaksi langganan & operasional toko diproses langsung melalui Payment Gateway resmi terverifikasi:
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <div style="background:rgba(2, 132, 199, 0.08); border:1.5px solid #0284c7; color:#0284c7; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+                <span>🔷</span> Mitra Resmi: <strong>iPaymu Gateway</strong>
+              </div>
+              <div style="background:rgba(16, 183, 127, 0.08); border:1.5px solid #10b981; color:#059669; padding:7px 14px; border-radius:8px; font-size:12px; font-weight:800; display:inline-flex; align-items:center; gap:6px;">
+                <span>⚡</span> Mitra Resmi: <strong>Xendit Invoice</strong>
+              </div>
+              <div style="background:var(--bg-hover, #f1f5f9); color:var(--text-secondary); padding:7px 12px; border-radius:8px; font-size:11.5px; font-weight:600;">
+                QRIS Dinamis · VA BCA / Mandiri / BRI / BNI · Alfamart · Indomaret
+              </div>
             </div>
           </div>
         </section>
@@ -987,7 +1015,59 @@ const LandingView = {
   },
 
   /**
-   * Opens live Xendit subscription checkout modal
+   * Updates UI when user toggles payment gateway in checkout modal
+   * @param {'IPAYMU'|'XENDIT'} gw
+   * @param {string} formattedPrice
+   */
+  updateSelectedGateway(gw, formattedPrice) {
+    const cardIpaymu = document.getElementById('card-gw-ipaymu');
+    const cardXendit = document.getElementById('card-gw-xendit');
+    const descEl = document.getElementById('checkout-gateway-desc');
+    const submitBtn = document.getElementById('btn-submit-sub-checkout');
+
+    if (gw === 'IPAYMU') {
+      if (cardIpaymu) {
+        cardIpaymu.style.borderColor = '#0284c7';
+        cardIpaymu.style.background = 'rgba(2, 132, 199, 0.08)';
+      }
+      if (cardXendit) {
+        cardXendit.style.borderColor = 'var(--border-color, #e2e8f0)';
+        cardXendit.style.background = 'var(--card-bg, #fff)';
+      }
+      if (descEl) {
+        descEl.innerHTML = `
+          🛡️ <strong>Metode Pembayaran Resmi via iPaymu:</strong><br/>
+          Mendukung QRIS Dinamis (Semua Bank & E-Wallet), Virtual Account Multi-Bank (BCA, Mandiri, BRI, BNI, Permata, BSI), Direct Debit, & Gerai Retail (Indomaret, Alfamart).
+        `;
+      }
+      if (submitBtn) {
+        submitBtn.style.background = 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)';
+        submitBtn.innerHTML = `<span>🔷</span> Bayar via iPaymu (${formattedPrice})`;
+      }
+    } else {
+      if (cardXendit) {
+        cardXendit.style.borderColor = '#10b981';
+        cardXendit.style.background = 'rgba(16, 183, 127, 0.08)';
+      }
+      if (cardIpaymu) {
+        cardIpaymu.style.borderColor = 'var(--border-color, #e2e8f0)';
+        cardIpaymu.style.background = 'var(--card-bg, #fff)';
+      }
+      if (descEl) {
+        descEl.innerHTML = `
+          🛡️ <strong>Metode Pembayaran Resmi via Xendit:</strong><br/>
+          Mendukung QRIS Dinamis, Virtual Account Bank (BCA, Mandiri, BRI, BNI, Permata), Kartu Kredit/Debit Visa/Mastercard, & E-Wallet.
+        `;
+      }
+      if (submitBtn) {
+        submitBtn.style.background = 'linear-gradient(135deg, #10B77F 0%, #059669 100%)';
+        submitBtn.innerHTML = `<span>⚡</span> Bayar via Xendit (${formattedPrice})`;
+      }
+    }
+  },
+
+  /**
+   * Opens live subscription checkout modal with iPaymu & Xendit gateway choices
    * @param {'STARTER'|'PRO'|'ENTERPRISE'} tier
    * @param {string} planName
    * @param {number} price
@@ -1012,7 +1092,7 @@ const LandingView = {
         <button type="button" class="modal-close-btn" onclick="LandingView.closeCheckoutModal()">✕</button>
         
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
-          <div style="width:44px; height:44px; border-radius:12px; background:rgba(16, 183, 127, 0.12); display:flex; align-items:center; justify-content:center; font-size:22px;">
+          <div style="width:44px; height:44px; border-radius:12px; background:rgba(2, 132, 199, 0.12); display:flex; align-items:center; justify-content:center; font-size:22px;">
             💳
           </div>
           <div>
@@ -1020,7 +1100,7 @@ const LandingView = {
               Langganan SiDaya — Paket ${planName}
             </h3>
             <p style="font-size:0.75rem; color:var(--text-secondary); margin:2px 0 0 0;">
-              Integrasi Resmi Payment Gateway Bank Indonesia via Xendit
+              Integrasi Resmi Payment Gateway Bank Indonesia via iPaymu & Xendit
             </p>
           </div>
         </div>
@@ -1041,6 +1121,40 @@ const LandingView = {
         </div>
 
         <form id="landing-checkout-form" onsubmit="event.preventDefault(); LandingView.executeSubscriptionCheckout('${tier}', '${planName}', ${price});">
+          <!-- PAYMENT GATEWAY SELECTOR -->
+          <div style="margin-bottom:14px;">
+            <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">
+              Pilih Saluran Pembayaran Resmi:
+            </label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <label id="card-gw-ipaymu" style="border:2px solid #0284c7; background:rgba(2, 132, 199, 0.08); border-radius:8px; padding:10px 12px; cursor:pointer; display:flex; flex-direction:column; gap:4px; transition:all 0.2s ease;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:12.5px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+                    <input type="radio" name="selected_gateway" value="IPAYMU" checked onchange="LandingView.updateSelectedGateway('IPAYMU', '${formattedPrice}')" style="accent-color:#0284c7;">
+                    iPaymu
+                  </span>
+                  <span style="font-size:10px; background:#0284c7; color:#fff; padding:2px 6px; border-radius:4px; font-weight:700;">Rekomendasi</span>
+                </div>
+                <span style="font-size:10.5px; color:var(--text-muted); margin-left:18px;">
+                  QRIS Dinamis, VA Bank, & Alfamart/Indomaret
+                </span>
+              </label>
+
+              <label id="card-gw-xendit" style="border:1px solid var(--border-color, #cbd5e1); background:var(--card-bg, #fff); border-radius:8px; padding:10px 12px; cursor:pointer; display:flex; flex-direction:column; gap:4px; transition:all 0.2s ease;">
+                <div style="display:flex; align-items:center; justify-content:space-between;">
+                  <span style="font-size:12.5px; font-weight:800; color:var(--text-primary); display:flex; align-items:center; gap:6px;">
+                    <input type="radio" name="selected_gateway" value="XENDIT" onchange="LandingView.updateSelectedGateway('XENDIT', '${formattedPrice}')" style="accent-color:#10b981;">
+                    Xendit
+                  </span>
+                  <span style="font-size:10px; background:var(--badge-bg, #e2e8f0); color:var(--text-secondary); padding:2px 6px; border-radius:4px; font-weight:700;">Alternatif</span>
+                </div>
+                <span style="font-size:10.5px; color:var(--text-muted); margin-left:18px;">
+                  Invoice, Kartu Kredit/Debit & E-Wallet
+                </span>
+              </label>
+            </div>
+          </div>
+
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
             <div>
               <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Nama Usaha / Toko *</label>
@@ -1063,9 +1177,9 @@ const LandingView = {
             </div>
           </div>
 
-          <div style="background:rgba(80, 72, 229, 0.06); border:1px solid rgba(80, 72, 229, 0.2); border-radius:6px; padding:10px; margin-bottom:14px; font-size:11.5px; color:var(--text-secondary); line-height:1.4;">
-            🛡️ <strong>Metode Pembayaran Resmi via Xendit:</strong><br/>
-            Mendukung QRIS Dinamis (Semua Bank & E-Wallet), Virtual Account (BCA, Mandiri, BRI, BNI, Permata, BSI), Kartu Kredit/Debit, & Gerai Retail.
+          <div id="checkout-gateway-desc" style="background:rgba(2, 132, 199, 0.06); border:1px solid rgba(2, 132, 199, 0.2); border-radius:6px; padding:10px; margin-bottom:14px; font-size:11.5px; color:var(--text-secondary); line-height:1.4;">
+            🛡️ <strong>Metode Pembayaran Resmi via iPaymu:</strong><br/>
+            Mendukung QRIS Dinamis (Semua Bank & E-Wallet), Virtual Account Multi-Bank (BCA, Mandiri, BRI, BNI, Permata, BSI), Direct Debit, & Gerai Retail (Indomaret, Alfamart).
           </div>
 
           <div id="checkout-action-status" style="margin-bottom:12px; font-size:12px; display:none;"></div>
@@ -1074,8 +1188,8 @@ const LandingView = {
             <button type="button" class="btn btn-outline" style="flex:1; padding:10px;" onclick="LandingView.closeCheckoutModal()">
               Batal
             </button>
-            <button id="btn-submit-sub-checkout" type="submit" class="btn btn-primary" style="flex:2; padding:10px; font-weight:800; background:linear-gradient(135deg, #10B77F 0%, #059669 100%); border:none; display:flex; align-items:center; justify-content:center; gap:8px;">
-              <span>🚀</span> Bayar via Xendit (${formattedPrice})
+            <button id="btn-submit-sub-checkout" type="submit" class="btn btn-primary" style="flex:2; padding:10px; font-weight:800; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+              <span>🔷</span> Bayar via iPaymu (${formattedPrice})
             </button>
           </div>
         </form>
@@ -1097,28 +1211,35 @@ const LandingView = {
     const tenantSubdomain = document.getElementById('sub-domain')?.value || 'berasjaya';
     const ownerEmail = document.getElementById('sub-email')?.value || 'ashvin.labs@gmail.com';
     const ownerPhone = document.getElementById('sub-phone')?.value || '08139506092';
+    const selectedGateway = document.querySelector('input[name="selected_gateway"]:checked')?.value || 'IPAYMU';
+    const isIpaymu = selectedGateway === 'IPAYMU';
 
     if (statusEl) {
       statusEl.style.display = 'block';
-      statusEl.innerHTML = '<span style="color:var(--primary); font-weight:600;">⏳ Menghubungi API Xendit untuk membuat sesi invoice pembayaran resmi...</span>';
+      statusEl.innerHTML = isIpaymu
+        ? '<span style="color:#0284c7; font-weight:600;">⏳ Menghubungi API iPaymu untuk membuat sesi pembayaran resmi...</span>'
+        : '<span style="color:#10b981; font-weight:600;">⏳ Menghubungi API Xendit untuk membuat sesi invoice resmi...</span>';
     }
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span>⏳</span> Memproses Xendit...';
+      submitBtn.innerHTML = isIpaymu
+        ? '<span>⏳</span> Memproses iPaymu...'
+        : '<span>⏳</span> Memproses Xendit...';
     }
 
     try {
-      const res = await fetch('/api/v1/billing/subscription/checkout', {
+      const res = await fetch(`/api/v1/billing/subscription/checkout?gateway=${selectedGateway.toLowerCase()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          gateway: selectedGateway,
           tier,
           billingPeriod: 'MONTHLY',
           businessName,
           tenantSubdomain,
           ownerEmail,
           ownerPhone,
-          ownerName: 'Gabriel Fermy (Merchant)'
+          ownerName: 'Gabriel Fermy (Merchant SiDaya)'
         })
       });
 
@@ -1126,14 +1247,17 @@ const LandingView = {
       if (json && json.success && json.data?.checkoutUrl) {
         const url = json.data.checkoutUrl;
         const invNum = json.data.invoiceNumber || 'INV-001';
+        const gatewayTitle = isIpaymu ? 'iPaymu' : 'Xendit';
+        const btnBg = isIpaymu ? '#0284c7' : '#10B77F';
+
         if (statusEl) {
           statusEl.innerHTML = `
-            <div style="background:rgba(16,183,127,0.12); border:1px solid #10b981; border-radius:6px; padding:10px; color:#065f46; font-size:12px; margin-bottom:10px;">
-              ✅ <strong>Invoice Xendit Terbit (${invNum})!</strong><br/>
-              Mengalihkan Anda ke halaman pembayaran resmi Xendit...
+            <div style="background:${isIpaymu ? 'rgba(2,132,199,0.12)' : 'rgba(16,183,127,0.12)'}; border:1px solid ${isIpaymu ? '#0284c7' : '#10b981'}; border-radius:6px; padding:12px; color:${isIpaymu ? '#0369a1' : '#065f46'}; font-size:12px; margin-bottom:10px;">
+              ✅ <strong>Sesi Pembayaran ${gatewayTitle} Terbit (${invNum})!</strong><br/>
+              Mengalihkan Anda ke portal pembayaran resmi ${gatewayTitle}...
               <div style="margin-top:8px;">
-                <a href="${url}" target="_blank" class="btn btn-primary btn-sm" style="display:inline-block; font-weight:700; text-decoration:none; padding:8px 12px; background:#10B77F; color:#fff; border-radius:6px;">
-                  🔗 Buka Halaman Pembayaran Xendit (${invNum}) →
+                <a href="${url}" target="_blank" class="btn btn-primary btn-sm" style="display:inline-block; font-weight:700; text-decoration:none; padding:8px 14px; background:${btnBg}; color:#fff; border-radius:6px;">
+                  🔗 Buka Portal Pembayaran ${gatewayTitle} (${invNum}) →
                 </a>
               </div>
             </div>
@@ -1143,7 +1267,7 @@ const LandingView = {
           window.open(url, '_blank');
         }, 600);
       } else {
-        throw new Error(json?.error?.message || 'Gagal membuat invoice');
+        throw new Error(json?.error?.message || 'Gagal membuat sesi pembayaran');
       }
     } catch (err) {
       if (statusEl) {
@@ -1151,7 +1275,7 @@ const LandingView = {
       }
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<span>🚀</span> Coba Bayar Lagi';
+        submitBtn.innerHTML = `<span>🚀</span> Coba Bayar Lagi (${isIpaymu ? 'iPaymu' : 'Xendit'})`;
       }
     }
   }

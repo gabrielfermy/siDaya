@@ -159,6 +159,33 @@ const PosController = {
     }
   },
 
+  async createLiveIpaymuPayment() {
+    try {
+      showToast('Menghubungi iPaymu untuk membuat sesi pembayaran resmi...', 'info');
+      const res = await fetch('/api/v1/billing/subscription/checkout?gateway=ipaymu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gateway: 'IPAYMU',
+          tier: 'STARTER',
+          businessName: 'Toko Beras Jaya (POS Kasir)',
+          ownerEmail: 'ashvin.labs@gmail.com',
+          ownerPhone: '08139506092',
+          tenantSubdomain: 'berasjaya'
+        })
+      });
+      const json = await res.json();
+      if (json && json.success && json.data?.checkoutUrl) {
+        window.open(json.data.checkoutUrl, '_blank');
+        showToast('✅ Halaman pembayaran resmi iPaymu berhasil dibuka di tab baru!', 'success');
+      } else {
+        throw new Error(json?.error?.message || 'Gagal membuat sesi iPaymu');
+      }
+    } catch (e) {
+      showToast('Gagal memuat pembayaran iPaymu: ' + e.message, 'error');
+    }
+  },
+
   async createLiveXenditInvoice() {
     try {
       showToast('Menghubungi Xendit untuk menerbitkan invoice resmi...', 'info');

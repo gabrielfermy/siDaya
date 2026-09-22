@@ -272,11 +272,14 @@ const ModalsView = {
           </div>
 
           <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px;">
-            <button class="btn btn-primary" style="background:linear-gradient(135deg, #10b981, #059669); border:none; padding:10px; font-weight:700;" onclick="PosController.simulateQrisSuccess()">
-              ⚡ Simulasikan Pembayaran Pelanggan (Webhook Auto-Settlement)
+            <button class="btn btn-primary" style="background:linear-gradient(135deg, #0284c7, #0369a1); border:none; font-size:12px; font-weight:700; padding:10px;" onclick="PosController.createLiveIpaymuPayment()">
+              🔷 Buka Pembayaran Resmi iPaymu (Live Session URL)
             </button>
-            <button class="btn btn-primary" style="background:linear-gradient(135deg, #0284c7, #0369a1); border:none; font-size:12px; font-weight:700; padding:10px;" onclick="PosController.createLiveXenditInvoice()">
-              🚀 Buka Xendit Invoice Resmi (Live Checkout URL)
+            <button class="btn btn-primary" style="background:linear-gradient(135deg, #059669, #047857); border:none; font-size:12px; font-weight:700; padding:10px;" onclick="PosController.createLiveXenditInvoice()">
+              ⚡ Buka Xendit Invoice Resmi (Live Checkout URL)
+            </button>
+            <button class="btn btn-outline" style="font-size:12px;" onclick="PosController.simulateQrisSuccess()">
+              ⚡ Simulasikan Pembayaran Pelanggan (Webhook Auto-Settlement)
             </button>
             <button class="btn btn-outline" style="font-size:12px;" onclick="PosController.shareWhatsAppPayLink()">
               📲 Bagikan Tautan Bayar via WhatsApp

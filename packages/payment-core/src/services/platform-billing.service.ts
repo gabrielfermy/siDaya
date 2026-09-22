@@ -107,16 +107,20 @@ export interface PlatformSubscriptionRecord {
 export class PlatformBillingService {
   constructor(private readonly platformGatewayProvider: IPaymentGatewayProvider) {}
 
-  public async createSubscriptionSession(dto: CreateSubscriptionCheckoutDTO) {
+  public async createSubscriptionSession(
+    dto: CreateSubscriptionCheckoutDTO,
+    providerOverride?: IPaymentGatewayProvider,
+  ) {
     const plan = PLATFORM_PLANS[dto.tier];
     if (!plan) {
       throw new Error(`Invalid plan tier requested: ${dto.tier}`);
     }
 
+    const provider = providerOverride ?? this.platformGatewayProvider;
     const amount = dto.billingPeriod === 'ANNUAL' ? plan.priceAnnual : plan.priceMonthly;
     const invoiceNumber = `SUB-${dto.tenantSubdomain.toUpperCase()}-${Date.now().toString().slice(-6)}`;
 
-    const session = await this.platformGatewayProvider.createPaymentSession({
+    const session = await provider.createPaymentSession({
       tenantId: dto.tenantId,
       orderId: `sub_order_${dto.tenantId}_${Date.now()}`,
       orderNumber: invoiceNumber,
@@ -142,6 +146,7 @@ export class PlatformBillingService {
       tier: dto.tier,
       amount,
       billingPeriod: dto.billingPeriod,
+      gatewayProvider: session.gatewayProvider,
       checkoutUrl: session.checkoutUrl,
       paymentToken: session.paymentToken,
       qrString: session.qrString,

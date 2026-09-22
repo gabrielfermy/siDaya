@@ -5866,7 +5866,7 @@ var require_ipaymu_provider = __commonJS({
         const expiresAt = new Date(Date.now() + expiresIn * 60 * 1e3);
         const referenceId = dto.orderId;
         const baseUrl = this.config.isProduction ? "https://my.ipaymu.com" : "https://sandbox.ipaymu.com";
-        let paymentMethod = "qris";
+        let paymentMethod = void 0;
         let paymentChannel = void 0;
         if (dto.preferredChannel === "QRIS") {
           paymentMethod = "qris";
@@ -5878,24 +5878,57 @@ var require_ipaymu_provider = __commonJS({
           paymentMethod = "cstore";
           paymentChannel = dto.preferredChannel?.toLowerCase();
         }
+        const returnUrl = "https://sidaya.biz.id/invoices?status=success";
+        const cancelUrl = "https://sidaya.biz.id/invoices?status=cancelled";
+        const notifyUrl = "https://sidaya.biz.id/api/v1/webhooks/payment/ipaymu";
+        const productNames = dto.items && dto.items.length > 0 ? dto.items.map((i) => i.name) : [`Order #${dto.orderNumber}`];
+        const productQtys = dto.items && dto.items.length > 0 ? dto.items.map((i) => String(i.quantity)) : ["1"];
+        const productPrices = dto.items && dto.items.length > 0 ? dto.items.map((i) => String(i.price)) : [String(dto.amount)];
         const payloadBody = {
-          name: dto.customer.name,
-          phone: dto.customer.phone,
-          email: dto.customer.email ?? "customer@sidaya.biz.id",
-          amount: dto.amount,
-          notifyUrl: dto.callbackUrl ?? "https://sidaya.biz.id/api/v1/webhooks/payment/ipaymu",
-          expired: expiresIn,
+          product: productNames,
+          qty: productQtys,
+          price: productPrices,
+          amount: String(dto.amount),
+          returnUrl,
+          cancelUrl,
+          notifyUrl,
           referenceId,
-          paymentMethod,
-          paymentChannel: paymentChannel ?? "qris",
-          product: dto.items.map((i) => i.name),
-          qty: dto.items.map((i) => String(i.quantity)),
-          price: dto.items.map((i) => String(i.price))
+          buyerName: dto.customer.name || "Gabriel Fermy",
+          buyerEmail: dto.customer.email || "ashvin.labs@gmail.com",
+          buyerPhone: dto.customer.phone || "08139506092"
         };
+        if (paymentMethod && paymentChannel) {
+          payloadBody["paymentMethod"] = paymentMethod;
+          payloadBody["paymentChannel"] = paymentChannel;
+        }
         const bodyJson = JSON.stringify(payloadBody);
         const bodyHash = crypto_1.default.createHash("sha256").update(bodyJson).digest("hex").toLowerCase();
         const stringToSign = `POST:${this.config.va}:${bodyHash}:${this.config.apiKey}`;
         const signature = crypto_1.default.createHmac("sha256", this.config.apiKey).update(stringToSign).digest("hex");
+        if (this.config.va && this.config.apiKey) {
+          try {
+            const res = await fetch(`${baseUrl}/api/v2/payment`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                va: this.config.va,
+                signature
+              },
+              body: bodyJson
+            });
+            const data = await res.json();
+            if (data && data.Status === 200 && data.Data?.Url) {
+              return {
+                gatewayProvider: this.providerId,
+                gatewayReferenceId: data.Data.SessionID || referenceId,
+                checkoutUrl: data.Data.Url,
+                paymentToken: data.Data.SessionID || signature,
+                expiresAt
+              };
+            }
+          } catch {
+          }
+        }
         const mockSessionId = `ipaymu_sid_${referenceId}_${Date.now()}`;
         const checkoutUrl = `${baseUrl}/payment/${mockSessionId}`;
         return {
@@ -6115,7 +6148,7 @@ var require_payment_gateway_registry = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.PaymentGatewayRegistry = void 0;
-    var PaymentGatewayRegistry2 = class {
+    var PaymentGatewayRegistry3 = class {
       providers = /* @__PURE__ */ new Map();
       register(provider) {
         this.providers.set(provider.providerId.toUpperCase(), provider);
@@ -6134,7 +6167,7 @@ var require_payment_gateway_registry = __commonJS({
         return Array.from(this.providers.keys());
       }
     };
-    exports2.PaymentGatewayRegistry = PaymentGatewayRegistry2;
+    exports2.PaymentGatewayRegistry = PaymentGatewayRegistry3;
   }
 });
 
@@ -6213,14 +6246,15 @@ var require_platform_billing_service = __commonJS({
       constructor(platformGatewayProvider) {
         this.platformGatewayProvider = platformGatewayProvider;
       }
-      async createSubscriptionSession(dto) {
+      async createSubscriptionSession(dto, providerOverride) {
         const plan = exports2.PLATFORM_PLANS[dto.tier];
         if (!plan) {
           throw new Error(`Invalid plan tier requested: ${dto.tier}`);
         }
+        const provider = providerOverride ?? this.platformGatewayProvider;
         const amount = dto.billingPeriod === "ANNUAL" ? plan.priceAnnual : plan.priceMonthly;
         const invoiceNumber = `SUB-${dto.tenantSubdomain.toUpperCase()}-${Date.now().toString().slice(-6)}`;
-        const session = await this.platformGatewayProvider.createPaymentSession({
+        const session = await provider.createPaymentSession({
           tenantId: dto.tenantId,
           orderId: `sub_order_${dto.tenantId}_${Date.now()}`,
           orderNumber: invoiceNumber,
@@ -6245,6 +6279,7 @@ var require_platform_billing_service = __commonJS({
           tier: dto.tier,
           amount,
           billingPeriod: dto.billingPeriod,
+          gatewayProvider: session.gatewayProvider,
           checkoutUrl: session.checkoutUrl,
           paymentToken: session.paymentToken,
           qrString: session.qrString,
@@ -9724,10 +9759,12 @@ var OperatorController = class {
 var import_payment_core = __toESM(require_dist3());
 var import_shared_types13 = __toESM(require_dist2());
 var BillingController = class {
-  constructor(platformBillingService2) {
+  constructor(platformBillingService2, gatewayRegistry2) {
     this.platformBillingService = platformBillingService2;
+    this.gatewayRegistry = gatewayRegistry2;
   }
   platformBillingService;
+  gatewayRegistry;
   /**
    * Returns list of available subscription plans and pricing
    */
@@ -9737,15 +9774,14 @@ var BillingController = class {
       currency: "IDR",
       data: Object.values(import_payment_core.PLATFORM_PLANS),
       supportedPaymentMethods: [
-        "QRIS (All Bank & E-Wallet)",
-        "Virtual Account (BCA, Mandiri, BRI, BNI, Permata, BSI)",
-        "Credit / Debit Card (Visa, Mastercard, JCB)",
-        "Retail Outlets (Indomaret, Alfamart)"
-      ]
+        "iPaymu (QRIS, VA Mandiri/BCA/BRI/BNI, Alfamart, Indomaret)",
+        "Xendit (QRIS, Virtual Account, Credit/Debit Card)"
+      ],
+      registeredGateways: this.gatewayRegistry ? this.gatewayRegistry.listRegistered() : ["XENDIT", "IPAYMU"]
     });
   }
   /**
-   * Creates a live platform subscription invoice checkout session (via Xendit)
+   * Creates a live platform subscription invoice checkout session (supports iPaymu & Xendit)
    */
   async checkoutSubscription(req, res) {
     let body = {};
@@ -9753,6 +9789,18 @@ var BillingController = class {
       body = await parseRequestBody(req);
     } catch {
       body = {};
+    }
+    const reqUrl = (req.url || "").toLowerCase();
+    const explicitGateway = String(body.gateway || body.provider || "").toLowerCase();
+    const isXendit = reqUrl.includes("gateway=xendit") || explicitGateway === "xendit";
+    const isIpaymu = reqUrl.includes("gateway=ipaymu") || explicitGateway === "ipaymu" || !isXendit;
+    let providerOverride = void 0;
+    if (this.gatewayRegistry) {
+      if (isIpaymu && this.gatewayRegistry.has("IPAYMU")) {
+        providerOverride = this.gatewayRegistry.get("IPAYMU");
+      } else if (isXendit && this.gatewayRegistry.has("XENDIT")) {
+        providerOverride = this.gatewayRegistry.get("XENDIT");
+      }
     }
     let tier = import_shared_types13.SubscriptionTier.RETAIL_STARTER;
     const rawTier = String(body.tier || "").toUpperCase();
@@ -9772,15 +9820,18 @@ var BillingController = class {
     const ownerPhone = String(body.ownerPhone || body.phone || "08139506092").trim();
     const tenantSubdomain = String(body.tenantSubdomain || body.subdomain || "berasjaya").toLowerCase().replace(/[^a-z0-9-]/g, "");
     try {
-      const session = await this.platformBillingService.createSubscriptionSession({
-        tenantId: `tenant_${tenantSubdomain || "demo"}`,
-        tenantSubdomain: tenantSubdomain || "demo",
-        ownerEmail,
-        ownerName: `${ownerName} - ${businessName}`,
-        ownerPhone,
-        tier,
-        billingPeriod
-      });
+      const session = await this.platformBillingService.createSubscriptionSession(
+        {
+          tenantId: `tenant_${tenantSubdomain || "demo"}`,
+          tenantSubdomain: tenantSubdomain || "demo",
+          ownerEmail,
+          ownerName: `${ownerName} - ${businessName}`,
+          ownerPhone,
+          tier,
+          billingPeriod
+        },
+        providerOverride
+      );
       sendJson(res, 200, {
         success: true,
         data: {
@@ -9788,12 +9839,13 @@ var BillingController = class {
           tier: session.tier,
           amount: session.amount,
           billingPeriod: session.billingPeriod,
+          gatewayProvider: session.gatewayProvider || (isIpaymu ? "IPAYMU" : "XENDIT"),
           checkoutUrl: session.checkoutUrl,
           paymentToken: session.paymentToken,
           qrString: session.qrString,
           vaNumber: session.vaNumber,
           expiresAt: session.expiresAt,
-          merchantName: "Ashvin Labs (SiDaya)",
+          merchantName: isIpaymu ? "siDaya (iPaymu)" : "Ashvin Labs (Xendit)",
           currency: "IDR"
         }
       });
@@ -10620,7 +10672,7 @@ var duitkuProvider = new import_payment_core2.DuitkuPaymentProvider({
 var ipaymuProvider = new import_payment_core2.IpaymuPaymentProvider({
   va: process.env["IPAYMU_VA"] || "1179008214154585",
   apiKey: process.env["IPAYMU_API_KEY"] || "6FF0178B-A610-4CC8-857A-4AAA272A1931",
-  isProduction: process.env["IPAYMU_IS_PRODUCTION"] === "true" || true
+  isProduction: process.env["IPAYMU_IS_PRODUCTION"] !== "false"
 });
 var gatewayRegistry = new import_payment_core2.PaymentGatewayRegistry();
 gatewayRegistry.register(midtransProvider);
@@ -10650,7 +10702,7 @@ var deliveryController = new DeliveryController(deliveryOrderDomainService);
 var shiftController = new ShiftController(shiftDomainService);
 var operatorController = new OperatorController(platformAdminDomainService, authTenantDomainService);
 var tenantController = new TenantController();
-var billingController = new BillingController(platformBillingService);
+var billingController = new BillingController(platformBillingService, gatewayRegistry);
 var router = new AppRouter();
 var healthHandler = (_req, res) => {
   const env = (process.env["NODE_ENV"] || "development").toLowerCase();

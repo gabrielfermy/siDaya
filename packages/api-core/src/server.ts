@@ -61,7 +61,7 @@ const duitkuProvider = new DuitkuPaymentProvider({
 const ipaymuProvider = new IpaymuPaymentProvider({
   va: process.env['IPAYMU_VA'] || '1179008214154585',
   apiKey: process.env['IPAYMU_API_KEY'] || '6FF0178B-A610-4CC8-857A-4AAA272A1931',
-  isProduction: process.env['IPAYMU_IS_PRODUCTION'] === 'true' || true,
+  isProduction: process.env['IPAYMU_IS_PRODUCTION'] !== 'false',
 });
 
 const gatewayRegistry = new PaymentGatewayRegistry();
@@ -104,7 +104,7 @@ const deliveryController = new DeliveryController(deliveryOrderDomainService);
 const shiftController = new ShiftController(shiftDomainService);
 const operatorController = new OperatorController(platformAdminDomainService, authTenantDomainService);
 const tenantController = new TenantController();
-const billingController = new BillingController(platformBillingService);
+const billingController = new BillingController(platformBillingService, gatewayRegistry);
 
 // Setup App Router
 const router = new AppRouter();
