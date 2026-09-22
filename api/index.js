@@ -123,26 +123,26 @@ var require_subscription_tiers_enum = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.TIER_DEFAULT_ENTITLEMENTS = exports2.SubscriptionTier = void 0;
     var feature_keys_enum_js_1 = require_feature_keys_enum();
-    var SubscriptionTier3;
-    (function(SubscriptionTier4) {
-      SubscriptionTier4["STARTER_FREE"] = "STARTER_FREE";
-      SubscriptionTier4["RETAIL_STARTER"] = "RETAIL_STARTER";
-      SubscriptionTier4["GROSIR_PRO"] = "GROSIR_PRO";
-      SubscriptionTier4["OMNICHANNEL_ENTERPRISE"] = "OMNICHANNEL_ENTERPRISE";
-    })(SubscriptionTier3 || (exports2.SubscriptionTier = SubscriptionTier3 = {}));
+    var SubscriptionTier4;
+    (function(SubscriptionTier5) {
+      SubscriptionTier5["STARTER_FREE"] = "STARTER_FREE";
+      SubscriptionTier5["RETAIL_STARTER"] = "RETAIL_STARTER";
+      SubscriptionTier5["GROSIR_PRO"] = "GROSIR_PRO";
+      SubscriptionTier5["OMNICHANNEL_ENTERPRISE"] = "OMNICHANNEL_ENTERPRISE";
+    })(SubscriptionTier4 || (exports2.SubscriptionTier = SubscriptionTier4 = {}));
     exports2.TIER_DEFAULT_ENTITLEMENTS = {
-      [SubscriptionTier3.STARTER_FREE]: [
+      [SubscriptionTier4.STARTER_FREE]: [
         feature_keys_enum_js_1.FeatureKey.CORE_POS,
         feature_keys_enum_js_1.FeatureKey.BASIC_INVENTORY,
         feature_keys_enum_js_1.FeatureKey.RECEIPT_PRINTING_THERMAL
       ],
-      [SubscriptionTier3.RETAIL_STARTER]: [
+      [SubscriptionTier4.RETAIL_STARTER]: [
         feature_keys_enum_js_1.FeatureKey.CORE_POS,
         feature_keys_enum_js_1.FeatureKey.BASIC_INVENTORY,
         feature_keys_enum_js_1.FeatureKey.RECEIPT_PRINTING_THERMAL,
         feature_keys_enum_js_1.FeatureKey.CLIENT_PAYLINK
       ],
-      [SubscriptionTier3.GROSIR_PRO]: [
+      [SubscriptionTier4.GROSIR_PRO]: [
         feature_keys_enum_js_1.FeatureKey.CORE_POS,
         feature_keys_enum_js_1.FeatureKey.BASIC_INVENTORY,
         feature_keys_enum_js_1.FeatureKey.RECEIPT_PRINTING_THERMAL,
@@ -162,7 +162,7 @@ var require_subscription_tiers_enum = __commonJS({
         feature_keys_enum_js_1.FeatureKey.COGS_PRIVACY_MASK,
         feature_keys_enum_js_1.FeatureKey.REALTIME_SYNC
       ],
-      [SubscriptionTier3.OMNICHANNEL_ENTERPRISE]: [
+      [SubscriptionTier4.OMNICHANNEL_ENTERPRISE]: [
         feature_keys_enum_js_1.FeatureKey.CORE_POS,
         feature_keys_enum_js_1.FeatureKey.BASIC_INVENTORY,
         feature_keys_enum_js_1.FeatureKey.RECEIPT_PRINTING_THERMAL,
@@ -6158,8 +6158,8 @@ var require_platform_billing_service = __commonJS({
       [shared_types_1.SubscriptionTier.RETAIL_STARTER]: {
         tier: shared_types_1.SubscriptionTier.RETAIL_STARTER,
         name: "SiDaya Retail Starter",
-        priceMonthly: 99e3,
-        priceAnnual: 99e4,
+        priceMonthly: 149e3,
+        priceAnnual: 149e4,
         features: ["pos:checkout", "shifts:operate", "catalog:view", "warehouse:inbound", "reports:basic"],
         maxBranches: 1,
         maxUsers: 5
@@ -6167,8 +6167,8 @@ var require_platform_billing_service = __commonJS({
       [shared_types_1.SubscriptionTier.GROSIR_PRO]: {
         tier: shared_types_1.SubscriptionTier.GROSIR_PRO,
         name: "SiDaya Grosir Pro Wholesale",
-        priceMonthly: 299e3,
-        priceAnnual: 299e4,
+        priceMonthly: 399e3,
+        priceAnnual: 399e4,
         features: [
           "pos:checkout",
           "shifts:operate",
@@ -6208,7 +6208,7 @@ var require_platform_billing_service = __commonJS({
         maxUsers: 999
       }
     };
-    var PlatformBillingService2 = class {
+    var PlatformBillingService3 = class {
       platformGatewayProvider;
       constructor(platformGatewayProvider) {
         this.platformGatewayProvider = platformGatewayProvider;
@@ -6228,7 +6228,7 @@ var require_platform_billing_service = __commonJS({
           customer: {
             name: dto.ownerName,
             email: dto.ownerEmail,
-            phone: "081234567890"
+            phone: dto.ownerPhone || "08139506092"
           },
           items: [
             {
@@ -6260,7 +6260,7 @@ var require_platform_billing_service = __commonJS({
         return this.platformGatewayProvider.parseWebhook(body);
       }
     };
-    exports2.PlatformBillingService = PlatformBillingService2;
+    exports2.PlatformBillingService = PlatformBillingService3;
   }
 });
 
@@ -8946,7 +8946,7 @@ var TenantController = class {
 };
 
 // packages/api-core/src/server.ts
-var import_payment_core = __toESM(require_dist3());
+var import_payment_core2 = __toESM(require_dist3());
 
 // packages/api-core/src/routes/app-router.ts
 var AppRouter = class {
@@ -9720,6 +9720,95 @@ var OperatorController = class {
   }
 };
 
+// packages/api-core/src/controllers/billing.controller.ts
+var import_payment_core = __toESM(require_dist3());
+var import_shared_types13 = __toESM(require_dist2());
+var BillingController = class {
+  constructor(platformBillingService2) {
+    this.platformBillingService = platformBillingService2;
+  }
+  platformBillingService;
+  /**
+   * Returns list of available subscription plans and pricing
+   */
+  async getPlans(_req, res) {
+    sendJson(res, 200, {
+      success: true,
+      currency: "IDR",
+      data: Object.values(import_payment_core.PLATFORM_PLANS),
+      supportedPaymentMethods: [
+        "QRIS (All Bank & E-Wallet)",
+        "Virtual Account (BCA, Mandiri, BRI, BNI, Permata, BSI)",
+        "Credit / Debit Card (Visa, Mastercard, JCB)",
+        "Retail Outlets (Indomaret, Alfamart)"
+      ]
+    });
+  }
+  /**
+   * Creates a live platform subscription invoice checkout session (via Xendit)
+   */
+  async checkoutSubscription(req, res) {
+    let body = {};
+    try {
+      body = await parseRequestBody(req);
+    } catch {
+      body = {};
+    }
+    let tier = import_shared_types13.SubscriptionTier.RETAIL_STARTER;
+    const rawTier = String(body.tier || "").toUpperCase();
+    if (rawTier === "STARTER" || rawTier === "RETAIL_STARTER") {
+      tier = import_shared_types13.SubscriptionTier.RETAIL_STARTER;
+    } else if (rawTier === "PRO" || rawTier === "GROSIR_PRO") {
+      tier = import_shared_types13.SubscriptionTier.GROSIR_PRO;
+    } else if (rawTier === "ENTERPRISE" || rawTier === "OMNICHANNEL_ENTERPRISE") {
+      tier = import_shared_types13.SubscriptionTier.OMNICHANNEL_ENTERPRISE;
+    } else if (rawTier === "FREE" || rawTier === "STARTER_FREE") {
+      tier = import_shared_types13.SubscriptionTier.STARTER_FREE;
+    }
+    const billingPeriod = body.billingPeriod === "ANNUAL" ? "ANNUAL" : "MONTHLY";
+    const businessName = String(body.businessName || body.storeName || "Toko Grosir Beras Jaya").trim();
+    const ownerName = String(body.ownerName || body.name || "Gabriel Fermy (Merchant SiDaya)").trim();
+    const ownerEmail = String(body.ownerEmail || body.email || "ashvin.labs@gmail.com").trim();
+    const ownerPhone = String(body.ownerPhone || body.phone || "08139506092").trim();
+    const tenantSubdomain = String(body.tenantSubdomain || body.subdomain || "berasjaya").toLowerCase().replace(/[^a-z0-9-]/g, "");
+    try {
+      const session = await this.platformBillingService.createSubscriptionSession({
+        tenantId: `tenant_${tenantSubdomain || "demo"}`,
+        tenantSubdomain: tenantSubdomain || "demo",
+        ownerEmail,
+        ownerName: `${ownerName} - ${businessName}`,
+        ownerPhone,
+        tier,
+        billingPeriod
+      });
+      sendJson(res, 200, {
+        success: true,
+        data: {
+          invoiceNumber: session.invoiceNumber,
+          tier: session.tier,
+          amount: session.amount,
+          billingPeriod: session.billingPeriod,
+          checkoutUrl: session.checkoutUrl,
+          paymentToken: session.paymentToken,
+          qrString: session.qrString,
+          vaNumber: session.vaNumber,
+          expiresAt: session.expiresAt,
+          merchantName: "Ashvin Labs (SiDaya)",
+          currency: "IDR"
+        }
+      });
+    } catch (err) {
+      sendJson(res, 500, {
+        success: false,
+        error: {
+          message: err.message || "Gagal membuat sesi pembayaran tagihan.",
+          code: "BILLING_CHECKOUT_FAILED"
+        }
+      });
+    }
+  }
+};
+
 // packages/api-core/src/routes/auth.routes.ts
 function registerAuthRoutes(router2, authController2) {
   router2.post("/api/v1/auth/login", (req, res) => authController2.login(req, res));
@@ -9737,6 +9826,24 @@ function registerAuthRoutes(router2, authController2) {
   router2.post(
     "/api/v1/tenants/:tenantId/staff/:staffId/pin",
     (req, res, params) => authController2.setStaffPin(req, res, params)
+  );
+}
+
+// packages/api-core/src/routes/billing.routes.ts
+function registerBillingRoutes(router2, billingController2) {
+  router2.get("/api/v1/billing/plans", (req, res) => billingController2.getPlans(req, res));
+  router2.get("/api/billing/plans", (req, res) => billingController2.getPlans(req, res));
+  router2.post(
+    "/api/v1/billing/subscription/checkout",
+    (req, res) => billingController2.checkoutSubscription(req, res)
+  );
+  router2.post(
+    "/api/v1/billing/checkout",
+    (req, res) => billingController2.checkoutSubscription(req, res)
+  );
+  router2.post(
+    "/api/billing/checkout",
+    (req, res) => billingController2.checkoutSubscription(req, res)
   );
 }
 
@@ -9853,6 +9960,16 @@ function registerWebhookRoutes(router2, webhookController2) {
     }
   });
   router2.post("/api/v1/webhooks/payment/xendit", async (req, res) => {
+    try {
+      const body = await parseRequestBody(req);
+      const headers = normalizeHeaders(req.headers);
+      const result = await webhookController2.handleWebhook("XENDIT", headers, body);
+      sendJson(res, 200, { success: true, data: result });
+    } catch (err) {
+      sendJson(res, 400, { success: false, error: { message: err.message || "Webhook failed" } });
+    }
+  });
+  router2.post("/api/v1/webhooks/xendit", async (req, res) => {
     try {
       const body = await parseRequestBody(req);
       const headers = normalizeHeaders(req.headers);
@@ -10486,34 +10603,34 @@ function registerOpenApiRoutes(router2) {
 
 // packages/api-core/src/server.ts
 var PORT = parseInt(process.env["API_PORT"] || "4000", 10);
-var midtransProvider = new import_payment_core.MidtransPaymentProvider({
+var midtransProvider = new import_payment_core2.MidtransPaymentProvider({
   serverKey: process.env["MIDTRANS_SERVER_KEY"] || "SB-Mid-server-DEV-TEST",
   clientKey: process.env["MIDTRANS_CLIENT_KEY"] || "SB-Mid-client-DEV-TEST",
   isProduction: false
 });
-var xenditProvider = new import_payment_core.XenditPaymentProvider({
+var xenditProvider = new import_payment_core2.XenditPaymentProvider({
   secretApiKey: process.env["XENDIT_SECRET_KEY"] || "xnd_development_TEST",
   webhookVerificationToken: process.env["XENDIT_WEBHOOK_VERIFICATION_TOKEN"] || process.env["XENDIT_WEBHOOK_TOKEN"] || "wh_token_dev_test"
 });
-var duitkuProvider = new import_payment_core.DuitkuPaymentProvider({
+var duitkuProvider = new import_payment_core2.DuitkuPaymentProvider({
   merchantCode: process.env["DUITKU_MERCHANT_CODE"] || "D1000",
   merchantKey: process.env["DUITKU_MERCHANT_KEY"] || "merchant_key_dev",
   isSandbox: true
 });
-var ipaymuProvider = new import_payment_core.IpaymuPaymentProvider({
+var ipaymuProvider = new import_payment_core2.IpaymuPaymentProvider({
   va: process.env["IPAYMU_VA"] || "1179008214154585",
   apiKey: process.env["IPAYMU_API_KEY"] || "6FF0178B-A610-4CC8-857A-4AAA272A1931",
   isProduction: process.env["IPAYMU_IS_PRODUCTION"] === "true" || true
 });
-var gatewayRegistry = new import_payment_core.PaymentGatewayRegistry();
+var gatewayRegistry = new import_payment_core2.PaymentGatewayRegistry();
 gatewayRegistry.register(midtransProvider);
 gatewayRegistry.register(xenditProvider);
 gatewayRegistry.register(duitkuProvider);
 gatewayRegistry.register(ipaymuProvider);
 var defaultDriver = (process.env["PAYMENT_DEFAULT_DRIVER"] || "XENDIT").toUpperCase();
 var defaultPlatformProvider = defaultDriver === "XENDIT" ? xenditProvider : defaultDriver === "DUITKU" ? duitkuProvider : midtransProvider;
-var platformBillingService = new import_payment_core.PlatformBillingService(defaultPlatformProvider);
-var merchantPaymentRouter = new import_payment_core.MerchantPaymentRouterService(defaultPlatformProvider);
+var platformBillingService = new import_payment_core2.PlatformBillingService(defaultPlatformProvider);
+var merchantPaymentRouter = new import_payment_core2.MerchantPaymentRouterService(defaultPlatformProvider);
 var orderDomainService = new OrderDomainService(defaultPlatformProvider);
 var shiftDomainService = new ShiftDomainService();
 var deliveryOrderDomainService = new DeliveryOrderDomainService();
@@ -10533,6 +10650,7 @@ var deliveryController = new DeliveryController(deliveryOrderDomainService);
 var shiftController = new ShiftController(shiftDomainService);
 var operatorController = new OperatorController(platformAdminDomainService, authTenantDomainService);
 var tenantController = new TenantController();
+var billingController = new BillingController(platformBillingService);
 var router = new AppRouter();
 var healthHandler = (_req, res) => {
   const env = (process.env["NODE_ENV"] || "development").toLowerCase();
@@ -10555,6 +10673,7 @@ router.get("/health", healthHandler);
 router.get("/api/health", healthHandler);
 router.get("/api/v1/health", healthHandler);
 registerAuthRoutes(router, authController);
+registerBillingRoutes(router, billingController);
 registerOrderRoutes(router, orderController);
 registerFifoRoutes(router, fifoController);
 registerDeliveryRoutes(router, deliveryController);

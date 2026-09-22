@@ -9,37 +9,37 @@ document.addEventListener('DOMContentLoaded', () => {
   // 1. Register Modules into Internal Dependency Manager
   if (window.moduleManager) {
     moduleManager.register('Store', [], store);
-    moduleManager.register('View:Layout', ['Store'], LayoutView);
-    moduleManager.register('View:Landing', ['Store'], LandingView);
-    moduleManager.register('View:Auth', ['Store'], AuthView);
-    moduleManager.register('View:Modals', ['Store'], ModalsView);
-    moduleManager.register('View:Dashboard', ['Store'], DashboardView);
-    moduleManager.register('View:POS', ['Store'], PosView);
-    moduleManager.register('View:Katalog', ['Store'], KatalogView);
-    moduleManager.register('View:FIFO', ['Store'], FifoView);
-    moduleManager.register('View:Customers', ['Store'], CustomersView);
-    moduleManager.register('View:Invoices', ['Store'], InvoicesView);
-    moduleManager.register('View:SJ', ['Store'], SjView);
-    moduleManager.register('View:Piutang', ['Store'], PiutangView);
-    moduleManager.register('View:Users', ['Store'], UsersView);
-    moduleManager.register('View:Roles', ['Store'], RolesView);
-    moduleManager.register('View:Profile', ['Store'], ProfileView);
-    moduleManager.register('View:Settings', ['Store'], SettingsView);
-    moduleManager.register('View:Operator', ['Store'], OperatorView);
-    moduleManager.register('View:Legal', ['Store'], LegalView);
+    if (typeof LayoutView !== 'undefined') moduleManager.register('View:Layout', ['Store'], LayoutView);
+    if (typeof LandingView !== 'undefined') moduleManager.register('View:Landing', ['Store'], LandingView);
+    if (typeof AuthView !== 'undefined') moduleManager.register('View:Auth', ['Store'], AuthView);
+    if (typeof ModalsView !== 'undefined') moduleManager.register('View:Modals', ['Store'], ModalsView);
+    if (typeof DashboardView !== 'undefined') moduleManager.register('View:Dashboard', ['Store'], DashboardView);
+    if (typeof PosView !== 'undefined') moduleManager.register('View:POS', ['Store'], PosView);
+    if (typeof KatalogView !== 'undefined') moduleManager.register('View:Katalog', ['Store'], KatalogView);
+    if (typeof FifoView !== 'undefined') moduleManager.register('View:FIFO', ['Store'], FifoView);
+    if (typeof CustomersView !== 'undefined') moduleManager.register('View:Customers', ['Store'], CustomersView);
+    if (typeof InvoicesView !== 'undefined') moduleManager.register('View:Invoices', ['Store'], InvoicesView);
+    if (typeof SjView !== 'undefined') moduleManager.register('View:SJ', ['Store'], SjView);
+    if (typeof PiutangView !== 'undefined') moduleManager.register('View:Piutang', ['Store'], PiutangView);
+    if (typeof UsersView !== 'undefined') moduleManager.register('View:Users', ['Store'], UsersView);
+    if (typeof RolesView !== 'undefined') moduleManager.register('View:Roles', ['Store'], RolesView);
+    if (typeof ProfileView !== 'undefined') moduleManager.register('View:Profile', ['Store'], ProfileView);
+    if (typeof SettingsView !== 'undefined') moduleManager.register('View:Settings', ['Store'], SettingsView);
+    if (typeof OperatorView !== 'undefined') moduleManager.register('View:Operator', ['Store'], OperatorView);
+    if (typeof LegalView !== 'undefined') moduleManager.register('View:Legal', ['Store'], LegalView);
 
-    moduleManager.register('Controller:Auth', ['Store'], AuthController);
-    moduleManager.register('Controller:POS', ['Store', 'View:POS'], PosController);
-    moduleManager.register('Controller:FIFO', ['Store'], FifoController);
-    moduleManager.register('Controller:Customers', ['Store'], CustomersController);
-    moduleManager.register('Controller:Users', ['Store'], UsersController);
-    moduleManager.register('Controller:Operator', ['Store'], OperatorController);
-    moduleManager.register('Controller:Invoices', ['Store'], InvoicesController);
-    moduleManager.register('Controller:Legal', ['Store'], LegalController);
+    if (typeof AuthController !== 'undefined') moduleManager.register('Controller:Auth', ['Store'], AuthController);
+    if (typeof PosController !== 'undefined') moduleManager.register('Controller:POS', ['Store', 'View:POS'], PosController);
+    if (typeof FifoController !== 'undefined') moduleManager.register('Controller:FIFO', ['Store'], FifoController);
+    if (typeof CustomersController !== 'undefined') moduleManager.register('Controller:Customers', ['Store'], CustomersController);
+    if (typeof UsersController !== 'undefined') moduleManager.register('Controller:Users', ['Store'], UsersController);
+    if (typeof OperatorController !== 'undefined') moduleManager.register('Controller:Operator', ['Store'], OperatorController);
+    if (typeof InvoicesController !== 'undefined') moduleManager.register('Controller:Invoices', ['Store'], InvoicesController);
+    if (typeof LegalController !== 'undefined') moduleManager.register('Controller:Legal', ['Store'], LegalController);
 
-    moduleManager.register('View:Daya', ['Store'], DayaView);
-    moduleManager.register('Controller:Daya', ['Store'], DayaController);
-    moduleManager.register('Util:Audit', ['Store'], AuditEmitter);
+    if (typeof DayaView !== 'undefined') moduleManager.register('View:Daya', ['Store'], DayaView);
+    if (typeof DayaController !== 'undefined') moduleManager.register('Controller:Daya', ['Store'], DayaController);
+    if (typeof AuditEmitter !== 'undefined') moduleManager.register('Util:Audit', ['Store'], AuditEmitter);
 
     if (typeof OnboardingRegistry !== 'undefined') {
       moduleManager.register('Onboarding:Registry', [], OnboardingRegistry);

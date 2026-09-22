@@ -25,7 +25,9 @@ import { DeliveryController } from './controllers/delivery.controller';
 import { ShiftController } from './controllers/shift.controller';
 import { OperatorController } from './controllers/operator.controller';
 import { TenantController } from './controllers/tenant.controller';
+import { BillingController } from './controllers/billing.controller';
 import { registerAuthRoutes } from './routes/auth.routes';
+import { registerBillingRoutes } from './routes/billing.routes';
 import { registerOrderRoutes } from './routes/order.routes';
 import { registerFifoRoutes } from './routes/fifo.routes';
 import { registerDeliveryRoutes } from './routes/delivery.routes';
@@ -102,6 +104,7 @@ const deliveryController = new DeliveryController(deliveryOrderDomainService);
 const shiftController = new ShiftController(shiftDomainService);
 const operatorController = new OperatorController(platformAdminDomainService, authTenantDomainService);
 const tenantController = new TenantController();
+const billingController = new BillingController(platformBillingService);
 
 // Setup App Router
 const router = new AppRouter();
@@ -129,6 +132,7 @@ router.get('/api/health', healthHandler);
 router.get('/api/v1/health', healthHandler);
 
 registerAuthRoutes(router, authController);
+registerBillingRoutes(router, billingController);
 registerOrderRoutes(router, orderController);
 registerFifoRoutes(router, fifoController);
 registerDeliveryRoutes(router, deliveryController);

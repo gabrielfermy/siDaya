@@ -159,6 +159,32 @@ const PosController = {
     }
   },
 
+  async createLiveXenditInvoice() {
+    try {
+      showToast('Menghubungi Xendit untuk menerbitkan invoice resmi...', 'info');
+      const res = await fetch('/api/v1/billing/subscription/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tier: 'STARTER',
+          businessName: 'Toko Beras Jaya (POS Kasir)',
+          ownerEmail: 'ashvin.labs@gmail.com',
+          ownerPhone: '08139506092',
+          tenantSubdomain: 'berasjaya'
+        })
+      });
+      const json = await res.json();
+      if (json && json.success && json.data?.checkoutUrl) {
+        window.open(json.data.checkoutUrl, '_blank');
+        showToast('✅ Halaman pembayaran resmi Xendit berhasil dibuka di tab baru!', 'success');
+      } else {
+        throw new Error(json?.error?.message || 'Gagal membuat invoice');
+      }
+    } catch (e) {
+      showToast('Gagal memuat invoice Xendit: ' + e.message, 'error');
+    }
+  },
+
   shareWhatsAppPayLink() {
     const total = this.lastCheckoutSnapshot?.total || 0;
     const inv = this.lastCheckoutSnapshot?.invNum || 'INV-001';

@@ -725,8 +725,8 @@ const LandingView = {
                   <span>Export Laporan Penjualan ke Excel</span>
                 </li>
               </ul>
-              <button type="button" class="btn-tier" onclick="navigate('/register?plan=starter')">
-                <span>Pilih Paket Starter</span>
+              <button type="button" class="btn-tier" onclick="LandingView.openCheckoutModal('STARTER', 'Starter', 149000)">
+                <span>Pilih Paket Starter (Xendit)</span>
               </button>
             </div>
 
@@ -773,8 +773,8 @@ const LandingView = {
                   <span>Subdomain Resmi <code>[toko].${baseDomain}</code> + SSL</span>
                 </li>
               </ul>
-              <button type="button" class="btn-tier btn-featured" onclick="navigate('/register?plan=pro')">
-                <span>Mulai Uji Coba Grosir Pro</span>
+              <button type="button" class="btn-tier btn-featured" onclick="LandingView.openCheckoutModal('PRO', 'Grosir Pro', 399000)">
+                <span>Pilih Paket Grosir Pro (Xendit)</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
               </button>
             </div>
@@ -985,4 +985,174 @@ const LandingView = {
       </div>
     `;
   },
+
+  /**
+   * Opens live Xendit subscription checkout modal
+   * @param {'STARTER'|'PRO'|'ENTERPRISE'} tier
+   * @param {string} planName
+   * @param {number} price
+   */
+  openCheckoutModal(tier, planName, price) {
+    const modalRoot = document.getElementById('modal-root') || document.body;
+    const formattedPrice = (typeof formatRupiah === 'function') 
+      ? formatRupiah(price) 
+      : 'Rp ' + Number(price).toLocaleString('id-ID');
+
+    // Remove existing if any
+    const existing = document.getElementById('modal-landing-checkout');
+    if (existing) existing.remove();
+
+    const wrapper = document.createElement('div');
+    wrapper.id = 'modal-landing-checkout';
+    wrapper.className = 'modal-overlay';
+    wrapper.style.zIndex = '99999';
+
+    wrapper.innerHTML = `
+      <div class="modal-card" style="max-width:540px;">
+        <button type="button" class="modal-close-btn" onclick="LandingView.closeCheckoutModal()">✕</button>
+        
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:14px;">
+          <div style="width:44px; height:44px; border-radius:12px; background:rgba(16, 183, 127, 0.12); display:flex; align-items:center; justify-content:center; font-size:22px;">
+            💳
+          </div>
+          <div>
+            <h3 style="font-size:1.15rem; font-weight:800; color:var(--text-primary); margin:0;">
+              Langganan SiDaya — Paket ${planName}
+            </h3>
+            <p style="font-size:0.75rem; color:var(--text-secondary); margin:2px 0 0 0;">
+              Integrasi Resmi Payment Gateway Bank Indonesia via Xendit
+            </p>
+          </div>
+        </div>
+
+        <div style="background:var(--bg-hover, #f8fafc); border:1px solid var(--border-color, #e2e8f0); border-radius:8px; padding:12px 14px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:0.85rem; color:var(--text-secondary);">Paket Software SaaS:</span>
+            <strong style="font-size:0.9rem; color:var(--text-primary);">SiDaya ${planName}</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:0.85rem; color:var(--text-secondary);">Siklus Pembayaran:</span>
+            <span style="font-size:0.85rem; font-weight:600; color:var(--primary);">Bulanan (Cancel Kapan Saja)</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:8px; border-top:1px dashed var(--border-color, #cbd5e1);">
+            <span style="font-size:0.95rem; font-weight:700; color:var(--text-primary);">Total Tagihan:</span>
+            <span style="font-size:1.15rem; font-weight:800; color:var(--brand-warm-blue, #5048e5);">${formattedPrice} <span style="font-size:0.75rem; font-weight:500; color:var(--text-muted);">/ bulan</span></span>
+          </div>
+        </div>
+
+        <form id="landing-checkout-form" onsubmit="event.preventDefault(); LandingView.executeSubscriptionCheckout('${tier}', '${planName}', ${price});">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div>
+              <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Nama Usaha / Toko *</label>
+              <input id="sub-business-name" type="text" class="form-input" required value="Toko Grosir Beras Jaya" style="width:100%; font-size:12px; padding:8px 10px;">
+            </div>
+            <div>
+              <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Subdomain Workspace *</label>
+              <input id="sub-domain" type="text" class="form-input" required value="berasjaya" style="width:100%; font-size:12px; padding:8px 10px;">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+            <div>
+              <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Email Penanggung Jawab *</label>
+              <input id="sub-email" type="email" class="form-input" required value="ashvin.labs@gmail.com" style="width:100%; font-size:12px; padding:8px 10px;">
+            </div>
+            <div>
+              <label style="font-size:11.5px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">No. WhatsApp / HP *</label>
+              <input id="sub-phone" type="tel" class="form-input" required value="08139506092" style="width:100%; font-size:12px; padding:8px 10px;">
+            </div>
+          </div>
+
+          <div style="background:rgba(80, 72, 229, 0.06); border:1px solid rgba(80, 72, 229, 0.2); border-radius:6px; padding:10px; margin-bottom:14px; font-size:11.5px; color:var(--text-secondary); line-height:1.4;">
+            🛡️ <strong>Metode Pembayaran Resmi via Xendit:</strong><br/>
+            Mendukung QRIS Dinamis (Semua Bank & E-Wallet), Virtual Account (BCA, Mandiri, BRI, BNI, Permata, BSI), Kartu Kredit/Debit, & Gerai Retail.
+          </div>
+
+          <div id="checkout-action-status" style="margin-bottom:12px; font-size:12px; display:none;"></div>
+
+          <div style="display:flex; gap:10px;">
+            <button type="button" class="btn btn-outline" style="flex:1; padding:10px;" onclick="LandingView.closeCheckoutModal()">
+              Batal
+            </button>
+            <button id="btn-submit-sub-checkout" type="submit" class="btn btn-primary" style="flex:2; padding:10px; font-weight:800; background:linear-gradient(135deg, #10B77F 0%, #059669 100%); border:none; display:flex; align-items:center; justify-content:center; gap:8px;">
+              <span>🚀</span> Bayar via Xendit (${formattedPrice})
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    modalRoot.appendChild(wrapper);
+  },
+
+  closeCheckoutModal() {
+    const modal = document.getElementById('modal-landing-checkout');
+    if (modal) modal.remove();
+  },
+
+  async executeSubscriptionCheckout(tier, planName, price) {
+    const statusEl = document.getElementById('checkout-action-status');
+    const submitBtn = document.getElementById('btn-submit-sub-checkout');
+    const businessName = document.getElementById('sub-business-name')?.value || 'Toko Grosir Beras Jaya';
+    const tenantSubdomain = document.getElementById('sub-domain')?.value || 'berasjaya';
+    const ownerEmail = document.getElementById('sub-email')?.value || 'ashvin.labs@gmail.com';
+    const ownerPhone = document.getElementById('sub-phone')?.value || '08139506092';
+
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.innerHTML = '<span style="color:var(--primary); font-weight:600;">⏳ Menghubungi API Xendit untuk membuat sesi invoice pembayaran resmi...</span>';
+    }
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>⏳</span> Memproses Xendit...';
+    }
+
+    try {
+      const res = await fetch('/api/v1/billing/subscription/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tier,
+          billingPeriod: 'MONTHLY',
+          businessName,
+          tenantSubdomain,
+          ownerEmail,
+          ownerPhone,
+          ownerName: 'Gabriel Fermy (Merchant)'
+        })
+      });
+
+      const json = await res.json();
+      if (json && json.success && json.data?.checkoutUrl) {
+        const url = json.data.checkoutUrl;
+        const invNum = json.data.invoiceNumber || 'INV-001';
+        if (statusEl) {
+          statusEl.innerHTML = `
+            <div style="background:rgba(16,183,127,0.12); border:1px solid #10b981; border-radius:6px; padding:10px; color:#065f46; font-size:12px; margin-bottom:10px;">
+              ✅ <strong>Invoice Xendit Terbit (${invNum})!</strong><br/>
+              Mengalihkan Anda ke halaman pembayaran resmi Xendit...
+              <div style="margin-top:8px;">
+                <a href="${url}" target="_blank" class="btn btn-primary btn-sm" style="display:inline-block; font-weight:700; text-decoration:none; padding:8px 12px; background:#10B77F; color:#fff; border-radius:6px;">
+                  🔗 Buka Halaman Pembayaran Xendit (${invNum}) →
+                </a>
+              </div>
+            </div>
+          `;
+        }
+        setTimeout(() => {
+          window.open(url, '_blank');
+        }, 600);
+      } else {
+        throw new Error(json?.error?.message || 'Gagal membuat invoice');
+      }
+    } catch (err) {
+      if (statusEl) {
+        statusEl.innerHTML = `<span style="color:#ef4444; font-weight:600;">✕ Gagal: ${err.message}. Silakan coba lagi.</span>`;
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>🚀</span> Coba Bayar Lagi';
+      }
+    }
+  }
 };
