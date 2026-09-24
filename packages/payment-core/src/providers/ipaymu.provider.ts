@@ -81,6 +81,8 @@ export class IpaymuPaymentProvider implements IPaymentGatewayProvider {
     const stringToSign = `POST:${va}:${bodyHash}:${apiKey}`;
     const signature = crypto.createHmac('sha256', apiKey).update(stringToSign).digest('hex');
 
+    const timestamp = new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0, 14);
+
     try {
       const res = await fetch(`${baseUrl}/api/v2/payment`, {
         method: 'POST',
@@ -88,6 +90,7 @@ export class IpaymuPaymentProvider implements IPaymentGatewayProvider {
           'Content-Type': 'application/json',
           va,
           signature,
+          timestamp,
         },
         body: bodyJson,
       });
@@ -111,7 +114,13 @@ export class IpaymuPaymentProvider implements IPaymentGatewayProvider {
       }
 
       console.error('[iPaymu Payment Error]', res.status, data);
-      throw new Error(`iPaymu rejected: ${data?.Message || data?.message || raw || `HTTP ${res.status}`}`);
+      const errMsg = data?.Message || data?.message || raw || `HTTP ${res.status}`;
+      if (errMsg.toLowerCase().includes('invalid ip')) {
+        throw new Error(
+          `iPaymu rejected: Invalid IP (IP server belum di-whitelist di dashboard iPaymu my.ipaymu.com menu Integrasi). Gunakan Xendit atau daftarkan IP server.`,
+        );
+      }
+      throw new Error(`iPaymu rejected: ${errMsg}`);
     } catch (err: any) {
       if (process.env['VERCEL']) {
         throw err;

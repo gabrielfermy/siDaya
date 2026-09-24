@@ -1270,8 +1270,29 @@ const LandingView = {
         throw new Error(json?.error?.message || 'Gagal membuat sesi pembayaran');
       }
     } catch (err) {
+      const errMsg = err.message || 'Gagal memproses pembayaran';
+      const isInvalidIp = errMsg.toLowerCase().includes('invalid ip');
+      
       if (statusEl) {
-        statusEl.innerHTML = `<span style="color:#ef4444; font-weight:600;">✕ Gagal: ${err.message}. Silakan coba lagi.</span>`;
+        if (isIpaymu && isInvalidIp) {
+          statusEl.innerHTML = `
+            <div style="background:rgba(239, 68, 68, 0.08); border:1px solid #ef4444; border-radius:8px; padding:12px; font-size:11.5px; color:var(--text-primary); margin-bottom:10px;">
+              <div style="font-weight:700; color:#ef4444; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+                <span>⚠️</span> iPaymu Menolak: IP Server Belum Di-Whitelist
+              </div>
+              <p style="margin:0 0 8px 0; line-height:1.4; color:var(--text-secondary);">
+                Server memerlukan whitelist IP di Dashboard iPaymu (<em>my.ipaymu.com → Integrasi → IP Terdaftar</em>) atau verifikasi akun merchant yang masih dalam peninjauan.
+              </p>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-sm" style="background:#10b981; color:#fff; font-weight:700; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="document.querySelector('input[name=\\'selected_gateway\\'][value=\\'XENDIT\\']').click(); LandingView.executeSubscriptionCheckout('${tier}', '${planName}', ${price});">
+                  ⚡ Bayar via Xendit (QRIS & VA Langsung Aktif) →
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          statusEl.innerHTML = `<div style="background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:6px; padding:10px; color:#ef4444; font-weight:600; font-size:11.5px; margin-bottom:10px;">✕ Gagal: ${errMsg}</div>`;
+        }
       }
       if (submitBtn) {
         submitBtn.disabled = false;
