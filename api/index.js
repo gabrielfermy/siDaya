@@ -5907,13 +5907,15 @@ var require_ipaymu_provider = __commonJS({
         const bodyHash = crypto_1.default.createHash("sha256").update(bodyJson).digest("hex").toLowerCase();
         const stringToSign = `POST:${va}:${bodyHash}:${apiKey}`;
         const signature = crypto_1.default.createHmac("sha256", apiKey).update(stringToSign).digest("hex");
+        const timestamp = (/* @__PURE__ */ new Date()).toISOString().replace(/[-:T.Z]/g, "").slice(0, 14);
         try {
           const res = await fetch(`${baseUrl}/api/v2/payment`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               va,
-              signature
+              signature,
+              timestamp
             },
             body: bodyJson
           });
@@ -5934,7 +5936,11 @@ var require_ipaymu_provider = __commonJS({
             };
           }
           console.error("[iPaymu Payment Error]", res.status, data);
-          throw new Error(`iPaymu rejected: ${data?.Message || data?.message || raw || `HTTP ${res.status}`}`);
+          const errMsg = data?.Message || data?.message || raw || `HTTP ${res.status}`;
+          if (errMsg.toLowerCase().includes("invalid ip")) {
+            throw new Error(`iPaymu rejected: Invalid IP (IP server belum di-whitelist di dashboard iPaymu my.ipaymu.com menu Integrasi). Gunakan Xendit atau daftarkan IP server.`);
+          }
+          throw new Error(`iPaymu rejected: ${errMsg}`);
         } catch (err) {
           if (process.env["VERCEL"]) {
             throw err;
